@@ -39,9 +39,34 @@ func NewSpeechConfigFromSubscription(subscriptionKey string, region string) (*Sp
 	return config, nil
 }
 
-// func NewSpeechConfigFromAuthorizationToken(authorizationToken string, region string) (SpeechSpeechConfig, error) {
-
-// }
+// NewSpeechConfigFromAuthorizationToken creates an instance of the speech config with specified authorization token and
+// region.
+// Note: The caller needs to ensure that the authorization token is valid. Before the authorization token expires, the
+// caller needs to refresh it by calling this setter with a new valid token.
+// As configuration values are copied when creating a new recognizer, the new token value will not apply to recognizers
+// that have already been created.
+// For recognizers that have been created before, you need to set authorization token of the corresponding recognizer
+// to refresh the token. Otherwise, the recognizers will encounter errors during recognition.
+func NewSpeechConfigFromAuthorizationToken(authorizationToken string, region string) (*SpeechConfig, error) {
+	var handle C.SPXHANDLE
+	var propBagHandle C.SPXPROPERTYBAGHANDLE
+	authToken := C.CString(authorizationToken)
+	defer C.free(unsafe.Pointer(authToken))
+	r := C.CString(region)
+	defer C.free(unsafe.Pointer(r))
+	ret := uintptr(C.speech_config_from_authorization_token(&handle, authToken, r))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	ret = uintptr(C.speech_config_get_property_bag(handle, &propBagHandle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	config := new(SpeechConfig)
+	config.handle = handle
+	config.propertyBagHandle = propBagHandle
+	return config, nil
+}
 // func NewSpeechConfigFromEndpoint(endpoint string, subscriptionKey string) (SpeechConfig, error) {
 
 // }
