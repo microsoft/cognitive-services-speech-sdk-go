@@ -67,9 +67,69 @@ func NewSpeechConfigFromAuthorizationToken(authorizationToken string, region str
 	config.propertyBagHandle = propBagHandle
 	return config, nil
 }
-// func NewSpeechConfigFromEndpoint(endpoint string, subscriptionKey string) (SpeechConfig, error) {
 
-// }
+// NewSpeechConfigFromEndpointWithSubscription creates an instance of the speech config with specified endpoint
+// and subscription.
+// This method is intended only for users who use a non-standard service endpoint.
+// Note: The query parameters specified in the endpoint URI are not changed, even if they are set by any other APIs.
+// For example, if the recognition language is defined in URI as query parameter "language=de-DE", and also set by
+// SetSpeechRecognitionLanguage("en-US"), the language setting in URI takes precedence, and the effective language
+// is "de-DE".
+/// Only the parameters that are not specified in the endpoint URI can be set by other APIs.
+/// Note: To use an authorization token with endoint, use FromEndpoint,
+/// and then call SetAuthorizationToken() on the created SpeechConfig instance.
+func NewSpeechConfigFromEndpointWithSubscription(endpoint string, subscriptionKey string) (*SpeechConfig, error) {
+	var handle C.SPXHANDLE
+	var propBagHandle C.SPXPROPERTYBAGHANDLE
+	e := C.CString(endpoint)
+	defer C.free(unsafe.Pointer(e))
+	sk := C.CString(subscriptionKey)
+	defer C.free(unsafe.Pointer(sk))
+	ret := uintptr(C.speech_config_from_endpoint(&handle, e, sk))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	ret = uintptr(C.speech_config_get_property_bag(handle, &propBagHandle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	config := new(SpeechConfig)
+	config.handle = handle
+	config.propertyBagHandle = propBagHandle
+	return config, nil
+}
+
+// NewSpeechConfigFromEndpoint creates an instance of SpeechConfig with specified endpoint.
+// This method is intended only for users who use a non-standard service endpoint.
+// Note: The query parameters specified in the endpoint URI are not changed, even if they are set by any other APIs.
+// For example, if the recognition language is defined in URI as query parameter "language=de-DE", and also set by
+// SetSpeechRecognitionLanguage("en-US"), the language setting in URI takes precedence, and the effective language is
+// "de-DE".
+// Only the parameters that are not specified in the endpoint URI can be set by other APIs.
+// Note: If the endpoint requires a subscription key for authentication, use NewSpeechConfigFromEndpointWithSubscription
+// to pass the subscription key as parameter.
+// To use an authorization token with FromEndpoint, use this method to create a SpeechConfig instance, and then
+// call SetAuthorizationToken() on the created SpeechConfig instance.
+// Note: Added in version 1.5.0.
+func NewSpeechConfigFromEndpoint(endpoint string) (*SpeechConfig, error) {
+	var handle C.SPXHANDLE
+	var propBagHandle C.SPXPROPERTYBAGHANDLE
+	e := C.CString(endpoint)
+	defer C.free(unsafe.Pointer(e))
+	ret := uintptr(C.speech_config_from_endpoint(&handle, e, nil))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	ret = uintptr(C.speech_config_get_property_bag(handle, &propBagHandle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	config := new(SpeechConfig)
+	config.handle = handle
+	config.propertyBagHandle = propBagHandle
+	return config, nil
+}
+
 // func NewSpeechConfigFromHost(host string, subscriptionKey string) (SpeechConfig, error) {
 
 // }
