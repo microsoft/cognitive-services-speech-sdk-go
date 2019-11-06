@@ -2,6 +2,7 @@ package speech
 
 import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
+	"strconv"
 )
 // #cgo CFLAGS: -I/home/gelecaro/carbon/current/include/c_api
 // #cgo LDFLAGS: -L/home/gelecaro/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core
@@ -186,32 +187,46 @@ func NewSpeechConfigFromHost(host string) (*SpeechConfig, error) {
 	return config, nil
 }
 
-// Only getters
+// SubscriptionKey is the subscription key that is used to create Speech Recognizer or Intent Recognizer or Translation
+// Recognizer or Speech Synthesizer
 func (config *SpeechConfig) SubscriptionKey() string {
 	return config.GetProperty(common.SpeechServiceConnectionKey)
 }
 
+// Region is the region key that used to create Speech Recognizer or Intent Recognizer or Translation Recognizer or
+// Speech Synthesizer.
 func (config *SpeechConfig) Region() string {
 	return config.GetProperty(common.SpeechServiceConnectionRegion)
 }
 
-// Getter-setter
+// AuthorizationToken is the authorization token to connect to the service.
 func (config *SpeechConfig) AuthorizationToken() string {
 	return config.GetProperty(common.SpeechServiceAuthorizationToken)
 }
 
+// SetAuthorizationToken sets the authorization token to connect to the service.
+// Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
+// expires, the caller needs to refresh it by calling this setter with a new valid token.
+// As configuration values are copied when creating a new recognizer, the new token value will not apply to
+// recognizers that have already been created.
+// For recognizers that have been created before, you need to set authorization token of the corresponding recognizer
+// to refresh the token. Otherwise, the recognizers will encounter errors during recognition.
 func (config *SpeechConfig) SetAuthorizationToken(authToken string) error {
 	return config.SetProperty(common.SpeechServiceAuthorizationToken, authToken)
 }
 
+// SpeechRecognitionLanguage is the input language to the speech recognition.
+// The language is specified in BCP-47 format.
 func (config *SpeechConfig) SpeechRecognitionLanguage() string {
 	return config.GetProperty(common.SpeechServiceConnectionRecoLanguage)
 }
 
+// SetSpeechRecognitionLanguage sets the input language to the speech recognizer.
 func (config *SpeechConfig) SetSpeechRecognitionLanguage(language string) error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, language);
 }
 
+// OutputFormat is result output format.
 func (config *SpeechConfig) OutputFormat() common.OutputFormat {
 	format := config.GetProperty(common.SpeechServiceResponseRequestDetailedResultTrueFalse)
 	if format == "true" {
@@ -220,6 +235,7 @@ func (config *SpeechConfig) OutputFormat() common.OutputFormat {
 	return common.Simple
 }
 
+// SetOutputFormat sets output format.
 func (config *SpeechConfig) SetOutputFormat(outputFormat common.OutputFormat) error {
 	val := "false"
 	if outputFormat == common.Detailed {
@@ -228,34 +244,83 @@ func (config *SpeechConfig) SetOutputFormat(outputFormat common.OutputFormat) er
 	return config.SetProperty(common.SpeechServiceResponseRequestDetailedResultTrueFalse, val)
 }
 
-func (config *SpeechConfig) EndpointId() string {
+// EndpointID is the endpoint ID
+func (config *SpeechConfig) EndpointID() string {
 	return config.GetProperty(common.SpeechServiceConnectionEndpointID)
 }
 
-func (config *SpeechConfig) SetEndpointId(endpointId string) error {
-	return config.SetProperty(common.SpeechServiceConnectionEndpointID, endpointId)
+// SetEndpointID sets the endpoint ID
+func (config *SpeechConfig) SetEndpointID(endpointID string) error {
+	return config.SetProperty(common.SpeechServiceConnectionEndpointID, endpointID)
 }
 
-// func (config *SpeechConfig) SpeechSynthesisLanguage
-// {}
-// func (config *SpeechConfig) SetSpeechSynthesisLanguage
-// {}
-// func (config *SpeechConfig) SpeechSynthesisVoiceName
-// {}
-// func (config *SpeechConfig) SetSpeechSynthesisVoiceName
-// {}
-// func (config *SpeechConfig) SpeechSynthesisOutputFormat
-// {}
-// func (config *SpeechConfig) SetSpeechSynthesisOutputFormat
-// {}
-// func (config *SpeechConfig) SpeechSynthesisOutputFormat
-// {}
-// func (config *SpeechConfig) SetSpeechSynthesisOutputFormat
-// {}
+// SpeechSynthesisLanguage is the language of the speech synthesizer.
+// Added in version 1.4.0
+func (config *SpeechConfig) SpeechSynthesisLanguage() string {
+	return config.GetProperty(common.SpeechServiceConnectionSynthLanguage)
+}
 
-// // Member functions
-// func (config *SpeechConfig) SetProxy
-// {}
+// SetSpeechSynthesisLanguage sets the language of the speech synthesizer.
+// Added in version 1.4.0
+func (config *SpeechConfig) SetSpeechSynthesisLanguage(language string) error {
+	return config.SetProperty(common.SpeechServiceConnectionSynthLanguage, language)
+}
+
+// SpeechSynthesisVoiceName is the voice of the speech synthesizer.
+// Added in version 1.4.0
+func (config *SpeechConfig) SpeechSynthesisVoiceName() string {
+	return config.GetProperty(common.SpeechServiceConnectionSynthVoice);
+}
+
+// SetSpeechSynthesisVoiceName sets the voice of the speech synthesizer.
+// Added in version 1.4.0
+func (config *SpeechConfig) SetSpeechSynthesisVoiceName(voiceName string) error {
+	return config.SetProperty(common.SpeechServiceConnectionSynthVoice, voiceName)
+}
+
+// SpeechSynthesisOutputFormat is the speech synthesis output format.
+// Added in version 1.4.0
+func (config *SpeechConfig) SpeechSynthesisOutputFormat() string {
+	return config.GetProperty(common.SpeechServiceConnectionSynthOutputFormat);
+}
+
+// SetSpeechSynthesisOutputFormat sets the speech synthesis output format (e.g. Riff16Khz16BitMonoPcm).
+// Added in version 1.4.0
+func (config *SpeechConfig) SetSpeechSynthesisOutputFormat(format common.SpeechSynthesisOutputFormat) error {
+	ret := uintptr(C.speech_config_set_audio_output_format(config.handle, (C.Speech_Synthesis_Output_Format)(format)))
+	if (ret != C.SPX_NOERROR) {
+		return common.NewCarbonError(ret)
+	}
+	return nil
+}
+
+// SetProxy sets proxy configuration
+// Added in version 1.1.0
+//
+// Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
+func (config *SpeechConfig) SetProxy(hostname string, port uint64) error {
+	res := config.SetProperty(common.SpeechServiceConnectionProxyHostName, hostname)
+	if res != nil {
+		return res
+	}
+	return config.SetProperty(common.SpeechServiceConnectionProxyPort, strconv.FormatUint(port, 10))
+}
+
+// SetProxyWithUsernameAndPassword sets proxy configuration with username and password
+// Added in version 1.1.0
+//
+// Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
+func (config *SpeechConfig) SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error {
+	res := config.SetProxy(hostname, port)
+	if res != nil {
+		return res
+	}
+	res = config.SetProperty(common.SpeechServiceConnectionProxyUserName, username)
+	if res != nil {
+		return res
+	}
+	return config.SetProperty(common.SpeechServiceConnectionProxyPassword, password)
+}
 
 func (config *SpeechConfig) SetProperty(id common.PropertyID, value string) error {
 	v := C.CString(value)
