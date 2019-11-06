@@ -130,10 +130,61 @@ func NewSpeechConfigFromEndpoint(endpoint string) (*SpeechConfig, error) {
 	return config, nil
 }
 
-// func NewSpeechConfigFromHost(host string, subscriptionKey string) (SpeechConfig, error) {
+// NewSpeechConfigFromHostWithSubscription creates an instance of the speech config with specified host and subscription.
+// This method is intended only for users who use a non-default service host. Standard resource path will be assumed.
+// For services with a non-standard resource path or no path at all, use FromEndpoint instead.
+// Note: Query parameters are not allowed in the host URI and must be set by other APIs.
+// Note: To use an authorization token with host, use NewSpeechConfigFromHost,
+// and then call SetAuthorizationToken() on the created SpeechConfig instance.
+// Note: Added in version 1.8.0.
+func NewSpeechConfigFromHostWithSubscription(host string, subscriptionKey string) (*SpeechConfig, error) {
+	var handle C.SPXHANDLE
+	var propBagHandle C.SPXPROPERTYBAGHANDLE
+	h := C.CString(host)
+	defer C.free(unsafe.Pointer(h))
+	sk := C.CString(subscriptionKey)
+	defer C.free(unsafe.Pointer(sk))
+	ret := uintptr(C.speech_config_from_host(&handle, h, sk))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	ret = uintptr(C.speech_config_get_property_bag(handle, &propBagHandle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	config := new(SpeechConfig)
+	config.handle = handle
+	config.propertyBagHandle = propBagHandle
+	return config, nil
+}
 
-// }
-// /* end */
+// NewSpeechConfigFromHost Creates an instance of SpeechConfig with specified host.
+// This method is intended only for users who use a non-default service host. Standard resource path will be assumed.
+// For services with a non-standard resource path or no path at all, use FromEndpoint instead.
+// Note: Query parameters are not allowed in the host URI and must be set by other APIs.
+// Note: If the host requires a subscription key for authentication, use NewSpeechConfigFromHostWithSubscription to pass
+// the subscription key as parameter.
+// To use an authorization token with FromHost, use this method to create a SpeechConfig instance, and then
+// call SetAuthorizationToken() on the created SpeechConfig instance.
+// Note: Added in version 1.8.0.
+func NewSpeechConfigFromHost(host string) (*SpeechConfig, error) {
+	var handle C.SPXHANDLE
+	var propBagHandle C.SPXPROPERTYBAGHANDLE
+	h := C.CString(host)
+	defer C.free(unsafe.Pointer(h))
+	ret := uintptr(C.speech_config_from_host(&handle, h, nil))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	ret = uintptr(C.speech_config_get_property_bag(handle, &propBagHandle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	config := new(SpeechConfig)
+	config.handle = handle
+	config.propertyBagHandle = propBagHandle
+	return config, nil
+}
 
 // Only getters
 func (config *SpeechConfig) SubscriptionKey() string {
