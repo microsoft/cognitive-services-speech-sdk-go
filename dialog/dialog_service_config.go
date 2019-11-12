@@ -73,10 +73,18 @@ func (config *DialogServiceConfig) GetLanguage() string {
 	return config.GetProperty(common.SpeechServiceConnectionRecoLanguage)
 }
 
+// Close disposes the associated resources.
+func (config *DialogServiceConfig) Close() {
+	config.config.Close()
+}
+
+// BotFrameworkConfig defines configurations for the dialog service connector object for using a Bot Framework backend.
 type BotFrameworkConfig struct {
 	DialogServiceConfig
 }
 
+// NewBotFrameworkConfigFromSubscription creates a bot framework service config instance with the specified subscription
+// key and region.
 func NewBotFrameworkConfigFromSubscription(subscriptionKey string, region string) (*BotFrameworkConfig, error) {
 	var handle C.SPXHANDLE
 	sk := C.CString(subscriptionKey)
@@ -96,3 +104,98 @@ func NewBotFrameworkConfigFromSubscription(subscriptionKey string, region string
 	config.config = speechConfig
 	return config, nil
 }
+
+// NewBotFrameworkConfigFromAuthorizationToken creates a bot framework service config instance with the specified authorization
+// token and region.
+// Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
+// expires, the caller needs to refresh it by calling this setter with a new valid token.
+// As configuration values are copied when creating a new connector, the new token value will not apply to connectors that have
+// already been created.
+// For connectors that have been created before, you need to set authorization token of the corresponding connector
+// to refresh the token. Otherwise, the connectors will encounter errors during operation.
+func NewBotFrameworkConfigFromAuthorizationToken(authorizationToken string, region string) (*BotFrameworkConfig, error) {
+	var handle C.SPXHANDLE
+	at := C.CString(authorizationToken)
+	defer C.free(unsafe.Pointer(at))
+	r := C.CString(region)
+	defer C.free(unsafe.Pointer(r))
+	ret := uintptr(C.bot_framework_config_from_authorization_token(&handle, at, r))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	speechConfig, err := speech.NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+	config := new(BotFrameworkConfig)
+	config.config = speechConfig
+	return config, nil
+}
+
+// CustomCommandsConfig defines configurations for the dialog service connector object for using a CustomCommands backend.
+type CustomCommandsConfig struct {
+	DialogServiceConfig
+}
+
+// NewCustomCommandsConfigFromSubscription creates a Custom Commands config instance with the specified application id,
+// subscription key and region.
+func NewCustomCommandsConfigFromSubscription(applicationID string, subscriptionKey string, region string) (*CustomCommandsConfig, error) {
+	var handle C.SPXHANDLE
+	appID := C.CString(applicationID)
+	defer C.free(unsafe.Pointer(appID))
+	sk := C.CString(subscriptionKey)
+	defer C.free(unsafe.Pointer(sk))
+	r := C.CString(region)
+	defer C.free(unsafe.Pointer(r))
+	ret := uintptr(C.custom_commands_config_from_subscription(&handle, appID, sk, r))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	speechConfig, err := speech.NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+	config := new(CustomCommandsConfig)
+	config.config = speechConfig
+	return config, nil
+}
+
+// NewCustomCommandsConfigFromAuthorizationToken creates a Custom Commands config instance with the specified application id
+// authorization token and region.
+// Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
+// expires, the caller needs to refresh it by calling this setter with a new valid token.
+// As configuration values are copied when creating a new connector, the new token value will not apply to connectors that have
+// already been created.
+// For connectors that have been created before, you need to set authorization token of the corresponding connector
+// to refresh the token. Otherwise, the connectors will encounter errors during operation.
+func NewCustomCommandsConfigFromAuthorizationToken(applicationID string, authorizationToken string, region string) (*CustomCommandsConfig, error) {
+	var handle C.SPXHANDLE
+	appID := C.CString(applicationID)
+	defer C.free(unsafe.Pointer(appID))
+	at := C.CString(authorizationToken)
+	defer C.free(unsafe.Pointer(at))
+	r := C.CString(region)
+	defer C.free(unsafe.Pointer(r))
+	ret := uintptr(C.custom_commands_config_from_authorization_token(&handle, appID, at, r))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	speechConfig, err := speech.NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+	config := new(CustomCommandsConfig)
+	config.config = speechConfig
+	return config, nil
+}
+
+// ApplicationID is the corresponding backend application identifier.
+func (config *CustomCommandsConfig) ApplicationID() string {
+	return config.GetProperty(common.ConversationApplicationID)
+}
+
+// SetApplicationID sets the corresponding backend application identifier.
+func (config *CustomCommandsConfig) SetApplicationID(appID string) error {
+	return config.SetProperty(common.ConversationApplicationID, appID)
+}
+
