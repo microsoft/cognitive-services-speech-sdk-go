@@ -4,8 +4,7 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"strconv"
 )
-// #cgo CFLAGS: -I/home/gelecaro/carbon/current/include/c_api
-// #cgo LDFLAGS: -L/home/gelecaro/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core
+
 // #include <stdlib.h>
 // #include <speechapi_c_speech_config.h>
 // #include <speechapi_c_property_bag.h>
