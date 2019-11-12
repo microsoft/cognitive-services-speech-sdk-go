@@ -322,6 +322,7 @@ func (config *SpeechConfig) SetProxyWithUsernameAndPassword(hostname string, por
 	return config.SetProperty(common.SpeechServiceConnectionProxyPassword, password)
 }
 
+// SetProperty sets a property value by ID.
 func (config *SpeechConfig) SetProperty(id common.PropertyID, value string) error {
 	v := C.CString(value)
 	ret := uintptr(C.property_bag_set_string(config.propertyBagHandle, (C.int)(id), nil, v))
@@ -332,6 +333,7 @@ func (config *SpeechConfig) SetProperty(id common.PropertyID, value string) erro
 	return nil
 }
 
+// GetProperty gets a property value by ID.
 func (config *SpeechConfig) GetProperty(id common.PropertyID) string {
 	emptyString := C.CString("")
 	defer C.free(unsafe.Pointer(emptyString))
@@ -341,13 +343,69 @@ func (config *SpeechConfig) GetProperty(id common.PropertyID) string {
 	return goValue
 }
 
-// func (config *SpeechConfig) SetServiceProperty
-// {}
-// func (config *SpeechConfig) SetProfanity
-// {}
-// func (config *SpeechConfig) EnableAudioLogging
-// {}
-// func (config *SpeechConfig) RequestWordLevelTimestamps
-// {}
-// func (config *SpeechConfig) EnableDictation
-// {}
+// SetPropertyByString sets a property value by string.
+func (config *SpeechConfig) SetPropertyByString(name string, value string) error {
+	n := C.CString(name)
+	defer C.free(unsafe.Pointer(n))
+	v := C.CString(value)
+	defer C.free(unsafe.Pointer(v))
+	ret := uintptr(C.property_bag_set_string(config.propertyBagHandle, -1, n, v))
+	if (ret != C.SPX_NOERROR) {
+		return common.NewCarbonError(ret)
+	}
+	return nil
+}
+
+// GetPropertyByString gets a property value by string.
+func (config *SpeechConfig) GetPropertyByString(name string) string {
+	emptyString := C.CString("")
+	defer C.free(unsafe.Pointer(emptyString))
+	n := C.CString(name)
+	defer C.free(unsafe.Pointer(n))
+	value := C.property_bag_get_string(config.propertyBagHandle, -1, n, emptyString)
+	goValue := C.GoString(value)
+	C.property_bag_free_string(value)
+	return goValue
+}
+
+// SetServiceProperty sets a property value that will be passed to service using the specified channel.
+// Added in version 1.5.0.
+func (config *SpeechConfig) SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error {
+	n := C.CString(name)
+	defer C.free(unsafe.Pointer(n))
+	v := C.CString(value)
+	defer C.free(unsafe.Pointer(v))
+	ret := uintptr(C.speech_config_set_service_property(config.handle, n, v, (C.SpeechConfig_ServicePropertyChannel)(channel)))
+	if (ret != C.SPX_NOERROR) {
+		return common.NewCarbonError(ret)
+	}
+	return nil
+}
+
+// SetProfanity sets profanity option.
+// Added in version 1.5.0.
+func (config *SpeechConfig) SetProfanity(profanity common.ProfanityOption) error {
+	ret := uintptr(C.speech_config_set_profanity(config.handle, (C.SpeechConfig_ProfanityOption)(profanity)))
+	if (ret != C.SPX_NOERROR) {
+		return common.NewCarbonError(ret)
+	}
+	return nil
+}
+
+// EnableAudioLogging enables audio logging in service.
+// Added in version 1.5.0.
+func (config *SpeechConfig) EnableAudioLogging() error {
+	return config.SetProperty(common.SpeechServiceConnectionEnableAudioLogging, "true")
+}
+
+// RequestWordLevelTimestamps includes word-level timestamps in response result.
+// Added in version 1.5.0.
+func (config *SpeechConfig) RequestWordLevelTimestamps() error {
+	return config.SetProperty(common.SpeechServiceResponseRequestWordLevelTimestamps, "true")
+}
+
+// EnableDictation enables dictation mode. Only supported in speech continuous recognition.
+// Added in version 1.5.0.
+func (config *SpeechConfig) EnableDictation() error {
+	return config.SetProperty(common.SpeechServiceConnectionRecoMode, "DICTATION")
+}
