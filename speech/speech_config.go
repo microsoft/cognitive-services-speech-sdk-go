@@ -373,3 +373,9 @@ func (config *SpeechConfig) RequestWordLevelTimestamps() error {
 func (config *SpeechConfig) EnableDictation() error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoMode, "DICTATION")
 }
+
+// Close disposes the associated resources.
+func (config *SpeechConfig) Close() {
+	C.speech_config_release(config.handle)
+	C.property_bag_release(config.propertyBagHandle)
+}
