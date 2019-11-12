@@ -17,15 +17,27 @@ type SpeechConfig struct {
 	propertyBagHandle C.SPXPROPERTYBAGHANDLE
 }
 
+// SPXHandle is the internal handle type
+type SPXHandle uintptr
+
+func uintptr2handle(h SPXHandle) C.SPXHANDLE {
+	return (C.SPXHANDLE)(unsafe.Pointer(h))
+}
+
+func handle2uintptr(h C.SPXHANDLE) SPXHandle {
+	return (SPXHandle)(unsafe.Pointer(h))
+}
+
 // NewSpeechConfigFromHandle creates a SpeechConfig instance from a valid handle. This is for internal use only.
-func NewSpeechConfigFromHandle(handle C.SPXHANDLE) (*SpeechConfig, error) {
+func NewSpeechConfigFromHandle(handle SPXHandle) (*SpeechConfig, error) {
+	var cHandle = uintptr2handle(handle)
 	var propBagHandle C.SPXPROPERTYBAGHANDLE
-	ret := uintptr(C.speech_config_get_property_bag(handle, &propBagHandle))
+	ret := uintptr(C.speech_config_get_property_bag(cHandle, &propBagHandle))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
 	config := new(SpeechConfig)
-	config.handle = handle
+	config.handle = cHandle
 	config.propertyBagHandle = propBagHandle
 	return config, nil
 }
@@ -41,7 +53,7 @@ func NewSpeechConfigFromSubscription(subscriptionKey string, region string) (*Sp
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	return NewSpeechConfigFromHandle(handle)
+	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
 // NewSpeechConfigFromAuthorizationToken creates an instance of the speech config with specified authorization token and
@@ -62,7 +74,7 @@ func NewSpeechConfigFromAuthorizationToken(authorizationToken string, region str
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	return NewSpeechConfigFromHandle(handle)
+	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
 // NewSpeechConfigFromEndpointWithSubscription creates an instance of the speech config with specified endpoint
@@ -85,7 +97,7 @@ func NewSpeechConfigFromEndpointWithSubscription(endpoint string, subscriptionKe
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	return NewSpeechConfigFromHandle(handle)
+	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
 // NewSpeechConfigFromEndpoint creates an instance of SpeechConfig with specified endpoint.
@@ -108,7 +120,7 @@ func NewSpeechConfigFromEndpoint(endpoint string) (*SpeechConfig, error) {
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	return NewSpeechConfigFromHandle(handle)
+	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
 // NewSpeechConfigFromHostWithSubscription creates an instance of the speech config with specified host and subscription.
@@ -128,7 +140,7 @@ func NewSpeechConfigFromHostWithSubscription(host string, subscriptionKey string
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	return NewSpeechConfigFromHandle(handle)
+	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
 // NewSpeechConfigFromHost Creates an instance of SpeechConfig with specified host.
@@ -148,7 +160,7 @@ func NewSpeechConfigFromHost(host string) (*SpeechConfig, error) {
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	return NewSpeechConfigFromHandle(handle)
+	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
 // SubscriptionKey is the subscription key that is used to create Speech Recognizer or Intent Recognizer or Translation
