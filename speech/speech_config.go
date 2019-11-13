@@ -17,17 +17,6 @@ type SpeechConfig struct {
 	propertyBagHandle C.SPXPROPERTYBAGHANDLE
 }
 
-// SPXHandle is the internal handle type
-type SPXHandle uintptr
-
-func uintptr2handle(h SPXHandle) C.SPXHANDLE {
-	return (C.SPXHANDLE)(unsafe.Pointer(h))
-}
-
-func handle2uintptr(h C.SPXHANDLE) SPXHandle {
-	return (SPXHandle)(unsafe.Pointer(h))
-}
-
 // NewSpeechConfigFromHandle creates a SpeechConfig instance from a valid handle. This is for internal use only.
 func NewSpeechConfigFromHandle(handle SPXHandle) (*SpeechConfig, error) {
 	var cHandle = uintptr2handle(handle)
