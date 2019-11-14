@@ -14,11 +14,11 @@ import "unsafe"
 // SpeechConfig is the class that defines configurations for speech / intent recognition, or speech synthesis.
 type SpeechConfig struct {
 	handle C.SPXHANDLE
-	propertyBagHandle C.SPXPROPERTYBAGHANDLE
+	properties common.PropertyCollection
 }
 
 // NewSpeechConfigFromHandle creates a SpeechConfig instance from a valid handle. This is for internal use only.
-func NewSpeechConfigFromHandle(handle SPXHandle) (*SpeechConfig, error) {
+func NewSpeechConfigFromHandle(handle common.SPXHandle) (*SpeechConfig, error) {
 	var cHandle = uintptr2handle(handle)
 	var propBagHandle C.SPXPROPERTYBAGHANDLE
 	ret := uintptr(C.speech_config_get_property_bag(cHandle, &propBagHandle))
@@ -27,7 +27,7 @@ func NewSpeechConfigFromHandle(handle SPXHandle) (*SpeechConfig, error) {
 	}
 	config := new(SpeechConfig)
 	config.handle = cHandle
-	config.propertyBagHandle = propBagHandle
+	config.properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
 	return config, nil
 }
 
@@ -289,48 +289,22 @@ func (config *SpeechConfig) SetProxyWithUsernameAndPassword(hostname string, por
 
 // SetProperty sets a property value by ID.
 func (config *SpeechConfig) SetProperty(id common.PropertyID, value string) error {
-	v := C.CString(value)
-	ret := uintptr(C.property_bag_set_string(config.propertyBagHandle, (C.int)(id), nil, v))
-	C.free(unsafe.Pointer(v))
-	if (ret != C.SPX_NOERROR) {
-		return common.NewCarbonError(ret)
-	}
-	return nil
+	return config.properties.SetProperty(id, value)
 }
 
 // GetProperty gets a property value by ID.
 func (config *SpeechConfig) GetProperty(id common.PropertyID) string {
-	emptyString := C.CString("")
-	defer C.free(unsafe.Pointer(emptyString))
-	value := C.property_bag_get_string(config.propertyBagHandle, (C.int)(id), nil, emptyString)
-	goValue := C.GoString(value)
-	C.property_bag_free_string(value)
-	return goValue
+	return config.properties.GetProperty(id, "")
 }
 
 // SetPropertyByString sets a property value by string.
 func (config *SpeechConfig) SetPropertyByString(name string, value string) error {
-	n := C.CString(name)
-	defer C.free(unsafe.Pointer(n))
-	v := C.CString(value)
-	defer C.free(unsafe.Pointer(v))
-	ret := uintptr(C.property_bag_set_string(config.propertyBagHandle, -1, n, v))
-	if (ret != C.SPX_NOERROR) {
-		return common.NewCarbonError(ret)
-	}
-	return nil
+	return config.properties.SetPropertyByString(name, value)
 }
 
 // GetPropertyByString gets a property value by string.
 func (config *SpeechConfig) GetPropertyByString(name string) string {
-	emptyString := C.CString("")
-	defer C.free(unsafe.Pointer(emptyString))
-	n := C.CString(name)
-	defer C.free(unsafe.Pointer(n))
-	value := C.property_bag_get_string(config.propertyBagHandle, -1, n, emptyString)
-	goValue := C.GoString(value)
-	C.property_bag_free_string(value)
-	return goValue
+	return config.properties.GetPropertyByString(name, "")
 }
 
 // SetServiceProperty sets a property value that will be passed to service using the specified channel.
@@ -377,6 +351,6 @@ func (config *SpeechConfig) EnableDictation() error {
 
 // Close disposes the associated resources.
 func (config *SpeechConfig) Close() {
+	config.properties.Close()
 	C.speech_config_release(config.handle)
-	C.property_bag_release(config.propertyBagHandle)
 }

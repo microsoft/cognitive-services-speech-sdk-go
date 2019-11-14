@@ -20,7 +20,7 @@ func (event SessionEventArgs) SessionID() string {
 }
 
 // NewSessionEventArgsFromHandle creates the object from the handle (for internal)
-func NewSessionEventArgsFromHandle(handle SPXHandle) (*SessionEventArgs, error) {
+func NewSessionEventArgsFromHandle(handle common.SPXHandle) (*SessionEventArgs, error) {
 	buffer := C.malloc(C.sizeof_char * 37)
 	defer C.free(unsafe.Pointer(buffer))
 	ret := uintptr(C.recognizer_session_event_get_session_id(uintptr2handle(handle), (*C.char)(buffer), 37))

@@ -1,8 +1,4 @@
-package speech
-
-import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
-)
+package common
 
 // #include <stdlib.h>
 // #include <speechapi_c_common.h>
@@ -17,7 +13,7 @@ type PropertyCollection struct {
 
 // GetProperty returns value of a property.
 // If the property value is not defined, the specified default value is returned.
-func (properties PropertyCollection) GetProperty(id common.PropertyID, defaultValue string) string {
+func (properties PropertyCollection) GetProperty(id PropertyID, defaultValue string) string {
 	defValue := C.CString(defaultValue)
 	defer C.free(unsafe.Pointer(defValue))
 	value := C.property_bag_get_string(properties.handle, (C.int)(id), nil, defValue)
@@ -40,12 +36,12 @@ func (properties PropertyCollection) GetPropertyByString(name string, defaultVal
 }
 
 // SetProperty sets the value of a property.
-func (properties PropertyCollection) SetProperty(id common.PropertyID, value string) error {
+func (properties PropertyCollection) SetProperty(id PropertyID, value string) error {
 	v := C.CString(value)
 	ret := uintptr(C.property_bag_set_string(properties.handle, (C.int)(id), nil, v))
 	C.free(unsafe.Pointer(v))
 	if ret != C.SPX_NOERROR {
-		return common.NewCarbonError(ret)
+		return NewCarbonError(ret)
 	}
 	return nil
 }
@@ -58,7 +54,7 @@ func (properties PropertyCollection) SetPropertyByString(name string, value stri
 	defer C.free(unsafe.Pointer(v))
 	ret := uintptr(C.property_bag_set_string(properties.handle, -1, n, v))
 	if (ret != C.SPX_NOERROR) {
-		return common.NewCarbonError(ret)
+		return NewCarbonError(ret)
 	}
 	return nil
 }
