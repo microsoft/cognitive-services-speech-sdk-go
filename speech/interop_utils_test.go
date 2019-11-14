@@ -1,11 +1,12 @@
 package speech
 
 import (
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"testing"
 )
 
 func TestHandleConversion(t *testing.T) {
-	orig := SPXHandle(3)
+	orig := common.SPXHandle(3)
 	handle := uintptr2handle(orig)
 	dest := handle2uintptr(handle)
 	if orig != dest {
