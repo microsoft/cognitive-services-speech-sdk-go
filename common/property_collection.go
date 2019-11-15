@@ -38,8 +38,8 @@ func (properties PropertyCollection) GetPropertyByString(name string, defaultVal
 // SetProperty sets the value of a property.
 func (properties PropertyCollection) SetProperty(id PropertyID, value string) error {
 	v := C.CString(value)
+	defer C.free(unsafe.Pointer(v))
 	ret := uintptr(C.property_bag_set_string(properties.handle, (C.int)(id), nil, v))
-	C.free(unsafe.Pointer(v))
 	if ret != C.SPX_NOERROR {
 		return NewCarbonError(ret)
 	}
