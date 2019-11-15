@@ -213,5 +213,3 @@ func CreatePullStream(callback PullAudioInputStreamCallback) (*PullAudioInputStr
 	}
 	return CreatePullStreamFromFormat(callback, *format)
 }
-
-//
