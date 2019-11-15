@@ -21,10 +21,15 @@ import "unsafe"
 // AudioInputStream represents audio input stream used for custom audio input configurations
 type AudioInputStream interface {
 	Close()
+	getHandle() C.SPXHANDLE
 }
 
 type audioInputStreamBase struct {
 	handle C.SPXHANDLE
+}
+
+func (stream audioInputStreamBase) getHandle() C.SPXHANDLE {
+	return stream.handle
 }
 
 func (stream audioInputStreamBase) Close() {
