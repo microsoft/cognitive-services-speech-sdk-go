@@ -41,10 +41,10 @@ type PushAudioInputStream struct {
 	audioInputStreamBase
 }
 
-// CreatePushStreamFromFormat creates a memory backed PushAudioInputStream with the specified audio format.
+// CreatePushAudioInputStreamFromFormat creates a memory backed PushAudioInputStream with the specified audio format.
 // Currently, only WAV / PCM with 16-bit samples, 16 kHz sample rate, and a single channel (Mono) is supported. When used
 // with Conversation Transcription, eight channels are supported.
-func CreatePushStreamFromFormat(format AudioStreamFormat) (*PushAudioInputStream, error) {
+func CreatePushAudioInputStreamFromFormat(format AudioStreamFormat) (*PushAudioInputStream, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.audio_stream_create_push_audio_input_stream(&handle, format.handle))
 	if ret != C.SPX_NOERROR {
@@ -55,13 +55,13 @@ func CreatePushStreamFromFormat(format AudioStreamFormat) (*PushAudioInputStream
 	return stream, nil
 }
 
-// CreatePushStream creates a memory backed PushAudioInputStream using the default format (16 kHz, 16 bit, mono PCM).
-func CreatePushStream() (*PushAudioInputStream, error) {
+// CreatePushAudioInputStream creates a memory backed PushAudioInputStream using the default format (16 kHz, 16 bit, mono PCM).
+func CreatePushAudioInputStream() (*PushAudioInputStream, error) {
 	format, err := GetDefaultInputFormat()
 	if err != nil {
 		return nil, err
 	}
-	return CreatePushStreamFromFormat(*format)
+	return CreatePushAudioInputStreamFromFormat(*format)
 }
 
 // Write writes the audio data specified by making an internal copy of the data.

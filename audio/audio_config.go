@@ -79,7 +79,7 @@ func NewAudioConfigFromStreamInput(stream AudioInputStream) (*AudioConfig, error
 // Added in version 1.4.0
 func NewAudioConfigFromDefaultSpeakerOutput() (*AudioConfig, error) {
 	var handle C.SPXHANDLE
-	ret := C.audio_config_create_audio_output_from_default_speaker(&handle)
+	ret := uintptr(C.audio_config_create_audio_output_from_default_speaker(&handle))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
@@ -92,10 +92,21 @@ func NewAudioConfigFromWavFileOutput(filename string) (*AudioConfig, error) {
 	var handle C.SPXHANDLE
 	fn := C.CString(filename)
 	defer C.free(unsafe.Pointer(fn))
-	ret := C.audio_config_create_audio_output_from_default_speaker(&handle, filename)
+	ret := uintptr(C.audio_config_create_audio_output_from_wav_file_name(&handle, fn))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
 	return newAudioConfigFromHandle(handle)
 }
 
+// NewAudioConfigFromStreamOutput creates an AudioConfig object representing the specified output stream.
+// Added in version 1.4.0
+func NewAudioConfigFromStreamOutput(stream AudioOutputStream) (*AudioConfig, error) {
+	var handle C.SPXHANDLE
+	streamHandle := stream.getHandle()
+	ret := uintptr(C.audio_config_create_audio_output_from_stream(&handle, streamHandle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	return newAudioConfigFromHandle(handle)
+}
