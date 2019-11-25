@@ -17,6 +17,11 @@ type AudioConfig struct {
 	properties common.PropertyCollection
 }
 
+// GetHandle gets the handle to the resource (for internal use)
+func (config AudioConfig) GetHandle() common.SPXHandle {
+	return handle2uintptr(config.handle)
+}
+
 func newAudioConfigFromHandle(handle C.SPXHANDLE) (*AudioConfig, error) {
 	var propBagHandle C.SPXPROPERTYBAGHANDLE
 	ret := uintptr(C.audio_config_get_property_bag(handle, &propBagHandle))

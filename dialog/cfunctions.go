@@ -3,10 +3,10 @@ package dialog
 
 // #include <stdlib.h>
 // #include <speechapi_c_common.h>
-// extern void fireEventSessionStarted(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+// extern void dialogFireEventSessionStarted(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
 //
-// void cgo_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// void cgo_dialog_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
 // {
-//    fireEventSessionStarted(handle, event);
+//    dialogFireEventSessionStarted(handle, event);
 // }
 import "C"

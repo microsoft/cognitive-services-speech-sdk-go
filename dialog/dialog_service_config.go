@@ -13,74 +13,89 @@ import (
 import "C"
 import "unsafe"
 
-func handle2uintptr(h C.SPXHANDLE) speech.SPXHandle {
-	return (speech.SPXHandle)(unsafe.Pointer(h))
+// DialogServiceConfig defines base configurations for the dialog service connector object.
+type DialogServiceConfig interface {
+	SetProperty(id common.PropertyID, value string) error
+	GetProperty(id common.PropertyID) string
+	SetPropertyByString(name string, value string) error
+	GetPropertyByString(name string, value string) string
+	SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error
+	SetProxy(hostname string, port uint64) error
+	SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error
+	SetLanguage(lang string)
+	GetLanguage() string
+	Close()
+	getHandle() C.SPXHANDLE
 }
 
-// DialogServiceConfig defines base configurations for the dialog service connector object.
-type DialogServiceConfig struct {
-	config *speech.SpeechConfig
+type dialogServiceConfigBase struct {
+	config speech.SpeechConfig
+	handle C.SPXHANDLE
 }
 
 // SetProperty sets a property value by ID.
-func (config *DialogServiceConfig) SetProperty(id common.PropertyID, value string) error {
+func (config dialogServiceConfigBase) SetProperty(id common.PropertyID, value string) error {
 	return config.config.SetProperty(id, value)
 }
 
 // GetProperty gets a property value by ID.
-func (config *DialogServiceConfig) GetProperty(id common.PropertyID) string {
+func (config dialogServiceConfigBase) GetProperty(id common.PropertyID) string {
 	return config.config.GetProperty(id)
 }
 
 // SetPropertyByString sets a property value by name.
-func (config *DialogServiceConfig) SetPropertyByString(name string, value string) error {
+func (config dialogServiceConfigBase) SetPropertyByString(name string, value string) error {
 	return config.config.SetPropertyByString(name, value)
 }
 
 // GetPropertyByString gets a property value by name.
-func (config *DialogServiceConfig) GetPropertyByString(name string, value string) string {
+func (config dialogServiceConfigBase) GetPropertyByString(name string, value string) string {
 	return config.config.GetPropertyByString(name);
 }
 
 // SetServiceProperty sets a property value that will be passed to service using the specified channel.
-func (config *DialogServiceConfig) SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error {
+func (config dialogServiceConfigBase) SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error {
 	return config.config.SetServiceProperty(name, value, channel)
 }
 
 // SetProxy sets proxy configuration
 //
 // Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
-func (config *DialogServiceConfig) SetProxy(hostname string, port uint64) error {
+func (config dialogServiceConfigBase) SetProxy(hostname string, port uint64) error {
 	return config.config.SetProxy(hostname, port);
 }
 
 // SetProxyWithUsernameAndPassword sets proxy configuration with username and password
 //
 // Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
-func (config *DialogServiceConfig) SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error {
+func (config dialogServiceConfigBase) SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error {
 	return config.config.SetProxyWithUsernameAndPassword(hostname, port, username, password)
 }
 
 // SetLanguage sets the input language to the connector.
 // The language is specified in BCP-47 format.
-func (config *DialogServiceConfig) SetLanguage(lang string) error {
+func (config dialogServiceConfigBase) SetLanguage(lang string) error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, lang);
 }
 
 // GetLanguage gets the input language to the connector.
 // The language is specified in BCP-47 format.
-func (config *DialogServiceConfig) GetLanguage() string {
+func (config dialogServiceConfigBase) GetLanguage() string {
 	return config.GetProperty(common.SpeechServiceConnectionRecoLanguage)
 }
 
 // Close disposes the associated resources.
-func (config *DialogServiceConfig) Close() {
+func (config dialogServiceConfigBase) Close() {
 	config.config.Close()
+}
+
+func (config dialogServiceConfigBase) getHandle() C.SPXHANDLE {
+	return config.handle
 }
 
 // BotFrameworkConfig defines configurations for the dialog service connector object for using a Bot Framework backend.
 type BotFrameworkConfig struct {
-	DialogServiceConfig
+	dialogServiceConfigBase
 }
 
 // NewBotFrameworkConfigFromSubscription creates a bot framework service config instance with the specified subscription
@@ -101,7 +116,8 @@ func NewBotFrameworkConfigFromSubscription(subscriptionKey string, region string
 		return nil, err
 	}
 	config := new(BotFrameworkConfig)
-	config.config = speechConfig
+	config.config = *speechConfig
+	config.handle = handle
 	return config, nil
 }
 
@@ -128,13 +144,14 @@ func NewBotFrameworkConfigFromAuthorizationToken(authorizationToken string, regi
 		return nil, err
 	}
 	config := new(BotFrameworkConfig)
-	config.config = speechConfig
+	config.config = *speechConfig
+	config.handle = handle
 	return config, nil
 }
 
 // CustomCommandsConfig defines configurations for the dialog service connector object for using a CustomCommands backend.
 type CustomCommandsConfig struct {
-	DialogServiceConfig
+	dialogServiceConfigBase
 }
 
 // NewCustomCommandsConfigFromSubscription creates a Custom Commands config instance with the specified application id,
@@ -156,7 +173,8 @@ func NewCustomCommandsConfigFromSubscription(applicationID string, subscriptionK
 		return nil, err
 	}
 	config := new(CustomCommandsConfig)
-	config.config = speechConfig
+	config.config = *speechConfig
+	config.handle = handle
 	return config, nil
 }
 
@@ -185,7 +203,8 @@ func NewCustomCommandsConfigFromAuthorizationToken(applicationID string, authori
 		return nil, err
 	}
 	config := new(CustomCommandsConfig)
-	config.config = speechConfig
+	config.config = *speechConfig
+	config.handle = handle
 	return config, nil
 }
 
