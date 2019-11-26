@@ -4,7 +4,7 @@ This project contains golang binding for the Microsoft Cognitive Service Speech 
 
 # Getting Started
 
-This project required go 3.13
+This project requires go 3.13
 
 ## Linux
 
