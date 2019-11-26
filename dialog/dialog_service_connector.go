@@ -4,7 +4,6 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
-	"sync"
 )
 
 // #include <stdlib.h>
@@ -63,35 +62,7 @@ func (connector DialogServiceConnector) Close() {
 	C.dialog_service_connector_handle_release(connector.handle)
 }
 
-var mu sync.Mutex
-var sessionStartedCallbacks = make(map[C.SPXHANDLE]speech.SessionEventHandler)
-
-func registerSessionStartedCallback(handler speech.SessionEventHandler, handle C.SPXHANDLE) {
-	mu.Lock()
-	defer mu.Unlock()
-	sessionStartedCallbacks[handle] = handler
-}
-
-func getSessionStartedCallback(handle C.SPXHANDLE) speech.SessionEventHandler {
-	mu.Lock()
-	defer mu.Unlock()
-	return sessionStartedCallbacks[handle]
-}
-
-//export dialogFireEventSessionStarted
-func dialogFireEventSessionStarted(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
-	handler := getSessionStartedCallback(handle)
-	if handler == nil {
-		return
-	}
-	event, err := speech.NewSessionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
-		return
-	}
-	handler(*event)
-}
-
-func (connector *DialogServiceConnector) SessionStarted(handler speech.SessionEventHandler) {
+func (connector DialogServiceConnector) SessionStarted(handler speech.SessionEventHandler) {
 	registerSessionStartedCallback(handler, connector.handle)
 	if handler != nil {
 		C.dialog_service_connector_session_started_set_callback(
