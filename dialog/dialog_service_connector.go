@@ -13,6 +13,7 @@ import (
 //
 // /* Proxy functions forward declarations */
 // void cgo_dialog_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_dialog_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 //
 import "C"
 import "unsafe"
@@ -62,6 +63,7 @@ func (connector DialogServiceConnector) Close() {
 	C.dialog_service_connector_handle_release(connector.handle)
 }
 
+// SessionStarted signals that indicates the start of a listening session.
 func (connector DialogServiceConnector) SessionStarted(handler speech.SessionEventHandler) {
 	registerSessionStartedCallback(handler, connector.handle)
 	if handler != nil {
@@ -72,4 +74,18 @@ func (connector DialogServiceConnector) SessionStarted(handler speech.SessionEve
 	} else {
 		C.dialog_service_connector_session_started_set_callback(connector.handle, nil, nil)
 	}
+}
+
+// SessionStopped signals that indicates the end of a listening session.
+func (connector DialogServiceConnector) SessionStopped(handler speech.SessionEventHandler) {
+	registerSessionStoppedCallback(handler, connector.handle)
+	if handler != nil {
+		C.dialog_service_connector_session_stopped_set_callback(
+			connector.handle,
+			(C.PSESSION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_dialog_session_stopped)),
+			nil)
+	} else {
+		C.dialog_service_connector_session_stopped_set_callback(connector.handle, nil, nil)
+	}
+
 }

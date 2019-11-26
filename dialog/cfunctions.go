@@ -9,4 +9,12 @@ package dialog
 // {
 //    dialogFireEventSessionStarted(handle, event);
 // }
+//
+// extern void dialogFireEventSessionStopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_dialog_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//    dialogFireEventSessionStopped(handle, event);
+// }
+//
 import "C"
