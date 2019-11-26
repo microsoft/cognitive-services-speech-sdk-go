@@ -1,3 +1,34 @@
+# Overview
+
+This project contains golang binding for the Microsoft Cognitive Service Speech SDK.
+
+# Getting Started
+
+This project required go 3.13
+
+## Linux
+
+### Compiling
+
+First, new need to set the environment variables for go to find the SDK:
+
+
+```bash
+export CGO_CFLAGS="-I/path/to/SDKs/include/c_api"
+export CGO_LDFLAGS="-L/path/to/SDKs/library -lMicrosoft.CognitiveServices.Speech.core"
+
+```
+
+After that we are ready to compile the package
+
+### Running
+
+To run applications consuming this project, we need to add the library to the path (if it is not there already)
+
+```bash
+export LD_LIBRARY_PATH="/path/to/SDKs/library:$LD_LIBRARY_PATH"
+```
+
 
 # Contributing
 
