@@ -14,6 +14,8 @@ import (
 // /* Proxy functions forward declarations */
 // void cgo_dialog_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_dialog_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_dialog_recognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_dialog_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 //
 import "C"
 import "unsafe"
@@ -146,7 +148,33 @@ func (connector DialogServiceConnector) AuthorizationToken() string {
 	return connector.Properties.GetProperty(common.SpeechServiceAuthorizationToken, "")
 }
 
-// SessionStarted signals that indicates the start of a listening session.
+// Recognized signals events containing speech recognition results.
+func (connector DialogServiceConnector) Recognized(handler speech.SpeechRecognitionEventHandler) {
+	registerRecognizedCallback(handler, connector.handle)
+	if handler != nil {
+		C.dialog_service_connector_recognized_set_callback(
+			connector.handle,
+			(C.PRECOGNITION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_dialog_recognized)),
+			nil)
+	} else {
+		C.dialog_service_connector_recognized_set_callback(connector.handle, nil, nil)
+	}
+}
+
+// Recognizing signals events containing intermediate recognition results.
+func (connector DialogServiceConnector) Recognizing(handler speech.SpeechRecognitionEventHandler) {
+	registerRecognizingCallback(handler, connector.handle)
+	if handler != nil {
+		C.dialog_service_connector_recognizing_set_callback(
+			connector.handle,
+			(C.PRECOGNITION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_dialog_recognizing)),
+			nil)
+	} else {
+		C.dialog_service_connector_recognizing_set_callback(connector.handle, nil, nil)
+	}
+}
+
+// SessionStarted signals the start of a listening session.
 func (connector DialogServiceConnector) SessionStarted(handler speech.SessionEventHandler) {
 	registerSessionStartedCallback(handler, connector.handle)
 	if handler != nil {
@@ -159,7 +187,7 @@ func (connector DialogServiceConnector) SessionStarted(handler speech.SessionEve
 	}
 }
 
-// SessionStopped signals that indicates the end of a listening session.
+// SessionStopped signals the end of a listening session.
 func (connector DialogServiceConnector) SessionStopped(handler speech.SessionEventHandler) {
 	registerSessionStoppedCallback(handler, connector.handle)
 	if handler != nil {
@@ -170,5 +198,4 @@ func (connector DialogServiceConnector) SessionStopped(handler speech.SessionEve
 	} else {
 		C.dialog_service_connector_session_stopped_set_callback(connector.handle, nil, nil)
 	}
-
 }

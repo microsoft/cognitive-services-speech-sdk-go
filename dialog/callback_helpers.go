@@ -62,3 +62,57 @@ func dialogFireEventSessionStopped(handle C.SPXRECOHANDLE, eventHandle C.SPXEVEN
 	}
 	handler(*event)
 }
+
+var recognizedCallbacks = make(map[C.SPXHANDLE]speech.SpeechRecognitionEventHandler)
+
+func registerRecognizedCallback(handler speech.SpeechRecognitionEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	recognizedCallbacks[handle] = handler;
+}
+
+func getRecognizedCallback(handle C.SPXHANDLE) speech.SpeechRecognitionEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return recognizedCallbacks[handle]
+}
+
+//export dialogFireEventRecognized
+func dialogFireEventRecognized(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getRecognizedCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := speech.NewSpeechRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}
+
+var recognizingCallbacks = make(map[C.SPXHANDLE]speech.SpeechRecognitionEventHandler)
+
+func registerRecognizingCallback(handler speech.SpeechRecognitionEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	recognizingCallbacks[handle] = handler;
+}
+
+func getRecognizingCallback(handle C.SPXHANDLE) speech.SpeechRecognitionEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return recognizingCallbacks[handle]
+}
+
+//export dialogFireEventRecognizing
+func dialogFireEventRecognizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getRecognizingCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := speech.NewSpeechRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}

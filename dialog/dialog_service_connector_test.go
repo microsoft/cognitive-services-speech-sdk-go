@@ -72,6 +72,41 @@ func TestSessionEvents(t *testing.T) {
 	}
 }
 
+func TestSpeechRecognitionEvents(t *testing.T) {
+	connector := createConnectorFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
+	if connector == nil {
+		return
+	}
+	defer connector.Close()
+	receivedRecognized := false
+	recognizedHandle := func(event speech.SpeechRecognitionEventArgs) {
+		defer event.Close()
+		receivedRecognized = true
+		t.Log("Recognized ", event.Result.Text)
+	}
+	receivedRecognizing := false
+	recognizingHandle := func(event speech.SpeechRecognitionEventArgs) {
+		defer event.Close()
+		receivedRecognizing = true
+		t.Log("Recognizing ", event.Result.Text)
+	}
+	connector.Recognized(recognizedHandle)
+	connector.Recognizing(recognizingHandle)
+	future := connector.ListenOnceAsync()
+	outcome := <- future
+	defer outcome.Close()
+	if outcome.Failed() {
+		t.Error("Got an error: ", outcome.Error.Error())
+		return
+	}
+	if !receivedRecognized {
+		t.Error("Didn't receive Recognized event.")
+	}
+	if !receivedRecognizing {
+		t.Error("Didn't receive Recognizing event.")
+	}
+}
+
 func TestConnectionFunctions(t *testing.T) {
 	connector := createConnectorFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
 	if connector == nil {
