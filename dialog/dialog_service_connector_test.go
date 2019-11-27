@@ -33,11 +33,15 @@ func TestSessionEvents(t *testing.T) {
 		t.Error(msg)
 		return
 	}
+	receivedSessionStarted := false
 	sessionStartedHandler := func(event speech.SessionEventArgs) {
+		receivedSessionStarted = true
 		id := event.SessionID()
 		fmt.Println("Started ", id)
 	}
+	receivedSessionStopped := false
 	sessionStoppedHandler := func(event speech.SessionEventArgs) {
+		receivedSessionStopped = true
 		id := event.SessionID()
 		fmt.Println("Stopped ", id)
 	}
@@ -52,4 +56,10 @@ func TestSessionEvents(t *testing.T) {
 	}
 	result := outcome.Result
 	fmt.Println("Recognized: ", result.Text)
+	if !receivedSessionStarted {
+		t.Error("Didn't receive SessionStart event.")
+	}
+	if !receivedSessionStopped {
+		t.Error("Didn't receive SessionStopped event.")
+	}
 }
