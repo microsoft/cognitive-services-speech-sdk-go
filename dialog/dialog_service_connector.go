@@ -38,17 +38,17 @@ func newDialogServiceConnectorFromHandle(handle C.SPXHANDLE) (*DialogServiceConn
 
 // NewDialogServiceConnectorFromConfig creates a dialog service connector from a dialog service config and an audio config.
 // Users should use this function to create a dialog service connector.
-func NewDialogServiceConnectorFromConfig(config *DialogServiceConfig, audioConfig *audio.AudioConfig) (*DialogServiceConnector, error) {
+func NewDialogServiceConnectorFromConfig(config DialogServiceConfig, audioConfig *audio.AudioConfig) (*DialogServiceConnector, error) {
 	var handle C.SPXHANDLE
 	if config == nil {
 		return nil, common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))
 	}
-	configHandle := (*config).getHandle()
+	configHandle := config.getHandle()
 	var audioHandle C.SPXHANDLE
 	if audioConfig == nil {
 		audioHandle = nil
 	} else {
-		audioHandle = uintptr2handle((*audioConfig).GetHandle())
+		audioHandle = uintptr2handle(audioConfig.GetHandle())
 	}
 	ret := uintptr(C.dialog_service_connector_create_dialog_service_connector_from_config(&handle, configHandle, audioHandle));
 	if ret != C.SPX_NOERROR {
@@ -61,6 +61,23 @@ func NewDialogServiceConnectorFromConfig(config *DialogServiceConfig, audioConfi
 func (connector DialogServiceConnector) Close() {
 	connector.Properties.Close()
 	C.dialog_service_connector_handle_release(connector.handle)
+}
+
+// ListenOnceAsync starts a listening session that will terminate after the first utterance.
+func (connector DialogServiceConnector) ListenOnceAsync() <-chan speech.SpeechRecognitionOutcome {
+	outcome := make(chan speech.SpeechRecognitionOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		ret := uintptr(C.dialog_service_connector_listen_once(connector.handle, &handle))
+
+		if ret != C.SPX_NOERROR {
+			outcome <- speech.SpeechRecognitionOutcome{ Result: nil, Error: common.NewCarbonError(ret) }
+		} else {
+			result, err := speech.NewSpeechRecognitionResultFromHandle(handle2uintptr(handle))
+			outcome <- speech.SpeechRecognitionOutcome{ Result: result, Error: err }
+		}
+	}()
+	return outcome
 }
 
 // SessionStarted signals that indicates the start of a listening session.

@@ -18,11 +18,11 @@ type DialogServiceConfig interface {
 	SetProperty(id common.PropertyID, value string) error
 	GetProperty(id common.PropertyID) string
 	SetPropertyByString(name string, value string) error
-	GetPropertyByString(name string, value string) string
+	GetPropertyByString(name string) string
 	SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error
 	SetProxy(hostname string, port uint64) error
 	SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error
-	SetLanguage(lang string)
+	SetLanguage(lang string) error
 	GetLanguage() string
 	Close()
 	getHandle() C.SPXHANDLE
@@ -34,62 +34,62 @@ type dialogServiceConfigBase struct {
 }
 
 // SetProperty sets a property value by ID.
-func (config dialogServiceConfigBase) SetProperty(id common.PropertyID, value string) error {
+func (config *dialogServiceConfigBase) SetProperty(id common.PropertyID, value string) error {
 	return config.config.SetProperty(id, value)
 }
 
 // GetProperty gets a property value by ID.
-func (config dialogServiceConfigBase) GetProperty(id common.PropertyID) string {
+func (config *dialogServiceConfigBase) GetProperty(id common.PropertyID) string {
 	return config.config.GetProperty(id)
 }
 
 // SetPropertyByString sets a property value by name.
-func (config dialogServiceConfigBase) SetPropertyByString(name string, value string) error {
+func (config *dialogServiceConfigBase) SetPropertyByString(name string, value string) error {
 	return config.config.SetPropertyByString(name, value)
 }
 
 // GetPropertyByString gets a property value by name.
-func (config dialogServiceConfigBase) GetPropertyByString(name string, value string) string {
+func (config *dialogServiceConfigBase) GetPropertyByString(name string) string {
 	return config.config.GetPropertyByString(name);
 }
 
 // SetServiceProperty sets a property value that will be passed to service using the specified channel.
-func (config dialogServiceConfigBase) SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error {
+func (config *dialogServiceConfigBase) SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error {
 	return config.config.SetServiceProperty(name, value, channel)
 }
 
 // SetProxy sets proxy configuration
 //
 // Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
-func (config dialogServiceConfigBase) SetProxy(hostname string, port uint64) error {
+func (config *dialogServiceConfigBase) SetProxy(hostname string, port uint64) error {
 	return config.config.SetProxy(hostname, port);
 }
 
 // SetProxyWithUsernameAndPassword sets proxy configuration with username and password
 //
 // Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
-func (config dialogServiceConfigBase) SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error {
+func (config *dialogServiceConfigBase) SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error {
 	return config.config.SetProxyWithUsernameAndPassword(hostname, port, username, password)
 }
 
 // SetLanguage sets the input language to the connector.
 // The language is specified in BCP-47 format.
-func (config dialogServiceConfigBase) SetLanguage(lang string) error {
+func (config *dialogServiceConfigBase) SetLanguage(lang string) error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, lang);
 }
 
 // GetLanguage gets the input language to the connector.
 // The language is specified in BCP-47 format.
-func (config dialogServiceConfigBase) GetLanguage() string {
+func (config *dialogServiceConfigBase) GetLanguage() string {
 	return config.GetProperty(common.SpeechServiceConnectionRecoLanguage)
 }
 
 // Close disposes the associated resources.
-func (config dialogServiceConfigBase) Close() {
+func (config *dialogServiceConfigBase) Close() {
 	config.config.Close()
 }
 
-func (config dialogServiceConfigBase) getHandle() C.SPXHANDLE {
+func (config *dialogServiceConfigBase) getHandle() C.SPXHANDLE {
 	return config.handle
 }
 
