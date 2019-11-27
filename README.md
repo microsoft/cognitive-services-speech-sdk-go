@@ -29,6 +29,14 @@ To run applications consuming this project, we need to add the library to the pa
 export LD_LIBRARY_PATH="/path/to/SDKs/library:$LD_LIBRARY_PATH"
 ```
 
+### Running Tests
+
+Additional to the environment variables needed to run applications, running tests requires setting the following variables:
+
+```bash
+export TEST_SUBSCRIPTION_KEY="your_subscription_key"
+export TEST_SUBSCRIPTION_REGION="your_region"
+```
 
 # Contributing
 
