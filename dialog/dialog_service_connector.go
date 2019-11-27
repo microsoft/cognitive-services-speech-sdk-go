@@ -63,13 +63,40 @@ func (connector DialogServiceConnector) Close() {
 	C.dialog_service_connector_handle_release(connector.handle)
 }
 
+// ConnectAsync connects with the back end.
+func (connector DialogServiceConnector) ConnectAsync() chan error {
+	outcome := make(chan error)
+	go func() {
+		ret := uintptr(C.dialog_service_connector_connect(connector.handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- common.NewCarbonError(ret)
+		} else {
+			outcome <- nil
+		}
+	}()
+	return outcome
+}
+
+// DisconnectAsync disconnects from the back end.
+func (connector DialogServiceConnector) DisconnectAsync() chan error {
+	outcome := make(chan error)
+	go func() {
+		ret := uintptr(C.dialog_service_connector_disconnect(connector.handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- common.NewCarbonError(ret)
+		} else {
+			outcome <- nil
+		}
+	}()
+	return outcome
+}
+
 // ListenOnceAsync starts a listening session that will terminate after the first utterance.
 func (connector DialogServiceConnector) ListenOnceAsync() <-chan speech.SpeechRecognitionOutcome {
 	outcome := make(chan speech.SpeechRecognitionOutcome)
 	go func() {
 		var handle C.SPXRESULTHANDLE
 		ret := uintptr(C.dialog_service_connector_listen_once(connector.handle, &handle))
-
 		if ret != C.SPX_NOERROR {
 			outcome <- speech.SpeechRecognitionOutcome{ Result: nil, Error: common.NewCarbonError(ret) }
 		} else {
