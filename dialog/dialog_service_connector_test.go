@@ -19,6 +19,7 @@ func TestSessionEvents(t *testing.T) {
 		t.Error(msg)
 		return
 	}
+	defer audioConfig.Close()
 	var config *BotFrameworkConfig
 	config, err = NewBotFrameworkConfigFromSubscription(subscription, region)
 	if err != nil {
@@ -26,6 +27,7 @@ func TestSessionEvents(t *testing.T) {
 		t.Error(msg)
 		return
 	}
+	defer config.Close()
 	var connector *DialogServiceConnector
 	connector, err = NewDialogServiceConnectorFromConfig(config, audioConfig)
 	if err != nil {
@@ -33,6 +35,7 @@ func TestSessionEvents(t *testing.T) {
 		t.Error(msg)
 		return
 	}
+	defer connector.Close()
 	receivedSessionStarted := false
 	sessionStartedHandler := func(event speech.SessionEventArgs) {
 		receivedSessionStarted = true
@@ -49,6 +52,7 @@ func TestSessionEvents(t *testing.T) {
 	connector.SessionStopped(sessionStoppedHandler)
 	future := connector.ListenOnceAsync()
 	outcome := <- future
+	defer outcome.Close()
 	if outcome.Error != nil {
 		msg := fmt.Sprint("Got an error: ", err.Error())
 		t.Error(msg)

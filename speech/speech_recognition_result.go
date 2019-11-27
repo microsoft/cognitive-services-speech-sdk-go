@@ -37,12 +37,7 @@ type SpeechRecognitionResult struct {
 	Properties common.PropertyCollection
 }
 
-// SpeechRecognitionOutcome is a wrapper type to be returned by operations returning SpeechRecognitionResult and error
-type SpeechRecognitionOutcome struct {
-	Result *SpeechRecognitionResult
-	Error error
-}
-
+// Close releases the underlying resources
 func (result SpeechRecognitionResult) Close() {
 	C.recognizer_result_handle_release(result.handle)
 }
@@ -94,4 +89,17 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 	}
 	result.Properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
 	return result, nil
+}
+
+// SpeechRecognitionOutcome is a wrapper type to be returned by operations returning SpeechRecognitionResult and error
+type SpeechRecognitionOutcome struct {
+	Result *SpeechRecognitionResult
+	Error error
+}
+
+// Close releases the underlying resources
+func (outcome SpeechRecognitionOutcome) Close() {
+	if outcome.Result != nil {
+		outcome.Result.Close()
+	}
 }

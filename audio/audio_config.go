@@ -22,6 +22,11 @@ func (config AudioConfig) GetHandle() common.SPXHandle {
 	return handle2uintptr(config.handle)
 }
 
+// Close releases the underlying resources
+func (config AudioConfig) Close() {
+	config.properties.Close()
+}
+
 func newAudioConfigFromHandle(handle C.SPXHANDLE) (*AudioConfig, error) {
 	var propBagHandle C.SPXPROPERTYBAGHANDLE
 	ret := uintptr(C.audio_config_get_property_bag(handle, &propBagHandle))
