@@ -5,6 +5,7 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"testing"
 	"os"
+	"encoding/json"
 )
 
 func createConnectorFromFileInput(t *testing.T, file string) *DialogServiceConnector {
@@ -57,7 +58,7 @@ func TestSessionEvents(t *testing.T) {
 	future := connector.ListenOnceAsync()
 	outcome := <- future
 	defer outcome.Close()
-	if outcome.Error != nil {
+	if outcome.Failed() {
 		t.Error("Got an error: ", outcome.Error.Error())
 		return
 	}
@@ -89,4 +90,26 @@ func TestConnectionFunctions(t *testing.T) {
 		t.Error("Got an error ", err.Error())
 	}
 	t.Log("Disconnect Succeeded")
+}
+
+type testActivity struct {
+	Type string    `json:"type"`
+	Text string `json:"text"`
+}
+
+func TestSendActivity(t *testing.T) {
+	connector := createConnectorFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
+	if connector == nil {
+		return
+	}
+	defer connector.Close()
+	act := testActivity{ Type: "message", Text: "Make this larger" }
+	msg, _ := json.Marshal(act)
+	future := connector.SendActivityAsync(string(msg))
+	outcome := <- future
+	if outcome.Failed() {
+		t.Error("Got an error ", outcome.Error.Error())
+	} else {
+		t.Log("Got interactionID ", outcome.InteractionID)
+	}
 }

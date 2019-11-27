@@ -93,8 +93,10 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 
 // SpeechRecognitionOutcome is a wrapper type to be returned by operations returning SpeechRecognitionResult and error
 type SpeechRecognitionOutcome struct {
+	common.OperationOutcome
+
+	// Result is the result of the operation
 	Result *SpeechRecognitionResult
-	Error error
 }
 
 // Close releases the underlying resources

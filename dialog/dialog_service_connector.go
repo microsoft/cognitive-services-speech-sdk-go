@@ -91,6 +91,32 @@ func (connector DialogServiceConnector) DisconnectAsync() chan error {
 	return outcome
 }
 
+type SendActivityOutcome struct {
+	common.OperationOutcome
+
+	// InteractionID is the identifier associated with the interaction
+	InteractionID string
+}
+
+// SendActivityAsync sends an activity to the backing dialog.
+func (connector DialogServiceConnector) SendActivityAsync(message string) chan SendActivityOutcome {
+	outcome := make(chan SendActivityOutcome)
+	go func() {
+		msg := C.CString(message)
+		defer C.free(unsafe.Pointer(msg))
+		buffer := C.malloc(C.sizeof_char * 37)
+		defer C.free(unsafe.Pointer(buffer))
+		ret := uintptr(C.dialog_service_connector_send_activity(connector.handle, msg, (*C.char)(buffer)));
+		if ret != C.SPX_NOERROR {
+			outcome <- SendActivityOutcome{ InteractionID: "", OperationOutcome: common.OperationOutcome{ common.NewCarbonError(ret) } }
+		} else {
+			interactionID := C.GoString((*C.char)(buffer))
+			outcome <- SendActivityOutcome{ InteractionID: interactionID, OperationOutcome: common.OperationOutcome{ nil } }
+		}
+	}()
+	return outcome
+}
+
 // ListenOnceAsync starts a listening session that will terminate after the first utterance.
 func (connector DialogServiceConnector) ListenOnceAsync() <-chan speech.SpeechRecognitionOutcome {
 	outcome := make(chan speech.SpeechRecognitionOutcome)
@@ -98,13 +124,26 @@ func (connector DialogServiceConnector) ListenOnceAsync() <-chan speech.SpeechRe
 		var handle C.SPXRESULTHANDLE
 		ret := uintptr(C.dialog_service_connector_listen_once(connector.handle, &handle))
 		if ret != C.SPX_NOERROR {
-			outcome <- speech.SpeechRecognitionOutcome{ Result: nil, Error: common.NewCarbonError(ret) }
+			outcome <- speech.SpeechRecognitionOutcome{ Result: nil, OperationOutcome: common.OperationOutcome{ common.NewCarbonError(ret) } }
 		} else {
 			result, err := speech.NewSpeechRecognitionResultFromHandle(handle2uintptr(handle))
-			outcome <- speech.SpeechRecognitionOutcome{ Result: result, Error: err }
+			outcome <- speech.SpeechRecognitionOutcome{ Result: result, OperationOutcome: common.OperationOutcome{ err } }
 		}
 	}()
 	return outcome
+}
+
+// SetAuthorizationToken sets the authorization token that will be used for connecting to the service.
+// Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
+// expires, the caller needs to refresh it by calling this setter with a new valid token.
+// Otherwise, the connector will encounter errors during its operation.
+func (connector DialogServiceConnector) SetAuthorizationToken(token string) error {
+	return connector.Properties.SetProperty(common.SpeechServiceAuthorizationToken, token)
+}
+
+// AuthorizationToken is the authorization token.
+func (connector DialogServiceConnector) AuthorizationToken() string {
+	return connector.Properties.GetProperty(common.SpeechServiceAuthorizationToken, "")
 }
 
 // SessionStarted signals that indicates the start of a listening session.
