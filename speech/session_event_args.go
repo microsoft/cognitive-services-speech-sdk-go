@@ -28,7 +28,7 @@ func NewSessionEventArgsFromHandle(handle common.SPXHandle) (*SessionEventArgs, 
 		return nil, common.NewCarbonError(ret)
 	}
 	event := new(SessionEventArgs)
-	event.sessionID = string(C.GoBytes(buffer, 37))
+	event.sessionID = C.GoString((*C.char)(buffer))
 	return event, nil
 }
 
