@@ -116,3 +116,30 @@ func dialogFireEventRecognizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHA
 	}
 	handler(*event)
 }
+
+var canceledCallbacks = make(map[C.SPXHANDLE]speech.SpeechRecognitionCanceledEventHandler)
+
+func registerCanceledCallback(handler speech.SpeechRecognitionCanceledEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	canceledCallbacks[handle] = handler;
+}
+
+func getCanceledCallback(handle C.SPXHANDLE) speech.SpeechRecognitionCanceledEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return canceledCallbacks[handle]
+}
+
+//export dialogFireEventCanceled
+func dialogFireEventCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getCanceledCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := speech.NewSpeechRecognitionCanceledEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}

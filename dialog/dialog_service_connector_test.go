@@ -4,13 +4,12 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"testing"
+	"time"
 	"os"
 	"encoding/json"
 )
 
-func createConnectorFromFileInput(t *testing.T, file string) *DialogServiceConnector {
-	subscription := os.Getenv("TEST_SUBSCRIPTION_KEY")
-	region := os.Getenv("TEST_SUBSCRIPTION_REGION")
+func createConnectorFromSubscriptionRegionAndFileInput(t *testing.T, subscription string, region string, file string) *DialogServiceConnector {
 	var err error
 	var audioConfig *audio.AudioConfig
 	audioConfig, err = audio.NewAudioConfigFromFileInput(file)
@@ -33,6 +32,12 @@ func createConnectorFromFileInput(t *testing.T, file string) *DialogServiceConne
 		return nil
 	}
 	return connector
+}
+
+func createConnectorFromFileInput(t *testing.T, file string) *DialogServiceConnector {
+	subscription := os.Getenv("TEST_SUBSCRIPTION_KEY")
+	region := os.Getenv("TEST_SUBSCRIPTION_REGION")
+	return createConnectorFromSubscriptionRegionAndFileInput(t, subscription, region, file)
 }
 
 func TestSessionEvents(t *testing.T) {
@@ -104,6 +109,26 @@ func TestSpeechRecognitionEvents(t *testing.T) {
 	}
 	if !receivedRecognizing {
 		t.Error("Didn't receive Recognizing event.")
+	}
+}
+
+func TestCancellationEvent(t *testing.T) {
+	region := os.Getenv("TEST_SUBSCRIPTION_REGION")
+	connector := createConnectorFromSubscriptionRegionAndFileInput(t, "bad_suscription", region, "../test_files/turn_on_the_lamp.wav")
+	defer connector.Close()
+	future := make(chan string)
+	cancelledHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
+		defer event.Close()
+		future <- "Received"
+		t.Log("Received cancellation.")
+	}
+	connector.Canceled(cancelledHandler)
+	connector.ListenOnceAsync()
+	select {
+	case <- future:
+		t.Log("All good, received the event.")
+	case <-time.After((5 * time.Second)):
+		t.Error("Timeout, no event received")
 	}
 }
 

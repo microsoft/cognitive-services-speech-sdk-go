@@ -16,6 +16,7 @@ import (
 // void cgo_dialog_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_dialog_recognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_dialog_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_dialog_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 //
 import "C"
 import "unsafe"
@@ -197,5 +198,18 @@ func (connector DialogServiceConnector) SessionStopped(handler speech.SessionEve
 			nil)
 	} else {
 		C.dialog_service_connector_session_stopped_set_callback(connector.handle, nil, nil)
+	}
+}
+
+// Canceled signals events relating to the cancellation of an interaction. The event indicates if the reason is a direct cancellation or an error.
+func (connector DialogServiceConnector) Canceled(handler speech.SpeechRecognitionCanceledEventHandler) {
+	registerCanceledCallback(handler, connector.handle)
+	if handler != nil {
+		C.dialog_service_connector_canceled_set_callback(
+			connector.handle,
+			(C.PRECOGNITION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_dialog_canceled)),
+			nil)
+	} else {
+		C.dialog_service_connector_canceled_set_callback(connector.handle, nil, nil)
 	}
 }
