@@ -17,6 +17,7 @@ import (
 // void cgo_dialog_recognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_dialog_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_dialog_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_dialog_activity_received(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 //
 import "C"
 import "unsafe"
@@ -211,5 +212,18 @@ func (connector DialogServiceConnector) Canceled(handler speech.SpeechRecognitio
 			nil)
 	} else {
 		C.dialog_service_connector_canceled_set_callback(connector.handle, nil, nil)
+	}
+}
+
+// ActivityReceived signals that an activity was received from the backend.
+func (connector DialogServiceConnector) ActivityReceived(handler ActivityReceivedEventHandler) {
+	registerActivityReceivedCallback(handler, connector.handle)
+	if handler != nil {
+		C.dialog_service_connector_activity_received_set_callback(
+			connector.handle,
+			(C.PRECOGNITION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_dialog_activity_received)),
+			nil)
+	} else {
+		C.dialog_service_connector_activity_received_set_callback(connector.handle, nil, nil)
 	}
 }

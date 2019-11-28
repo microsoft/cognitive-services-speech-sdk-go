@@ -143,3 +143,30 @@ func dialogFireEventCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDL
 	}
 	handler(*event)
 }
+
+var activityReceivedCallbacks = make(map[C.SPXHANDLE]ActivityReceivedEventHandler)
+
+func registerActivityReceivedCallback(handler ActivityReceivedEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	activityReceivedCallbacks[handle] = handler;
+}
+
+func getActivityReceivedCallback(handle C.SPXHANDLE) ActivityReceivedEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return activityReceivedCallbacks[handle]
+}
+
+//export dialogFireEventActivityReceived
+func dialogFireEventActivityReceived(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getActivityReceivedCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewActivityReceivedEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}

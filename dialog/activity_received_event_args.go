@@ -41,3 +41,5 @@ func NewActivityReceivedEventArgsFromHandle(handle common.SPXHandle) (*ActivityR
 	event.Activity = C.GoString((*C.char)(actBuffer))
 	return event, nil
 }
+
+type ActivityReceivedEventHandler func (event ActivityReceivedEventArgs)

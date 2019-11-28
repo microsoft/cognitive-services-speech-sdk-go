@@ -40,4 +40,11 @@ package dialog
 //     dialogFireEventCanceled(handle, event);
 // }
 //
+// extern void dialogFireEventActivityReceived(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_dialog_activity_received(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     dialogFireEventActivityReceived(handle, event);
+// }
+//
 import "C"
