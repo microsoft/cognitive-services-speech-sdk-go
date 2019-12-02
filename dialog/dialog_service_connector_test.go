@@ -172,6 +172,13 @@ func TestActivityWithAudio(t *testing.T) {
 	future := make(chan bool)
 	activityReceivedHandler := func(event ActivityReceivedEventArgs) {
 		defer event.Close()
+		var activity map[string]interface{}
+		json.Unmarshal([]byte(event.Activity), &activity)
+		messageType := activity["type"].(string);
+		if messageType == "conversationUpdate" {
+			t.Log("Got conversation update, ignoring")
+			return
+		}
 		if event.HasAudio() {
 			audio, err := event.GetAudio()
 			if err != nil {
