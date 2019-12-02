@@ -2,6 +2,7 @@ package dialog
 
 
 import (
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
@@ -19,6 +20,21 @@ type ActivityReceivedEventArgs struct {
 // Close releases the underlying resources
 func (event ActivityReceivedEventArgs) Close() {
 	C.dialog_service_connector_activity_received_event_release(event.handle)
+}
+
+// HasAudio checks if the event contains audio
+func (event ActivityReceivedEventArgs) HasAudio() bool {
+	return bool(C.dialog_service_connector_activity_received_event_has_audio(event.handle))
+}
+
+// GetAudio gets the audio associated with the event.
+func (event ActivityReceivedEventArgs) GetAudio() (*audio.PullAudioOutputStream, error) {
+	var handle C.SPXHANDLE
+	ret := uintptr(C.dialog_service_connector_activity_received_event_get_audio(event.handle, &handle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	return audio.NewPullAudioOutputStreamFromHandle(handle2uintptr(handle)), nil
 }
 
 // NewSpeechRecognitionCanceledEventArgsFromHandle creates the object from the handle (for internal use)

@@ -27,11 +27,11 @@ type audioOutputStreamBase struct {
 	handle C.SPXHANDLE
 }
 
-func (stream audioOutputStreamBase) getHandle() C.SPXHANDLE {
+func (stream *audioOutputStreamBase) getHandle() C.SPXHANDLE {
 	return stream.handle
 }
 
-func (stream audioOutputStreamBase) Close() {
+func (stream *audioOutputStreamBase) Close() {
 	C.audio_stream_release(stream.handle)
 }
 
@@ -41,6 +41,13 @@ type PullAudioOutputStream struct {
 	audioOutputStreamBase
 }
 
+// NewPullAudioOutputStreamFromHandle creates a new PullAudioOutputStream from a handle (for internal use)
+func NewPullAudioOutputStreamFromHandle(handle common.SPXHandle) *PullAudioOutputStream {
+	stream := new(PullAudioOutputStream)
+	stream.handle = uintptr2handle(handle)
+	return stream
+}
+
 // CreatePullAudioOutputStream creates a memory backed PullAudioOutputStream.
 func CreatePullAudioOutputStream() (*PullAudioOutputStream, error) {
 	var handle C.SPXHANDLE
@@ -48,9 +55,7 @@ func CreatePullAudioOutputStream() (*PullAudioOutputStream, error) {
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	stream := new(PullAudioOutputStream)
-	stream.handle = handle
-	return stream, nil
+	return NewPullAudioOutputStreamFromHandle(handle2uintptr(handle)), nil
 }
 
 // Read reads audio from the stream.

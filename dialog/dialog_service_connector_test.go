@@ -2,6 +2,7 @@ package dialog
 
 import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"testing"
 	"time"
@@ -25,6 +26,7 @@ func createConnectorFromSubscriptionRegionAndFileInput(t *testing.T, subscriptio
 		return nil
 	}
 	defer config.Close()
+	config.SetProperty(common.SpeechLogFilename, "/home/glecaros/github/cognitive-services-speech-sdk-go/dialog/log.txt")
 	var connector *DialogServiceConnector
 	connector, err = NewDialogServiceConnectorFromConfig(config, audioConfig)
 	if err != nil {
@@ -156,6 +158,53 @@ func TestActivityReceivedEvent(t *testing.T) {
 	select {
 	case <- future:
 		t.Log("All good, received the event.")
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout, no event received")
+	}
+}
+
+func TestActivityWithAudio(t *testing.T) {
+	connector := createConnectorFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
+	if connector == nil {
+		return
+	}
+	defer connector.Close()
+	future := make(chan bool)
+	activityReceivedHandler := func(event ActivityReceivedEventArgs) {
+		defer event.Close()
+		if event.HasAudio() {
+			audio, err := event.GetAudio()
+			if err != nil {
+				t.Log("Got an error ", err.Error())
+				future <- false
+				return
+			}
+			i := 1
+			for buffer, err := audio.Read(3200); (err == nil) && (len(buffer) > 0); buffer, err = audio.Read(3200) {
+				t.Log("Got ", len(buffer), " bytes(", i, ")")
+				i += 1
+			}
+			if err != nil {
+				t.Log("Got an error ", err.Error())
+				future <- false
+				return
+			}
+			future <- true
+		} else {
+			future <- false
+		}
+	}
+	connector.ActivityReceived(activityReceivedHandler)
+	act := testActivity{ Type: "message", Text: "what is the weather forecast in the mountain?" }
+	msg, _ := json.Marshal(act)
+	connector.SendActivityAsync(string(msg))
+	select {
+	case hasAudio := <- future:
+		if !hasAudio {
+			t.Error("No audio")
+		} else {
+			t.Log("Got audio")
+		}
 	case <- time.After(5 * time.Second):
 		t.Error("Timeout, no event received")
 	}
