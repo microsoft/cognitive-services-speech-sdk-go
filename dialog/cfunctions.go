@@ -20,7 +20,6 @@ package dialog
 // extern void dialogFireEventRecognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
 //
 // void cgo_dialog_recognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
-//
 // {
 //     dialogFireEventRecognized(handle, event);
 // }
@@ -28,7 +27,6 @@ package dialog
 // extern void dialogFireEventRecognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
 //
 // void cgo_dialog_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
-//
 // {
 //     dialogFireEventRecognizing(handle, event);
 // }

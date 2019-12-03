@@ -2,38 +2,38 @@ package dialog
 
 import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"testing"
 	"time"
 	"os"
+	"io"
+	"bufio"
 	"encoding/json"
 )
 
+func createConnectorFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *DialogServiceConnector {
+	config, err := NewBotFrameworkConfigFromSubscription(subscription, region)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return nil
+	}
+	defer config.Close()
+	connector, err := NewDialogServiceConnectorFromConfig(config, audioConfig)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return nil
+	}
+	return connector
+}
+
 func createConnectorFromSubscriptionRegionAndFileInput(t *testing.T, subscription string, region string, file string) *DialogServiceConnector {
-	var err error
-	var audioConfig *audio.AudioConfig
-	audioConfig, err = audio.NewAudioConfigFromFileInput(file)
+	audioConfig, err := audio.NewAudioConfigFromFileInput(file)
 	if err != nil {
 		t.Error("Got an error: ", err.Error())
 		return nil
 	}
 	defer audioConfig.Close()
-	var config *BotFrameworkConfig
-	config, err = NewBotFrameworkConfigFromSubscription(subscription, region)
-	if err != nil {
-		t.Error("Got an error: ", err.Error())
-		return nil
-	}
-	defer config.Close()
-	config.SetProperty(common.SpeechLogFilename, "/home/glecaros/github/cognitive-services-speech-sdk-go/dialog/log.txt")
-	var connector *DialogServiceConnector
-	connector, err = NewDialogServiceConnectorFromConfig(config, audioConfig)
-	if err != nil {
-		t.Error("Got an error: ", err.Error())
-		return nil
-	}
-	return connector
+	return createConnectorFromSubscriptionRegionAndAudioConfig(t, subscription, region, audioConfig)
 }
 
 func createConnectorFromFileInput(t *testing.T, file string) *DialogServiceConnector {
@@ -42,21 +42,27 @@ func createConnectorFromFileInput(t *testing.T, file string) *DialogServiceConne
 	return createConnectorFromSubscriptionRegionAndFileInput(t, subscription, region, file)
 }
 
+func createConnectorFromAudioConfig(t *testing.T, audioConfig *audio.AudioConfig) *DialogServiceConnector {
+	subscription := os.Getenv("TEST_SUBSCRIPTION_KEY")
+	region := os.Getenv("TEST_SUBSCRIPTION_REGION")
+	return createConnectorFromSubscriptionRegionAndAudioConfig(t, subscription, region, audioConfig)
+}
+
 func TestSessionEvents(t *testing.T) {
 	connector := createConnectorFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
 	if connector == nil {
 		return
 	}
 	defer connector.Close()
-	receivedSessionStarted := false
+	sessionStartedFuture := make(chan bool)
 	sessionStartedHandler := func(event speech.SessionEventArgs) {
-		receivedSessionStarted = true
+		sessionStartedFuture <- true
 		id := event.SessionID()
 		t.Log("Started ", id)
 	}
-	receivedSessionStopped := false
+	sessionStoppedFuture := make(chan bool)
 	sessionStoppedHandler := func(event speech.SessionEventArgs) {
-		receivedSessionStopped = true
+		sessionStoppedFuture <- true
 		id := event.SessionID()
 		t.Log("Stopped ", id)
 	}
@@ -71,11 +77,17 @@ func TestSessionEvents(t *testing.T) {
 	}
 	result := outcome.Result
 	t.Log("Recognized: ", result.Text)
-	if !receivedSessionStarted {
+	select {
+	case <- sessionStartedFuture:
+		t.Log("Received a SessionStart event")
+	case <- time.After(5 * time.Second):
 		t.Error("Didn't receive SessionStart event.")
 	}
-	if !receivedSessionStopped {
-		t.Error("Didn't receive SessionStopped event.")
+	select {
+	case <- sessionStoppedFuture:
+		t.Log("Received a SessionStop event")
+	case <- time.After(5 * time.Second):
+		t.Error("Didn't receive SessionStop event.")
 	}
 }
 
@@ -85,31 +97,31 @@ func TestSpeechRecognitionEvents(t *testing.T) {
 		return
 	}
 	defer connector.Close()
-	receivedRecognized := false
+	recognizedFuture := make(chan string)
 	recognizedHandle := func(event speech.SpeechRecognitionEventArgs) {
 		defer event.Close()
-		receivedRecognized = true
 		t.Log("Recognized ", event.Result.Text)
+		recognizedFuture <- "Recognized"
 	}
-	receivedRecognizing := false
+	recognizingFuture := make(chan string)
 	recognizingHandle := func(event speech.SpeechRecognitionEventArgs) {
 		defer event.Close()
-		receivedRecognizing = true
 		t.Log("Recognizing ", event.Result.Text)
+		recognizingFuture <- "Recognizing"
 	}
 	connector.Recognized(recognizedHandle)
 	connector.Recognizing(recognizingHandle)
-	future := connector.ListenOnceAsync()
-	outcome := <- future
-	defer outcome.Close()
-	if outcome.Failed() {
-		t.Error("Got an error: ", outcome.Error.Error())
-		return
+	connector.ListenOnceAsync()
+	select {
+	case <- recognizingFuture:
+		t.Log("Received at least one Recognizing event.")
+	case <- time.After(5 * time.Second):
+		t.Error("Didn't received Recognizing events.")
 	}
-	if !receivedRecognized {
-		t.Error("Didn't receive Recognized event.")
-	}
-	if !receivedRecognizing {
+	select {
+	case <- recognizedFuture:
+		t.Log("Received a Recognized event.")
+	case <- time.After(5 * time.Second):
 		t.Error("Didn't receive Recognizing event.")
 	}
 }
@@ -251,5 +263,99 @@ func TestSendActivity(t *testing.T) {
 		t.Error("Got an error ", outcome.Error.Error())
 	} else {
 		t.Log("Got interactionID ", outcome.InteractionID)
+	}
+}
+
+func pumpFileIntoStream(t *testing.T, filename string, stream *audio.PushAudioInputStream) {
+	file, err := os.Open(filename)
+	if err != nil {
+		t.Error("Error opening file: ", err);
+		return
+	}
+	defer file.Close()
+	reader := bufio.NewReader(file)
+	buffer := make([]byte, 1000)
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			t.Log("Done reading file.")
+			break
+		}
+		if err != nil {
+			t.Error("Error reading file: ", err)
+			break
+		}
+		err = stream.Write(buffer[0:n])
+		if err != nil {
+			t.Error("Error writing to the stream")
+		}
+	}
+}
+
+func TestFromPushInputStream(t *testing.T) {
+	format, err := audio.GetDefaultInputFormat()
+	if err != nil {
+		t.Error("Got an error ", err.Error())
+	}
+	defer format.Close()
+	stream, err := audio.CreatePushAudioInputStreamFromFormat(format)
+	if err != nil {
+		t.Error("Got an error ", err.Error())
+	}
+	defer stream.Close()
+	audioConfig, err := audio.NewAudioConfigFromStreamInput(stream)
+	connector := createConnectorFromAudioConfig(t, audioConfig)
+	if connector == nil {
+		return
+	}
+	defer connector.Close()
+	activityFuture := make(chan bool)
+	activityReceivedHandler := func(event ActivityReceivedEventArgs) {
+		defer event.Close()
+		var activity map[string]interface{}
+		json.Unmarshal([]byte(event.Activity), &activity)
+		messageType := activity["type"].(string);
+		if messageType == "conversationUpdate" {
+			t.Log("Got conversation update, ignoring")
+			return
+		}
+		t.Log(event.Activity)
+		t.Log("Received Activity")
+		activityFuture <- true
+	}
+	connector.ActivityReceived(activityReceivedHandler)
+	recognizedFuture := make(chan bool)
+	recognizedHandle := func(event speech.SpeechRecognitionEventArgs) {
+		defer event.Close()
+		t.Log("Recognized ", event.Result.Text)
+		recognizedFuture <- true
+	}
+	connector.Recognized(recognizedHandle)
+	recognizingHandler := func(event speech.SpeechRecognitionEventArgs) {
+		defer event.Close()
+		t.Log("Recognizing ", event.Result.Text)
+	}
+	connector.Recognizing(recognizingHandler)
+	pumpFileIntoStream(t, "../test_files/turn_on_the_lamp.wav", stream)
+	connector.ListenOnceAsync()
+	select {
+	case correct := <- recognizedFuture:
+		if correct {
+			t.Log("All good, received expected recognition event.")
+		} else {
+			t.Error("Bad recognition")
+		}
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout, no event recognition event received.")
+	}
+	select {
+	case correct := <- activityFuture:
+		if correct {
+			t.Log("All good, received expected activity event.")
+		} else {
+			t.Error("Bad activity event")
+		}
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout, no activity event received.")
 	}
 }

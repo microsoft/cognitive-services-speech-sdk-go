@@ -76,6 +76,6 @@ func GetCompressedFormat(compressedFormat AudioStreamContainerFormat) (*AudioStr
 }
 
 // Close disposes the associated resources.
-func (format AudioStreamFormat) Close() {
+func (format *AudioStreamFormat) Close() {
 	C.audio_stream_format_release(format.handle)
 }

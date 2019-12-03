@@ -79,12 +79,12 @@ type PushAudioOutputStream struct {
 	audioOutputStreamBase
 }
 
-// PushAudioOutputStreamCallback an interface that defines callback methods (Write() and Close()) for custom audio output
+// PushAudioOutputStreamCallback an interface that defines callback methods (Write() and CloseStream()) for custom audio output
 // streams).
 // Added in version 1.4.0
 type PushAudioOutputStreamCallback interface {
 	Write(buffer []byte) int
-	Close()
+	CloseStream()
 }
 
 var pushStreamCallbacks = make(map[C.SPXHANDLE]PushAudioOutputStreamCallback)
@@ -125,12 +125,12 @@ func cgoAudioOutputCallWriteCallback(handle C.SPXHANDLE, buffer *C.uint8_t, size
 func cgoAudioOutputCallCloseCallback(handle C.SPXHANDLE) {
 	callback := getPushStreamCallback(handle)
 	if callback != nil {
-		(*callback).Close()
+		(*callback).CloseStream()
 	}
 }
 
 // CreatePushAudioOutputStream creates a PushAudioOutputStream that delegates to the specified callback interface for Write()
-// and Close() methods.
+// and CloseStream() methods.
 func CreatePushAudioOutputStream(callback PushAudioOutputStreamCallback) (*PushAudioOutputStream, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.audio_stream_create_push_audio_output_stream(&handle))

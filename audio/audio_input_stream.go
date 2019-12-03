@@ -44,7 +44,7 @@ type PushAudioInputStream struct {
 // CreatePushAudioInputStreamFromFormat creates a memory backed PushAudioInputStream with the specified audio format.
 // Currently, only WAV / PCM with 16-bit samples, 16 kHz sample rate, and a single channel (Mono) is supported. When used
 // with Conversation Transcription, eight channels are supported.
-func CreatePushAudioInputStreamFromFormat(format AudioStreamFormat) (*PushAudioInputStream, error) {
+func CreatePushAudioInputStreamFromFormat(format *AudioStreamFormat) (*PushAudioInputStream, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.audio_stream_create_push_audio_input_stream(&handle, format.handle))
 	if ret != C.SPX_NOERROR {
@@ -61,7 +61,7 @@ func CreatePushAudioInputStream() (*PushAudioInputStream, error) {
 	if err != nil {
 		return nil, err
 	}
-	return CreatePushAudioInputStreamFromFormat(*format)
+	return CreatePushAudioInputStreamFromFormat(format)
 }
 
 // Write writes the audio data specified by making an internal copy of the data.
@@ -102,10 +102,9 @@ func (stream PushAudioInputStream) SetPropertyByName(name string, value string) 
 	return nil
 }
 
-// Close closes the stream.
-func (stream PushAudioInputStream) Close() {
+// CloseStream closes the stream.
+func (stream PushAudioInputStream) CloseStream() {
 	C.push_audio_input_stream_close(stream.handle)
-	stream.audioInputStreamBase.Close()
 }
 
 // PullAudioInputStream represents audio input stream used for custom audio input configurations.
@@ -113,12 +112,12 @@ type PullAudioInputStream struct {
 	audioInputStreamBase
 }
 
-// PullAudioInputStreamCallback interface that defines callback methods (Read(), GetProperty() and Close()) for custom
+// PullAudioInputStreamCallback interface that defines callback methods (Read(), GetProperty() and CloseStream()) for custom
 // audio input streams).
 type PullAudioInputStreamCallback interface {
 	Read(maxSize uint32) ([]byte, int)
 	GetProperty(id common.PropertyID) string
-	Close()
+	CloseStream()
 }
 
 var mu sync.Mutex
@@ -178,14 +177,14 @@ func cgoAudioCallGetPropertyCallback(handle C.SPXHANDLE, id int, value *C.uint8_
 func cgoAudioCallCloseCallback(handle C.SPXHANDLE) {
 	callback := getCallback(handle)
 	if callback != nil {
-		(*callback).Close()
+		(*callback).CloseStream()
 	}
 }
 
-// CreatePullStreamFromFormat creates a PullAudioInputStream that delegates to the specified callback interface for read()
-// and close() methods and the specified format.
+// CreatePullStreamFromFormat creates a PullAudioInputStream that delegates to the specified callback interface for Read()
+// and CloseStream() methods and the specified format.
 // Currently, only WAV / PCM with 16-bit samples, 16 kHz sample rate, and a single channel (Mono) is supported. When used with Conversation Transcription, eight channels are supported.
-func CreatePullStreamFromFormat(callback PullAudioInputStreamCallback, format AudioStreamFormat) (*PullAudioInputStream, error) {
+func CreatePullStreamFromFormat(callback PullAudioInputStreamCallback, format *AudioStreamFormat) (*PullAudioInputStream, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.audio_stream_create_pull_audio_input_stream(&handle, format.handle))
 	if ret != C.SPX_NOERROR {
@@ -209,12 +208,12 @@ func CreatePullStreamFromFormat(callback PullAudioInputStreamCallback, format Au
 	return stream, nil
 }
 
-// CreatePullStream creates a PullAudioInputStream that delegates to the specified callback interface for read() and close()
+// CreatePullStream creates a PullAudioInputStream that delegates to the specified callback interface for Read() and CloseStream()
 // methods using the default format (16 kHz, 16 bit, mono PCM).
 func CreatePullStream(callback PullAudioInputStreamCallback) (*PullAudioInputStream, error) {
 	format, err := GetDefaultInputFormat()
 	if err != nil {
 		return nil, err
 	}
-	return CreatePullStreamFromFormat(callback, *format)
+	return CreatePullStreamFromFormat(callback, format)
 }
