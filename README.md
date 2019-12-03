@@ -1,16 +1,16 @@
 # Overview
 
-This project contains golang binding for the Microsoft Cognitive Service Speech SDK.
+This project contains Golang binding for the Microsoft Cognitive Service Speech SDK.
 
 # Getting Started
 
-This project requires go 3.13
+This project requires Go 3.13
 
 ## Linux
 
 ### Compiling
 
-First, new need to set the environment variables for go to find the SDK:
+First, you new need to set the environment variables for Go to find the SDK:
 
 
 ```bash
@@ -31,7 +31,7 @@ export LD_LIBRARY_PATH="/path/to/SDKs/library:$LD_LIBRARY_PATH"
 
 ### Running Tests
 
-Additional to the environment variables needed to run applications, running tests requires setting the following variables:
+In addition to the environment variables needed to run applications, running tests requires setting the following variables:
 
 ```bash
 export TEST_SUBSCRIPTION_KEY="your_subscription_key"
