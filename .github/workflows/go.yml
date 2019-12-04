@@ -31,8 +31,8 @@ jobs:
 
     - name: Get Carbon
       run: |
-        mkdir $CARBON_HOME
-        pushd $CARBON_HOME
+        mkdir $HOME/carbon
+        pushd $HOME/carbon
         wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-Linux-$CARBON_VERSION.tar.gz
         tar xzf SpeechSDK-Linux-$CARBON_VERSION.tar.gz
         rm SpeechSDK-Linux-$CARBON_VERSION.tar.gz
