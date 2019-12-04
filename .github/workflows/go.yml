@@ -31,6 +31,7 @@ jobs:
 
     - name: Get Carbon
       run: |
+        echo "$HOME/carbon"
         mkdir $HOME/carbon
         pushd $HOME/carbon
         wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-Linux-$CARBON_VERSION.tar.gz
@@ -44,7 +45,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install libssl1.0.0 libasound2
     - name: Build
-      run: go build -v ./...
+      run: |
+        echo "CGO_CFLAGS"
+        echo "$CGO_CFLAGS"
+        echo "CGO_LDFLAGS"
+        echo "$CGO_LDFLAGS"
+        echo "LD_LIBRARY_PATH"
+        echo "$LD_LIBRARY_PATH"
+        go build -v ./...
     - name: Test
       run: go test ./...
 
