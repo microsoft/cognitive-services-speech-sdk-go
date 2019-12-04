@@ -39,8 +39,8 @@ jobs:
         ln -s SpeechSDK-Linux-$CARBON_VERSION current
         popd
     - name: Build
-      run: go build -v .
+      run: go build -v ./...
     - name: Test
-      run: go test ./..
+      run: go test ./...
 
 
