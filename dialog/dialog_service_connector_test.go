@@ -41,14 +41,14 @@ func createConnectorFromSubscriptionRegionAndFileInput(t *testing.T, subscriptio
 }
 
 func createConnectorFromFileInput(t *testing.T, file string) *DialogServiceConnector {
-	subscription := os.Getenv("TEST_SUBSCRIPTION_KEY")
-	region := os.Getenv("TEST_SUBSCRIPTION_REGION")
+	subscription := os.Getenv("DIALOG_SUBSCRIPTION_KEY")
+	region := os.Getenv("DIALOG_SUBSCRIPTION_REGION")
 	return createConnectorFromSubscriptionRegionAndFileInput(t, subscription, region, file)
 }
 
 func createConnectorFromAudioConfig(t *testing.T, audioConfig *audio.AudioConfig) *DialogServiceConnector {
-	subscription := os.Getenv("TEST_SUBSCRIPTION_KEY")
-	region := os.Getenv("TEST_SUBSCRIPTION_REGION")
+	subscription := os.Getenv("DIALOG_SUBSCRIPTION_KEY")
+	region := os.Getenv("DIALOG_SUBSCRIPTION_REGION")
 	return createConnectorFromSubscriptionRegionAndAudioConfig(t, subscription, region, audioConfig)
 }
 
@@ -131,7 +131,7 @@ func TestSpeechRecognitionEvents(t *testing.T) {
 }
 
 func TestCancellationEvent(t *testing.T) {
-	region := os.Getenv("TEST_SUBSCRIPTION_REGION")
+	region := os.Getenv("DIALOG_SUBSCRIPTION_REGION")
 	connector := createConnectorFromSubscriptionRegionAndFileInput(t, "bad_suscription", region, "../test_files/turn_on_the_lamp.wav")
 	defer connector.Close()
 	future := make(chan string)

@@ -51,6 +51,9 @@ jobs:
         echo "$LD_LIBRARY_PATH"
         go build -v ./...
     - name: Test
+      env:
+        DIALOG_SUBSCRIPTION_KEY: ${{ secrets.DIALOG_SUBSCRIPTION_KEY }}
+        DIALOG_SUBSCRIPTION_REGION: ${{ secrets.DIALOG_SUBSCRIPTION_REGION }}
       run: go test ./...
 
 
