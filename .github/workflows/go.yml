@@ -6,9 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CARBON_VERSION: "1.8.0"
-      CGO_CFLAGS: ${{ format('-I{0}/carbon/current/include/c_api', HOME) }}
-      CGO_LDFLAGS: ${{ format('-L{0}/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core', HOME) }}
-      LD_LIBRARY_PATH: ${{ format('{0}::{1}/carbon/current/lib/x64', LD_LIBRARY_PATH, HOME) }}
     steps:
     - name: Set up Go 1.13
       uses: actions/setup-go@v1
@@ -42,6 +39,9 @@ jobs:
         sudo apt-get install libssl1.0.0 libasound2
     - name: Build
       run: |
+        export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
+        export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
+        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
         echo "CGO_CFLAGS"
         echo "$CGO_CFLAGS"
         echo "CGO_LDFLAGS"
@@ -53,6 +53,10 @@ jobs:
       env:
         DIALOG_SUBSCRIPTION_KEY: ${{ secrets.DIALOG_SUBSCRIPTION_KEY }}
         DIALOG_SUBSCRIPTION_REGION: ${{ secrets.DIALOG_SUBSCRIPTION_REGION }}
-      run: go test ./...
+      run: |
+        export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
+        export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
+        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
+        go test ./...
 
 
