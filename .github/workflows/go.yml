@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CARBON_VERSION: "1.8.0"
-      CGO_CFLAGS: "-I${{env.HOME}}/carbon/current/include/c_api"
-      CGO_LDFLAGS: "-L${{env.HOME}}/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:${{env.HOME}}/carbon/current/lib/x64"
+      CGO_CFLAGS: ${{ format('-I{0}/carbon/current/include/c_api', env.HOME) }}
+      CGO_LDFLAGS: ${{ format('-L{0}/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core', env.HOME) }}
+      LD_LIBRARY_PATH: ${{ format('{0}::{1}/carbon/current/lib/x64', env.LD_LIBRARY_PATH, env.HOME) }}
     steps:
     - name: Set up Go 1.13
       uses: actions/setup-go@v1
