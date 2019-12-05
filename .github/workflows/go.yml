@@ -35,7 +35,6 @@ jobs:
         tar xzf SpeechSDK-Linux-$CARBON_VERSION.tar.gz
         rm SpeechSDK-Linux-$CARBON_VERSION.tar.gz
         ln -s SpeechSDK-Linux-$CARBON_VERSION current
-        ls -l $HOME/carbon/current/lib/x64
         popd
     - name: Get Carbon Dependencies
       run: |
