@@ -23,6 +23,10 @@ func (event SessionEventArgs) SessionID() string {
 	return event.sessionID
 }
 
+// Close releases the underlying resources.
+func (event SessionEventArgs) Close() {
+}
+
 // NewSessionEventArgsFromHandle creates the object from the handle (for internal use)
 func NewSessionEventArgsFromHandle(handle common.SPXHandle) (*SessionEventArgs, error) {
 	buffer := C.malloc(C.sizeof_char * 37)
