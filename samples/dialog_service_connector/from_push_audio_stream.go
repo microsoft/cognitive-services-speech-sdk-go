@@ -35,6 +35,7 @@ func pumpFileIntoStream(filename string, stream *audio.PushAudioInputStream) {
 			fmt.Println("Error writing to the stream")
 		}
 	}
+	stream.CloseStream()
 }
 
 
@@ -91,7 +92,6 @@ func main() {
 	recognizedHandle := func(event speech.SpeechRecognitionEventArgs) {
 		defer event.Close()
 		fmt.Println("Recognized ", event.Result.Text)
-		stream.CloseStream()
 	}
 	connector.Recognized(recognizedHandle)
 	recognizingHandler := func(event speech.SpeechRecognitionEventArgs) {
