@@ -141,6 +141,35 @@ func (connector DialogServiceConnector) ListenOnceAsync() <-chan speech.SpeechRe
 	return outcome
 }
 
+// StartKeywordRecognitionAsync initiates keyword recognition.
+func (connector DialogServiceConnector) StartKeywordRecognitionAsync(model *speech.KeywordRecognitionModel) chan error {
+	modelHandle := uintptr2handle(model.GetHandle())
+	outcome := make(chan error)
+	go func() {
+		ret := uintptr(C.dialog_service_connector_start_keyword_recognition(connector.handle, modelHandle))
+		if ret != C.SPX_NOERROR {
+			outcome <- common.NewCarbonError(ret)
+		} else {
+			outcome <- nil
+		}
+	}()
+	return outcome
+}
+
+// StopKeywordRecognitionAsync stops keyword recognition.
+func (connector DialogServiceConnector) StopKeywordRecognitionAsync() chan error {
+	outcome := make(chan error)
+	go func() {
+		ret := uintptr(C.dialog_service_connector_stop_keyword_recognition(connector.handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- common.NewCarbonError(ret)
+		} else {
+			outcome <- nil
+		}
+	}()
+	return outcome
+}
+
 // SetAuthorizationToken sets the authorization token that will be used for connecting to the service.
 // Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
 // expires, the caller needs to refresh it by calling this setter with a new valid token.

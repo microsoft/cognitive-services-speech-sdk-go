@@ -6,6 +6,7 @@ package dialog
 
 import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"testing"
 	"time"
@@ -351,6 +352,85 @@ func TestFromPushInputStream(t *testing.T) {
 		}
 	case <- time.After(5 * time.Second):
 		t.Error("Timeout, no event recognition event received.")
+	}
+	select {
+	case correct := <- activityFuture:
+		if correct {
+			t.Log("All good, received expected activity event.")
+		} else {
+			t.Error("Bad activity event")
+		}
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout, no activity event received.")
+	}
+}
+
+func TestKeyword(t *testing.T) {
+	connector := createConnectorFromFileInput(t, "../test_files/whats_the_weather_like.wav")
+	if connector == nil {
+		return
+	}
+	defer connector.Close()
+	model, err := speech.NewKeywordRecognitionModelFromFile("../test_files/kws.table")
+	if err != nil {
+		t.Error("Found an error: ", err);
+	}
+	defer model.Close()
+	activityFuture := make(chan bool)
+	activityReceivedHandler := func(event ActivityReceivedEventArgs) {
+		defer event.Close()
+		var activity map[string]interface{}
+		json.Unmarshal([]byte(event.Activity), &activity)
+		messageType := activity["type"].(string);
+		if messageType == "conversationUpdate" {
+			t.Log("Got conversation update, ignoring")
+			return
+		}
+		t.Log(event.Activity)
+		t.Log("Received Activity")
+		activityFuture <- true
+	}
+	connector.ActivityReceived(activityReceivedHandler)
+	recognizedFuture := make(chan bool)
+	keywordFuture := make(chan bool)
+	recognizedHandle := func(event speech.SpeechRecognitionEventArgs) {
+		defer event.Close()
+		t.Log("Recognized ", event.Result.Text)
+		if event.Result.Reason == common.RecognizedKeyword {
+			keywordFuture <- true
+		} else {
+			recognizedFuture <- true
+		}
+	}
+	connector.Recognized(recognizedHandle)
+	recognizingHandler := func(event speech.SpeechRecognitionEventArgs) {
+		defer event.Close()
+		t.Log("Recognizing ", event.Result.Text)
+	}
+	connector.Recognizing(recognizingHandler)
+	err = <- connector.StartKeywordRecognitionAsync(model)
+	if err != nil {
+		t.Error("Found an error: ", err);
+	}
+	select {
+	case correct := <- keywordFuture:
+		if correct {
+			t.Log("All good, received expected keyword recognition event.")
+		} else {
+			t.Error("Bad keyword recognition")
+		}
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout, no keyword recognition event received.")
+	}
+	select {
+	case correct := <- recognizedFuture:
+		if correct {
+			t.Log("All good, received expected recognition event.")
+		} else {
+			t.Error("Bad recognition")
+		}
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout, no recognition event received.")
 	}
 	select {
 	case correct := <- activityFuture:
