@@ -17,7 +17,7 @@ import "unsafe"
 
 // AudioConfig represents specific audio configuration, such as microphone, file, or custom audio streams.
 type AudioConfig struct {
-	handle C.SPXHANDLE
+	handle     C.SPXHANDLE
 	properties common.PropertyCollection
 }
 

@@ -17,7 +17,7 @@ import "unsafe"
 
 // SpeechConfig is the class that defines configurations for speech / intent recognition, or speech synthesis.
 type SpeechConfig struct {
-	handle C.SPXHANDLE
+	handle     C.SPXHANDLE
 	properties common.PropertyCollection
 }
 
@@ -192,7 +192,7 @@ func (config *SpeechConfig) SpeechRecognitionLanguage() string {
 
 // SetSpeechRecognitionLanguage sets the input language to the speech recognizer.
 func (config *SpeechConfig) SetSpeechRecognitionLanguage(language string) error {
-	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, language);
+	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, language)
 }
 
 // OutputFormat is result output format.
@@ -238,7 +238,7 @@ func (config *SpeechConfig) SetSpeechSynthesisLanguage(language string) error {
 // SpeechSynthesisVoiceName is the voice of the speech synthesizer.
 // Added in version 1.4.0
 func (config *SpeechConfig) SpeechSynthesisVoiceName() string {
-	return config.GetProperty(common.SpeechServiceConnectionSynthVoice);
+	return config.GetProperty(common.SpeechServiceConnectionSynthVoice)
 }
 
 // SetSpeechSynthesisVoiceName sets the voice of the speech synthesizer.
@@ -250,14 +250,14 @@ func (config *SpeechConfig) SetSpeechSynthesisVoiceName(voiceName string) error 
 // SpeechSynthesisOutputFormat is the speech synthesis output format.
 // Added in version 1.4.0
 func (config *SpeechConfig) SpeechSynthesisOutputFormat() string {
-	return config.GetProperty(common.SpeechServiceConnectionSynthOutputFormat);
+	return config.GetProperty(common.SpeechServiceConnectionSynthOutputFormat)
 }
 
 // SetSpeechSynthesisOutputFormat sets the speech synthesis output format (e.g. Riff16Khz16BitMonoPcm).
 // Added in version 1.4.0
 func (config *SpeechConfig) SetSpeechSynthesisOutputFormat(format common.SpeechSynthesisOutputFormat) error {
 	ret := uintptr(C.speech_config_set_audio_output_format(config.handle, (C.Speech_Synthesis_Output_Format)(format)))
-	if (ret != C.SPX_NOERROR) {
+	if ret != C.SPX_NOERROR {
 		return common.NewCarbonError(ret)
 	}
 	return nil
@@ -319,7 +319,7 @@ func (config *SpeechConfig) SetServiceProperty(name string, value string, channe
 	v := C.CString(value)
 	defer C.free(unsafe.Pointer(v))
 	ret := uintptr(C.speech_config_set_service_property(config.handle, n, v, (C.SpeechConfig_ServicePropertyChannel)(channel)))
-	if (ret != C.SPX_NOERROR) {
+	if ret != C.SPX_NOERROR {
 		return common.NewCarbonError(ret)
 	}
 	return nil
@@ -329,7 +329,7 @@ func (config *SpeechConfig) SetServiceProperty(name string, value string, channe
 // Added in version 1.5.0.
 func (config *SpeechConfig) SetProfanity(profanity common.ProfanityOption) error {
 	ret := uintptr(C.speech_config_set_profanity(config.handle, (C.SpeechConfig_ProfanityOption)(profanity)))
-	if (ret != C.SPX_NOERROR) {
+	if ret != C.SPX_NOERROR {
 		return common.NewCarbonError(ret)
 	}
 	return nil

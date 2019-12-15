@@ -15,7 +15,7 @@ import "C"
 // SpeechRecognitionCanceledEventArgs represents speech recognition canceled event arguments.
 type SpeechRecognitionCanceledEventArgs struct {
 	SpeechRecognitionEventArgs
-	Reason common.CancellationReason
+	Reason    common.CancellationReason
 	ErrorCode common.CancellationErrorCode
 }
 
@@ -47,4 +47,4 @@ func NewSpeechRecognitionCanceledEventArgsFromHandle(handle common.SPXHandle) (*
 }
 
 // SpeechRecognitionCanceledEventHandler is the type of the event handler that receives SpeechRecognitionCanceledEventArgs
-type SpeechRecognitionCanceledEventHandler func (event SpeechRecognitionCanceledEventArgs)
+type SpeechRecognitionCanceledEventHandler func(event SpeechRecognitionCanceledEventArgs)

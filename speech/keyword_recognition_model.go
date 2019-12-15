@@ -34,7 +34,7 @@ func NewKeywordRecognitionModelFromFile(filename string) (*KeywordRecognitionMod
 	f := C.CString(filename)
 	defer C.free(unsafe.Pointer(f))
 	ret := uintptr(C.keyword_recognition_model_create_from_file(f, &handle))
-	if (ret != C.SPX_NOERROR) {
+	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
 	model := new(KeywordRecognitionModel)

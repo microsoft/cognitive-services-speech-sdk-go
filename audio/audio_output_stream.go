@@ -69,7 +69,7 @@ func (stream PullAudioOutputStream) Read(size uint) ([]byte, error) {
 	cBuffer := C.malloc(C.sizeof_char * (C.size_t)(size))
 	defer C.free(unsafe.Pointer(cBuffer))
 	var outSize C.uint32_t
-	ret := uintptr(C.pull_audio_output_stream_read(stream.handle,(*C.uint8_t)(cBuffer), (C.uint32_t)(size), &outSize))
+	ret := uintptr(C.pull_audio_output_stream_read(stream.handle, (*C.uint8_t)(cBuffer), (C.uint32_t)(size), &outSize))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}

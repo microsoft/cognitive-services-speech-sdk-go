@@ -10,5 +10,5 @@ type ServicePropertyChannel int
 
 const (
 	// URIQueryParameter uses URI query parameter to pass property settings to service.
-	URIQueryParameter   ServicePropertyChannel = 0
+	URIQueryParameter ServicePropertyChannel = 0
 )

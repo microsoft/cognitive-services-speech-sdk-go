@@ -8,7 +8,7 @@ type CarbonError struct {
 	Code uintptr
 }
 
-var errorString = map[uintptr]string {
+var errorString = map[uintptr]string{
 	0x000: "SPX_NOERROR",
 	0xfff: "SPXERR_NOT_IMPL",
 	0x001: "SPXERR_UNINITIALIZED",
@@ -67,5 +67,5 @@ func NewCarbonError(code uintptr) CarbonError {
 }
 
 func (e CarbonError) Error() string {
-	return errorString[e.Code];
+	return errorString[e.Code]
 }

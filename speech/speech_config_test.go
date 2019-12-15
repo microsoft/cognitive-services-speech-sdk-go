@@ -5,8 +5,8 @@
 package speech
 
 import (
-	"testing"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
+	"testing"
 )
 
 func TestFromSubscription(t *testing.T) {

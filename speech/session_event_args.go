@@ -41,4 +41,4 @@ func NewSessionEventArgsFromHandle(handle common.SPXHandle) (*SessionEventArgs, 
 }
 
 // SessionEventHandler is the type of the event handler that receives SessionEventArgs
-type SessionEventHandler func (event SessionEventArgs)
+type SessionEventHandler func(event SessionEventArgs)

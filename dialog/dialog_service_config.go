@@ -54,7 +54,7 @@ func (config *dialogServiceConfigBase) SetPropertyByString(name string, value st
 
 // GetPropertyByString gets a property value by name.
 func (config *dialogServiceConfigBase) GetPropertyByString(name string) string {
-	return config.config.GetPropertyByString(name);
+	return config.config.GetPropertyByString(name)
 }
 
 // SetServiceProperty sets a property value that will be passed to service using the specified channel.
@@ -66,7 +66,7 @@ func (config *dialogServiceConfigBase) SetServiceProperty(name string, value str
 //
 // Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
 func (config *dialogServiceConfigBase) SetProxy(hostname string, port uint64) error {
-	return config.config.SetProxy(hostname, port);
+	return config.config.SetProxy(hostname, port)
 }
 
 // SetProxyWithUsernameAndPassword sets proxy configuration with username and password
@@ -79,7 +79,7 @@ func (config *dialogServiceConfigBase) SetProxyWithUsernameAndPassword(hostname 
 // SetLanguage sets the input language to the connector.
 // The language is specified in BCP-47 format.
 func (config *dialogServiceConfigBase) SetLanguage(lang string) error {
-	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, lang);
+	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, lang)
 }
 
 // GetLanguage gets the input language to the connector.
@@ -221,4 +221,3 @@ func (config *CustomCommandsConfig) ApplicationID() string {
 func (config *CustomCommandsConfig) SetApplicationID(appID string) error {
 	return config.SetProperty(common.ConversationApplicationID, appID)
 }
-

@@ -29,7 +29,7 @@ import "unsafe"
 // DialogServiceConnector connects to a speech enabled dialog backend.
 type DialogServiceConnector struct {
 	Properties common.PropertyCollection
-	handle C.SPXHANDLE
+	handle     C.SPXHANDLE
 }
 
 func newDialogServiceConnectorFromHandle(handle C.SPXHANDLE) (*DialogServiceConnector, error) {
@@ -58,7 +58,7 @@ func NewDialogServiceConnectorFromConfig(config DialogServiceConfig, audioConfig
 	} else {
 		audioHandle = uintptr2handle(audioConfig.GetHandle())
 	}
-	ret := uintptr(C.dialog_service_connector_create_dialog_service_connector_from_config(&handle, configHandle, audioHandle));
+	ret := uintptr(C.dialog_service_connector_create_dialog_service_connector_from_config(&handle, configHandle, audioHandle))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
@@ -114,12 +114,12 @@ func (connector DialogServiceConnector) SendActivityAsync(message string) chan S
 		defer C.free(unsafe.Pointer(msg))
 		buffer := C.malloc(C.sizeof_char * 37)
 		defer C.free(unsafe.Pointer(buffer))
-		ret := uintptr(C.dialog_service_connector_send_activity(connector.handle, msg, (*C.char)(buffer)));
+		ret := uintptr(C.dialog_service_connector_send_activity(connector.handle, msg, (*C.char)(buffer)))
 		if ret != C.SPX_NOERROR {
-			outcome <- SendActivityOutcome{ InteractionID: "", OperationOutcome: common.OperationOutcome{ common.NewCarbonError(ret) } }
+			outcome <- SendActivityOutcome{InteractionID: "", OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
 			interactionID := C.GoString((*C.char)(buffer))
-			outcome <- SendActivityOutcome{ InteractionID: interactionID, OperationOutcome: common.OperationOutcome{ nil } }
+			outcome <- SendActivityOutcome{InteractionID: interactionID, OperationOutcome: common.OperationOutcome{nil}}
 		}
 	}()
 	return outcome
@@ -132,10 +132,10 @@ func (connector DialogServiceConnector) ListenOnceAsync() <-chan speech.SpeechRe
 		var handle C.SPXRESULTHANDLE
 		ret := uintptr(C.dialog_service_connector_listen_once(connector.handle, &handle))
 		if ret != C.SPX_NOERROR {
-			outcome <- speech.SpeechRecognitionOutcome{ Result: nil, OperationOutcome: common.OperationOutcome{ common.NewCarbonError(ret) } }
+			outcome <- speech.SpeechRecognitionOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
 			result, err := speech.NewSpeechRecognitionResultFromHandle(handle2uintptr(handle))
-			outcome <- speech.SpeechRecognitionOutcome{ Result: result, OperationOutcome: common.OperationOutcome{ err } }
+			outcome <- speech.SpeechRecognitionOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
 		}
 	}()
 	return outcome

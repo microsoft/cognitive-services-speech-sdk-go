@@ -57,7 +57,7 @@ func (properties PropertyCollection) SetPropertyByString(name string, value stri
 	v := C.CString(value)
 	defer C.free(unsafe.Pointer(v))
 	ret := uintptr(C.property_bag_set_string(properties.handle, -1, n, v))
-	if (ret != C.SPX_NOERROR) {
+	if ret != C.SPX_NOERROR {
 		return NewCarbonError(ret)
 	}
 	return nil

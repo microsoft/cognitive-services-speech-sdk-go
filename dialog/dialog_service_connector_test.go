@@ -5,15 +5,15 @@
 package dialog
 
 import (
+	"bufio"
+	"encoding/json"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
+	"io"
+	"os"
 	"testing"
 	"time"
-	"os"
-	"io"
-	"bufio"
-	"encoding/json"
 )
 
 func createConnectorFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *DialogServiceConnector {
@@ -74,7 +74,7 @@ func TestSessionEvents(t *testing.T) {
 	connector.SessionStarted(sessionStartedHandler)
 	connector.SessionStopped(sessionStoppedHandler)
 	future := connector.ListenOnceAsync()
-	outcome := <- future
+	outcome := <-future
 	defer outcome.Close()
 	if outcome.Failed() {
 		t.Error("Got an error: ", outcome.Error.Error())
@@ -83,15 +83,15 @@ func TestSessionEvents(t *testing.T) {
 	result := outcome.Result
 	t.Log("Recognized: ", result.Text)
 	select {
-	case <- sessionStartedFuture:
+	case <-sessionStartedFuture:
 		t.Log("Received a SessionStart event")
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Didn't receive SessionStart event.")
 	}
 	select {
-	case <- sessionStoppedFuture:
+	case <-sessionStoppedFuture:
 		t.Log("Received a SessionStop event")
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Didn't receive SessionStop event.")
 	}
 }
@@ -118,15 +118,15 @@ func TestSpeechRecognitionEvents(t *testing.T) {
 	connector.Recognizing(recognizingHandle)
 	connector.ListenOnceAsync()
 	select {
-	case <- recognizingFuture:
+	case <-recognizingFuture:
 		t.Log("Received at least one Recognizing event.")
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Didn't received Recognizing events.")
 	}
 	select {
-	case <- recognizedFuture:
+	case <-recognizedFuture:
 		t.Log("Received a Recognized event.")
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Didn't receive Recognizing event.")
 	}
 }
@@ -144,7 +144,7 @@ func TestCancellationEvent(t *testing.T) {
 	connector.Canceled(cancelledHandler)
 	connector.ListenOnceAsync()
 	select {
-	case <- future:
+	case <-future:
 		t.Log("All good, received the event.")
 	case <-time.After((5 * time.Second)):
 		t.Error("Timeout, no event received")
@@ -152,7 +152,7 @@ func TestCancellationEvent(t *testing.T) {
 }
 
 type testActivity struct {
-	Type string    `json:"type"`
+	Type string `json:"type"`
 	Text string `json:"text"`
 }
 
@@ -169,13 +169,13 @@ func TestActivityReceivedEvent(t *testing.T) {
 		t.Log("Received Activity")
 	}
 	connector.ActivityReceived(activityReceivedHandler)
-	act := testActivity{ Type: "message", Text: "Make this larger" }
+	act := testActivity{Type: "message", Text: "Make this larger"}
 	msg, _ := json.Marshal(act)
 	connector.SendActivityAsync(string(msg))
 	select {
-	case <- future:
+	case <-future:
 		t.Log("All good, received the event.")
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout, no event received")
 	}
 }
@@ -191,7 +191,7 @@ func TestActivityWithAudio(t *testing.T) {
 		defer event.Close()
 		var activity map[string]interface{}
 		json.Unmarshal([]byte(event.Activity), &activity)
-		messageType := activity["type"].(string);
+		messageType := activity["type"].(string)
 		if messageType == "conversationUpdate" {
 			t.Log("Got conversation update, ignoring")
 			return
@@ -219,17 +219,17 @@ func TestActivityWithAudio(t *testing.T) {
 		}
 	}
 	connector.ActivityReceived(activityReceivedHandler)
-	act := testActivity{ Type: "message", Text: "what is the weather forecast in the mountain?" }
+	act := testActivity{Type: "message", Text: "what is the weather forecast in the mountain?"}
 	msg, _ := json.Marshal(act)
 	connector.SendActivityAsync(string(msg))
 	select {
-	case hasAudio := <- future:
+	case hasAudio := <-future:
 		if !hasAudio {
 			t.Error("No audio")
 		} else {
 			t.Log("Got audio")
 		}
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout, no event received")
 	}
 }
@@ -241,13 +241,13 @@ func TestConnectionFunctions(t *testing.T) {
 	}
 	defer connector.Close()
 	outcome := connector.ConnectAsync()
-	err := <- outcome
+	err := <-outcome
 	if err != nil {
 		t.Error("Got an error ", err.Error())
 	}
 	t.Log("Connect Succeeded")
 	outcome = connector.DisconnectAsync()
-	err = <- outcome
+	err = <-outcome
 	if err != nil {
 		t.Error("Got an error ", err.Error())
 	}
@@ -260,10 +260,10 @@ func TestSendActivity(t *testing.T) {
 		return
 	}
 	defer connector.Close()
-	act := testActivity{ Type: "message", Text: "Make this larger" }
+	act := testActivity{Type: "message", Text: "Make this larger"}
 	msg, _ := json.Marshal(act)
 	future := connector.SendActivityAsync(string(msg))
-	outcome := <- future
+	outcome := <-future
 	if outcome.Failed() {
 		t.Error("Got an error ", outcome.Error.Error())
 	} else {
@@ -274,7 +274,7 @@ func TestSendActivity(t *testing.T) {
 func pumpFileIntoStream(t *testing.T, filename string, stream *audio.PushAudioInputStream) {
 	file, err := os.Open(filename)
 	if err != nil {
-		t.Error("Error opening file: ", err);
+		t.Error("Error opening file: ", err)
 		return
 	}
 	defer file.Close()
@@ -319,7 +319,7 @@ func TestFromPushInputStream(t *testing.T) {
 		defer event.Close()
 		var activity map[string]interface{}
 		json.Unmarshal([]byte(event.Activity), &activity)
-		messageType := activity["type"].(string);
+		messageType := activity["type"].(string)
 		if messageType == "conversationUpdate" {
 			t.Log("Got conversation update, ignoring")
 			return
@@ -344,23 +344,23 @@ func TestFromPushInputStream(t *testing.T) {
 	pumpFileIntoStream(t, "../test_files/turn_on_the_lamp.wav", stream)
 	connector.ListenOnceAsync()
 	select {
-	case correct := <- recognizedFuture:
+	case correct := <-recognizedFuture:
 		if correct {
 			t.Log("All good, received expected recognition event.")
 		} else {
 			t.Error("Bad recognition")
 		}
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout, no event recognition event received.")
 	}
 	select {
-	case correct := <- activityFuture:
+	case correct := <-activityFuture:
 		if correct {
 			t.Log("All good, received expected activity event.")
 		} else {
 			t.Error("Bad activity event")
 		}
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout, no activity event received.")
 	}
 }
@@ -373,7 +373,7 @@ func TestKeyword(t *testing.T) {
 	defer connector.Close()
 	model, err := speech.NewKeywordRecognitionModelFromFile("../test_files/kws.table")
 	if err != nil {
-		t.Error("Found an error: ", err);
+		t.Error("Found an error: ", err)
 	}
 	defer model.Close()
 	activityFuture := make(chan bool)
@@ -381,7 +381,7 @@ func TestKeyword(t *testing.T) {
 		defer event.Close()
 		var activity map[string]interface{}
 		json.Unmarshal([]byte(event.Activity), &activity)
-		messageType := activity["type"].(string);
+		messageType := activity["type"].(string)
 		if messageType == "conversationUpdate" {
 			t.Log("Got conversation update, ignoring")
 			return
@@ -408,38 +408,38 @@ func TestKeyword(t *testing.T) {
 		t.Log("Recognizing ", event.Result.Text)
 	}
 	connector.Recognizing(recognizingHandler)
-	err = <- connector.StartKeywordRecognitionAsync(model)
+	err = <-connector.StartKeywordRecognitionAsync(model)
 	if err != nil {
-		t.Error("Found an error: ", err);
+		t.Error("Found an error: ", err)
 	}
 	select {
-	case correct := <- keywordFuture:
+	case correct := <-keywordFuture:
 		if correct {
 			t.Log("All good, received expected keyword recognition event.")
 		} else {
 			t.Error("Bad keyword recognition")
 		}
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout, no keyword recognition event received.")
 	}
 	select {
-	case correct := <- recognizedFuture:
+	case correct := <-recognizedFuture:
 		if correct {
 			t.Log("All good, received expected recognition event.")
 		} else {
 			t.Error("Bad recognition")
 		}
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout, no recognition event received.")
 	}
 	select {
-	case correct := <- activityFuture:
+	case correct := <-activityFuture:
 		if correct {
 			t.Log("All good, received expected activity event.")
 		} else {
 			t.Error("Bad activity event")
 		}
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout, no activity event received.")
 	}
 }

@@ -1,20 +1,20 @@
 package main
 
 import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/dialog"
-	"fmt"
-	"os"
 	"bufio"
+	"fmt"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/dialog"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"io"
+	"os"
 	"time"
 )
 
 func pumpFileIntoStream(filename string, stream *audio.PushAudioInputStream) {
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("Error opening file: ", err);
+		fmt.Println("Error opening file: ", err)
 		return
 	}
 	defer file.Close()
@@ -38,10 +38,9 @@ func pumpFileIntoStream(filename string, stream *audio.PushAudioInputStream) {
 	stream.CloseStream()
 }
 
-
 func main() {
 	args := os.Args[1:]
-	if (len(args) != 3) {
+	if len(args) != 3 {
 		fmt.Println("Input not valid")
 		fmt.Println("Usage: ")
 		fmt.Println(os.Args[0], " <subscription> <region> <file>")
@@ -101,5 +100,5 @@ func main() {
 	connector.Recognizing(recognizingHandler)
 	pumpFileIntoStream(file, stream)
 	connector.ListenOnceAsync()
-	<- time.After(10 * time.Second)
+	<-time.After(10 * time.Second)
 }

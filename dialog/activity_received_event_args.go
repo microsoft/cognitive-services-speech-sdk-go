@@ -4,7 +4,6 @@
 //
 package dialog
 
-
 import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -17,7 +16,7 @@ import "C"
 import "unsafe"
 
 type ActivityReceivedEventArgs struct {
-	handle C.SPXHANDLE
+	handle   C.SPXHANDLE
 	Activity string
 }
 
@@ -53,7 +52,7 @@ func NewActivityReceivedEventArgsFromHandle(handle common.SPXHandle) (*ActivityR
 	}
 	actBuffer := C.malloc(C.sizeof_char * (size + 1))
 	defer C.free(unsafe.Pointer(actBuffer))
-	ret = uintptr(C.dialog_service_connector_activity_received_event_get_activity(event.handle, (*C.char)(actBuffer), size + 1))
+	ret = uintptr(C.dialog_service_connector_activity_received_event_get_activity(event.handle, (*C.char)(actBuffer), size+1))
 	if ret != C.SPX_NOERROR {
 		event.Close()
 		return nil, common.NewCarbonError(ret)
@@ -62,4 +61,4 @@ func NewActivityReceivedEventArgsFromHandle(handle common.SPXHandle) (*ActivityR
 	return event, nil
 }
 
-type ActivityReceivedEventHandler func (event ActivityReceivedEventArgs)
+type ActivityReceivedEventHandler func(event ActivityReceivedEventArgs)

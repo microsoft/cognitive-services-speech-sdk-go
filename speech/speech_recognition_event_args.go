@@ -24,7 +24,6 @@ func (event SpeechRecognitionEventArgs) Close() {
 	C.recognizer_event_handle_release(event.handle)
 }
 
-
 // NewSpeechRecognitionEventArgsFromHandle creates the object from the handle (for internal use)
 func NewSpeechRecognitionEventArgsFromHandle(handle common.SPXHandle) (*SpeechRecognitionEventArgs, error) {
 	event := new(SpeechRecognitionEventArgs)
@@ -43,4 +42,4 @@ func NewSpeechRecognitionEventArgsFromHandle(handle common.SPXHandle) (*SpeechRe
 }
 
 // SpeechRecognitionEventHandler is the type of the event handler that receives SpeechRecognitionEventArgs
-type SpeechRecognitionEventHandler func (event SpeechRecognitionEventArgs)
+type SpeechRecognitionEventHandler func(event SpeechRecognitionEventArgs)
