@@ -33,7 +33,7 @@ package audio
 //
 // int cgo_audio_push_stream_write_callback_wrapper(void *context, uint8_t* buffer, uint32_t size)
 // {
-//     cgoAudioOutputCallWriteCallback((SPXHANDLE)context, buffer, size);
+//     return cgoAudioOutputCallWriteCallback((SPXHANDLE)context, buffer, size);
 // }
 //
 // void cgo_audio_push_stream_close_callback_wrapper(void *context)
