@@ -1,14 +1,15 @@
-package main
+package samples
 
 import (
 	"bufio"
 	"fmt"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/dialog"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"io"
 	"os"
 	"time"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/dialog"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
 
 func pumpFileIntoStream(filename string, stream *audio.PushAudioInputStream) {

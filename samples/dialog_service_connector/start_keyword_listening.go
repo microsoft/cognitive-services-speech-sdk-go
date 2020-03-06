@@ -1,11 +1,12 @@
-package main
+package samples
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/dialog"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
-	"time"
 )
 
 func kws(subscription string, region string, file string) {

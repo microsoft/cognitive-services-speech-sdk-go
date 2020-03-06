@@ -5,6 +5,8 @@
 package dialog
 
 import (
+	"unsafe"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
@@ -15,7 +17,6 @@ import (
 // #include <speechapi_c_property_bag.h>
 // #include <speechapi_c_dialog_service_config.h>
 import "C"
-import "unsafe"
 
 // DialogServiceConfig defines base configurations for the dialog service connector object.
 type DialogServiceConfig interface {
@@ -111,7 +112,32 @@ func NewBotFrameworkConfigFromSubscription(subscriptionKey string, region string
 	r := C.CString(region)
 	defer C.free(unsafe.Pointer(r))
 
-	ret := uintptr(C.bot_framework_config_from_subscription(&handle, sk, r))
+	ret := uintptr(C.bot_framework_config_from_subscription(&handle, sk, r, nil))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	speechConfig, err := speech.NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+	config := new(BotFrameworkConfig)
+	config.config = *speechConfig
+	config.handle = handle
+	return config, nil
+}
+
+// NewBotFrameworkConfigFromSubscriptionAndBotID creates a bot framework service config instance with the specified subscription
+// key, region, and botID .
+func NewBotFrameworkConfigFromSubscriptionAndBotID(subscriptionKey string, region string, botID string) (*BotFrameworkConfig, error) {
+	var handle C.SPXHANDLE
+	sk := C.CString(subscriptionKey)
+	defer C.free(unsafe.Pointer(sk))
+	r := C.CString(region)
+	defer C.free(unsafe.Pointer(r))
+	b := C.CString(botID)
+	defer C.free(unsafe.Pointer(b))
+
+	ret := uintptr(C.bot_framework_config_from_subscription(&handle, sk, r, nil))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}

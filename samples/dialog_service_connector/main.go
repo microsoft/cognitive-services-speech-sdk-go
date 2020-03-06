@@ -20,8 +20,8 @@ func main() {
 
 	switch sample {
 	case "1":
-		listenOnce(subscription, region, file)
+		samples.listenOnce(subscription, region, file)
 	case "2":
-		kws(subscription, region, file)
+		samples.kws(subscription, region, file)
 	}
 }
