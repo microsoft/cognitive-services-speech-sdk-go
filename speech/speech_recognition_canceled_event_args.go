@@ -15,8 +15,9 @@ import "C"
 // SpeechRecognitionCanceledEventArgs represents speech recognition canceled event arguments.
 type SpeechRecognitionCanceledEventArgs struct {
 	SpeechRecognitionEventArgs
-	Reason    common.CancellationReason
-	ErrorCode common.CancellationErrorCode
+	Reason       common.CancellationReason
+	ErrorCode    common.CancellationErrorCode
+	ErrorDetails string
 }
 
 // NewSpeechRecognitionCanceledEventArgsFromHandle creates the object from the handle (for internal use)
@@ -43,6 +44,7 @@ func NewSpeechRecognitionCanceledEventArgsFromHandle(handle common.SPXHandle) (*
 		return nil, common.NewCarbonError(ret)
 	}
 	event.ErrorCode = (common.CancellationErrorCode)(cCode)
+	event.ErrorDetails = event.Result.Properties.GetProperty(common.SpeechServiceResponseJSONErrorDetails, "")
 	return event, nil
 }
 

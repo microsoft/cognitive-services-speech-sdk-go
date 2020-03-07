@@ -7,13 +7,14 @@ package dialog
 import (
 	"bufio"
 	"encoding/json"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"io"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
 
 func createConnectorFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *DialogServiceConnector {
@@ -112,7 +113,12 @@ func TestSpeechRecognitionEvents(t *testing.T) {
 	recognizingHandle := func(event speech.SpeechRecognitionEventArgs) {
 		defer event.Close()
 		t.Log("Recognizing ", event.Result.Text)
-		recognizingFuture <- "Recognizing"
+		select {
+		case recognizingFuture <- "Recognizing":
+			t.Log("Notified listener.")
+		default:
+			t.Log("No one is listening, ignore...")
+		}
 	}
 	connector.Recognized(recognizedHandle)
 	connector.Recognizing(recognizingHandle)
@@ -326,7 +332,12 @@ func TestFromPushInputStream(t *testing.T) {
 		}
 		t.Log(event.Activity)
 		t.Log("Received Activity")
-		activityFuture <- true
+		select {
+		case activityFuture <- true:
+			t.Log("Notified listener.")
+		default:
+			t.Log("No one is listening, ignore...")
+		}
 	}
 	connector.ActivityReceived(activityReceivedHandler)
 	recognizedFuture := make(chan bool)
@@ -388,7 +399,12 @@ func TestKeyword(t *testing.T) {
 		}
 		t.Log(event.Activity)
 		t.Log("Received Activity")
-		activityFuture <- true
+		select {
+		case activityFuture <- true:
+			t.Log("Notified listener.")
+		default:
+			t.Log("No one is listening, ignore...")
+		}
 	}
 	connector.ActivityReceived(activityReceivedHandler)
 	recognizedFuture := make(chan bool)
