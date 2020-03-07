@@ -5,15 +5,15 @@
 package speech
 
 import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"strconv"
+	"unsafe"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 // #include <stdlib.h>
 // #include <speechapi_c_speech_config.h>
-// #include <speechapi_c_property_bag.h>
 import "C"
-import "unsafe"
 
 // SpeechConfig is the class that defines configurations for speech / intent recognition, or speech synthesis.
 type SpeechConfig struct {
@@ -357,4 +357,8 @@ func (config *SpeechConfig) EnableDictation() error {
 func (config *SpeechConfig) Close() {
 	config.properties.Close()
 	C.speech_config_release(config.handle)
+}
+
+func (config *SpeechConfig) getHandle() C.SPXHANDLE {
+	return config.handle
 }
