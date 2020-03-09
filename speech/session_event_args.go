@@ -5,13 +5,14 @@
 package speech
 
 import (
+	"unsafe"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 // #include <stdlib.h>
 // #include <speechapi_c_recognizer.h>
 import "C"
-import "unsafe"
 
 // SessionEventArgs represents the session event arguments.
 type SessionEventArgs struct {
