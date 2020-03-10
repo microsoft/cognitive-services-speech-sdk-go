@@ -27,6 +27,7 @@ import (
 //
 import "C"
 
+// SpeechRecognizer is the class for speech recognizers.
 type SpeechRecognizer struct {
 	Properties                 common.PropertyCollection
 	handle                     C.SPXHANDLE
@@ -44,11 +45,15 @@ func newSpeechRecognizerFromHandle(handle C.SPXHANDLE) (*SpeechRecognizer, error
 	}
 	recognizer := new(SpeechRecognizer)
 	recognizer.handle = handle
+	recognizer.handleAsyncStartContinuous = C.SPXHANDLE_INVALID
+	recognizer.handleAsyncStopContinuous = C.SPXHANDLE_INVALID
+	recognizer.handleAsyncStartKeyword = C.SPXHANDLE_INVALID
+	recognizer.handleAsyncStopKeyword = C.SPXHANDLE_INVALID
 	recognizer.Properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
 	return recognizer, nil
 }
 
-/// NewSpeechRecognizerFromConfig creates a speech recognizer from a speech config and audio config.
+// NewSpeechRecognizerFromConfig creates a speech recognizer from a speech config and audio config.
 func NewSpeechRecognizerFromConfig(config *SpeechConfig, audioConfig *audio.AudioConfig) (*SpeechRecognizer, error) {
 	var handle C.SPXHANDLE
 	if config == nil {
@@ -146,20 +151,28 @@ func (recognizer SpeechRecognizer) RecognizeOnceAsync() chan SpeechRecognitionOu
 	return outcome
 }
 
+func releaseAsyncHandleIfValid(handle *C.SPXASYNCHANDLE) uintptr {
+	ret := uintptr(C.SPX_NOERROR)
+	if *handle != C.SPXHANDLE_INVALID && C.recognizer_async_handle_is_valid(*handle) {
+		ret = uintptr(C.recognizer_async_handle_release(*handle))
+		*handle = C.SPXHANDLE_INVALID
+	}
+	return ret
+}
+
 // StartContinuousRecognitionAsync asynchronously initiates continuous speech recognition operation.
 func (recognizer SpeechRecognizer) StartContinuousRecognitionAsync() chan error {
 	outcome := make(chan error)
 	go func() {
 		// Close any unfinished previous attempt
-		ret := uintptr(C.recognizer_async_handle_release(recognizer.handleAsyncStartContinuous))
+		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStartContinuous)
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_start_continuous_recognition_async(recognizer.handle, &recognizer.handleAsyncStartContinuous))
 		}
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_start_continuous_recognition_async_wait_for(recognizer.handleAsyncStartContinuous, math.MaxUint32))
 		}
-		C.recognizer_async_handle_release(recognizer.handleAsyncStartContinuous)
-		recognizer.handleAsyncStartContinuous = C.SPXHANDLE_INVALID
+		releaseAsyncHandleIfValid(&recognizer.handleAsyncStartContinuous)
 		if ret != C.SPX_NOERROR {
 			outcome <- common.NewCarbonError(ret)
 			return
@@ -173,15 +186,14 @@ func (recognizer SpeechRecognizer) StartContinuousRecognitionAsync() chan error 
 func (recognizer SpeechRecognizer) StopContinuousRecognitionAsync() chan error {
 	outcome := make(chan error)
 	go func() {
-		ret := uintptr(C.recognizer_async_handle_release(recognizer.handleAsyncStartContinuous))
+		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStartContinuous)
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_stop_continuous_recognition_async(recognizer.handle, &recognizer.handleAsyncStopContinuous))
 		}
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_stop_continuous_recognition_async_wait_for(recognizer.handleAsyncStopContinuous, math.MaxUint32))
 		}
-		C.recognizer_async_handle_release(recognizer.handleAsyncStopContinuous)
-		recognizer.handleAsyncStopContinuous = C.SPXHANDLE_INVALID
+		releaseAsyncHandleIfValid(&recognizer.handleAsyncStartContinuous)
 		if ret != C.SPX_NOERROR {
 			outcome <- common.NewCarbonError(ret)
 			return
@@ -196,15 +208,14 @@ func (recognizer SpeechRecognizer) StartKeywordRecognitionAsync(model KeywordRec
 	outcome := make(chan error)
 	modelHandle := uintptr2handle(model.GetHandle())
 	go func() {
-		ret := uintptr(C.recognizer_async_handle_release(recognizer.handleAsyncStartKeyword))
+		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStartKeyword)
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_start_keyword_recognition_async(recognizer.handle, modelHandle, &recognizer.handleAsyncStartKeyword))
 		}
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_start_keyword_recognition_async_wait_for(recognizer.handleAsyncStartKeyword, math.MaxUint32))
 		}
-		C.recognizer_async_handle_release(recognizer.handleAsyncStartKeyword)
-		recognizer.handleAsyncStartKeyword = C.SPXHANDLE_INVALID
+		releaseAsyncHandleIfValid(&recognizer.handleAsyncStartKeyword)
 		if ret != C.SPX_NOERROR {
 			outcome <- common.NewCarbonError(ret)
 			return
@@ -218,15 +229,14 @@ func (recognizer SpeechRecognizer) StartKeywordRecognitionAsync(model KeywordRec
 func (recognizer SpeechRecognizer) StopKeywordRecognitionAsync() chan error {
 	outcome := make(chan error)
 	go func() {
-		ret := uintptr(C.recognizer_async_handle_release(recognizer.handleAsyncStopKeyword))
+		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStopKeyword)
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_stop_keyword_recognition_async(recognizer.handle, &recognizer.handleAsyncStopKeyword))
 		}
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_stop_keyword_recognition_async_wait_for(recognizer.handleAsyncStopKeyword, math.MaxUint32))
 		}
-		C.recognizer_async_handle_release(recognizer.handleAsyncStopKeyword)
-		recognizer.handleAsyncStopKeyword = C.SPXHANDLE_INVALID
+		releaseAsyncHandleIfValid(&recognizer.handleAsyncStopKeyword)
 		if ret != C.SPX_NOERROR {
 			outcome <- common.NewCarbonError(ret)
 			return
@@ -365,10 +375,7 @@ func (recognizer SpeechRecognizer) Close() {
 	}
 	for i := 0; i < len(asyncHandles); i++ {
 		handle := asyncHandles[i]
-		if (*handle != C.SPXHANDLE_INVALID) && C.recognizer_async_handle_is_valid(*handle) {
-			C.recognizer_async_handle_release(*handle)
-			*handle = C.SPXHANDLE_INVALID
-		}
+		releaseAsyncHandleIfValid(handle)
 	}
 	recognizer.Properties.Close()
 	if recognizer.handle != C.SPXHANDLE_INVALID {
