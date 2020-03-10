@@ -322,7 +322,7 @@ func (recognizer SpeechRecognizer) Recognizing(handler SpeechRecognitionEventHan
 // Recognized signals for events containing final recognition results.
 // (indicating a successful recognition attempt).
 func (recognizer SpeechRecognizer) Recognized(handler SpeechRecognitionEventHandler) {
-	registerRecognizingCallback(handler, recognizer.handle)
+	registerRecognizedCallback(handler, recognizer.handle)
 	if handler != nil {
 		C.recognizer_recognized_set_callback(
 			recognizer.handle,
@@ -345,5 +345,34 @@ func (recognizer SpeechRecognizer) Canceled(handler SpeechRecognitionCanceledEve
 			nil)
 	} else {
 		C.recognizer_canceled_set_callback(recognizer.handle, nil, nil)
+	}
+}
+
+// Close disposes the associated resources.
+func (recognizer SpeechRecognizer) Close() {
+	recognizer.SessionStarted(nil)
+	recognizer.SessionStopped(nil)
+	recognizer.SpeechStartDetected(nil)
+	recognizer.SpeechEndDetected(nil)
+	recognizer.Recognizing(nil)
+	recognizer.Recognized(nil)
+	recognizer.Canceled(nil)
+	var asyncHandles = []*C.SPXASYNCHANDLE{
+		&recognizer.handleAsyncStartContinuous,
+		&recognizer.handleAsyncStopContinuous,
+		&recognizer.handleAsyncStartKeyword,
+		&recognizer.handleAsyncStopKeyword,
+	}
+	for i := 0; i < len(asyncHandles); i++ {
+		handle := asyncHandles[i]
+		if (*handle != C.SPXHANDLE_INVALID) && C.recognizer_async_handle_is_valid(*handle) {
+			C.recognizer_async_handle_release(*handle)
+			*handle = C.SPXHANDLE_INVALID
+		}
+	}
+	recognizer.Properties.Close()
+	if recognizer.handle != C.SPXHANDLE_INVALID {
+		C.recognizer_handle_release(recognizer.handle)
+		recognizer.handle = C.SPXHANDLE_INVALID
 	}
 }
