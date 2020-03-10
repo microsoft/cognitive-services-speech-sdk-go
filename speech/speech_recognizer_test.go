@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 func createSpeechRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *SpeechRecognizer {
@@ -22,7 +21,6 @@ func createSpeechRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.T, su
 		return nil
 	}
 	defer config.Close()
-	config.SetProperty(common.SpeechLogFilename, "/home/glecaros/carbon_log.txt")
 	recognizer, err := NewSpeechRecognizerFromConfig(config, audioConfig)
 	if err != nil {
 		t.Error("Got an error: ", err)
