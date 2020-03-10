@@ -1,4 +1,4 @@
-package samples
+package dialog_service_connector
 
 import (
 	"fmt"
@@ -6,10 +6,11 @@ import (
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/dialog"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/helpers"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
 
-func kws(subscription string, region string, file string) {
+func KWS(subscription string, region string, file string) {
 	stream, err := audio.CreatePushAudioInputStream()
 	if err != nil {
 		fmt.Println("Got an error: ", err)
@@ -70,7 +71,7 @@ func kws(subscription string, region string, file string) {
 		fmt.Println("Error code ", event.ErrorCode)
 	}
 	connector.Canceled(canceledHandler)
-	pumpFileIntoStream(file, stream)
+	helpers.PumpFileIntoStream(file, stream)
 	connector.StartKeywordRecognitionAsync(model)
 	<-time.After(10 * time.Second)
 }

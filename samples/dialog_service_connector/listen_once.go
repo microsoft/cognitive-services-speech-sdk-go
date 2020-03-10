@@ -1,45 +1,16 @@
-package samples
+package dialog_service_connector
 
 import (
-	"bufio"
 	"fmt"
-	"io"
-	"os"
 	"time"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/dialog"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/helpers"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
 
-func pumpFileIntoStream(filename string, stream *audio.PushAudioInputStream) {
-	file, err := os.Open(filename)
-	if err != nil {
-		fmt.Println("Error opening file: ", err)
-		return
-	}
-	defer file.Close()
-	reader := bufio.NewReader(file)
-	buffer := make([]byte, 1000)
-	for {
-		n, err := reader.Read(buffer)
-		if err == io.EOF {
-			fmt.Println("Done reading file.")
-			break
-		}
-		if err != nil {
-			fmt.Println("Error reading file: ", err)
-			break
-		}
-		err = stream.Write(buffer[0:n])
-		if err != nil {
-			fmt.Println("Error writing to the stream")
-		}
-	}
-	stream.CloseStream()
-}
-
-func listenOnce(subscription string, region string, file string) {
+func ListenOnce(subscription string, region string, file string) {
 	stream, err := audio.CreatePushAudioInputStream()
 	if err != nil {
 		fmt.Println("Got an error: ", err)
@@ -89,7 +60,7 @@ func listenOnce(subscription string, region string, file string) {
 		fmt.Println("Recognizing ", event.Result.Text)
 	}
 	connector.Recognizing(recognizingHandler)
-	pumpFileIntoStream(file, stream)
+	helpers.PumpFileIntoStream(file, stream)
 	connector.ListenOnceAsync()
 	<-time.After(10 * time.Second)
 }

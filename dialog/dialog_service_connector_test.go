@@ -7,13 +7,14 @@ package dialog
 import (
 	"bufio"
 	"encoding/json"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"io"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
 
 func createConnectorFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *DialogServiceConnector {
@@ -61,18 +62,26 @@ func TestSessionEvents(t *testing.T) {
 	defer connector.Close()
 	sessionStartedFuture := make(chan bool)
 	sessionStartedHandler := func(event speech.SessionEventArgs) {
+		defer event.Close()
 		sessionStartedFuture <- true
 		id := event.SessionID()
 		t.Log("Started ", id)
 	}
 	sessionStoppedFuture := make(chan bool)
 	sessionStoppedHandler := func(event speech.SessionEventArgs) {
+		defer event.Close()
 		sessionStoppedFuture <- true
 		id := event.SessionID()
 		t.Log("Stopped ", id)
 	}
+	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
+		defer event.Close()
+		t.Log("Got a cancellation...")
+		t.Log(event.ErrorDetails)
+	}
 	connector.SessionStarted(sessionStartedHandler)
 	connector.SessionStopped(sessionStoppedHandler)
+	connector.Canceled(cancellationHandler)
 	future := connector.ListenOnceAsync()
 	outcome := <-future
 	defer outcome.Close()
@@ -112,10 +121,21 @@ func TestSpeechRecognitionEvents(t *testing.T) {
 	recognizingHandle := func(event speech.SpeechRecognitionEventArgs) {
 		defer event.Close()
 		t.Log("Recognizing ", event.Result.Text)
-		recognizingFuture <- "Recognizing"
+		select {
+		case recognizingFuture <- "Recognizing":
+			t.Log("Notified listener.")
+		default:
+			t.Log("No one is listening, ignore...")
+		}
+	}
+	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
+		defer event.Close()
+		t.Log("Got a cancellation...")
+		t.Log(event.ErrorDetails)
 	}
 	connector.Recognized(recognizedHandle)
 	connector.Recognizing(recognizingHandle)
+	connector.Canceled(cancellationHandler)
 	connector.ListenOnceAsync()
 	select {
 	case <-recognizingFuture:
@@ -168,7 +188,13 @@ func TestActivityReceivedEvent(t *testing.T) {
 		future <- "Received"
 		t.Log("Received Activity")
 	}
+	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
+		defer event.Close()
+		t.Log("Got a cancellation...")
+		t.Log(event.ErrorDetails)
+	}
 	connector.ActivityReceived(activityReceivedHandler)
+	connector.Canceled(cancellationHandler)
 	act := testActivity{Type: "message", Text: "Make this larger"}
 	msg, _ := json.Marshal(act)
 	connector.SendActivityAsync(string(msg))
@@ -218,7 +244,13 @@ func TestActivityWithAudio(t *testing.T) {
 			future <- false
 		}
 	}
+	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
+		defer event.Close()
+		t.Log("Got a cancellation...")
+		t.Log(event.ErrorDetails)
+	}
 	connector.ActivityReceived(activityReceivedHandler)
+	connector.Canceled(cancellationHandler)
 	act := testActivity{Type: "message", Text: "what is the weather forecast in the mountain?"}
 	msg, _ := json.Marshal(act)
 	connector.SendActivityAsync(string(msg))
@@ -326,7 +358,12 @@ func TestFromPushInputStream(t *testing.T) {
 		}
 		t.Log(event.Activity)
 		t.Log("Received Activity")
-		activityFuture <- true
+		select {
+		case activityFuture <- true:
+			t.Log("Notified listener.")
+		default:
+			t.Log("No one is listening, ignore...")
+		}
 	}
 	connector.ActivityReceived(activityReceivedHandler)
 	recognizedFuture := make(chan bool)
@@ -341,6 +378,12 @@ func TestFromPushInputStream(t *testing.T) {
 		t.Log("Recognizing ", event.Result.Text)
 	}
 	connector.Recognizing(recognizingHandler)
+	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
+		defer event.Close()
+		t.Log("Got a cancellation...")
+		t.Log(event.ErrorDetails)
+	}
+	connector.Canceled(cancellationHandler)
 	pumpFileIntoStream(t, "../test_files/turn_on_the_lamp.wav", stream)
 	connector.ListenOnceAsync()
 	select {
@@ -388,7 +431,12 @@ func TestKeyword(t *testing.T) {
 		}
 		t.Log(event.Activity)
 		t.Log("Received Activity")
-		activityFuture <- true
+		select {
+		case activityFuture <- true:
+			t.Log("Notified listener.")
+		default:
+			t.Log("No one is listening, ignore...")
+		}
 	}
 	connector.ActivityReceived(activityReceivedHandler)
 	recognizedFuture := make(chan bool)
@@ -408,6 +456,12 @@ func TestKeyword(t *testing.T) {
 		t.Log("Recognizing ", event.Result.Text)
 	}
 	connector.Recognizing(recognizingHandler)
+	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
+		defer event.Close()
+		t.Log("Got a cancellation...")
+		t.Log(event.ErrorDetails)
+	}
+	connector.Canceled(cancellationHandler)
 	err = <-connector.StartKeywordRecognitionAsync(model)
 	if err != nil {
 		t.Error("Found an error: ", err)
