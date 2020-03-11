@@ -186,14 +186,14 @@ func (recognizer SpeechRecognizer) StartContinuousRecognitionAsync() chan error 
 func (recognizer SpeechRecognizer) StopContinuousRecognitionAsync() chan error {
 	outcome := make(chan error)
 	go func() {
-		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStartContinuous)
+		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStopContinuous)
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_stop_continuous_recognition_async(recognizer.handle, &recognizer.handleAsyncStopContinuous))
 		}
 		if ret == C.SPX_NOERROR {
 			ret = uintptr(C.recognizer_stop_continuous_recognition_async_wait_for(recognizer.handleAsyncStopContinuous, math.MaxUint32))
 		}
-		releaseAsyncHandleIfValid(&recognizer.handleAsyncStartContinuous)
+		releaseAsyncHandleIfValid(&recognizer.handleAsyncStopContinuous)
 		if ret != C.SPX_NOERROR {
 			outcome <- common.NewCarbonError(ret)
 			return

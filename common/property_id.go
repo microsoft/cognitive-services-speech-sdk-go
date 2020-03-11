@@ -50,30 +50,25 @@ const (
 	// SpeechServiceConnectionProxyHostName is the host name of the proxy server used to connect to the Cognitive Services
 	// Speech Service. Under normal circumstances, you shouldn't have to use this property directly.
 	// Instead, use SpeechConfig.SetProxy.
-	// NOTE: This property id was added in version 1.1.0.
 	SpeechServiceConnectionProxyHostName PropertyID = 1100
 
 	// SpeechServiceConnectionProxyPort is the port of the proxy server used to connect to the Cognitive Services Speech
 	// Service. Under normal circumstances, you shouldn't have to use this property directly.
 	// Instead, use SpeechConfig.SetProxy.
-	// NOTE: This property id was added in version 1.1.0.
 	SpeechServiceConnectionProxyPort PropertyID = 1101
 
 	// SpeechServiceConnectionProxyUserName is the user name of the proxy server used to connect to the Cognitive Services
 	// Speech Service. Under normal circumstances, you shouldn't have to use this property directly.
 	// Instead, use SpeechConfig.SetProxy.
-	// NOTE: This property id was added in version 1.1.0.
 	SpeechServiceConnectionProxyUserName PropertyID = 1102
 
 	// SpeechServiceConnectionProxyPassword is the password of the proxy server used to connect to the Cognitive Services
 	// Speech Service. Under normal circumstances, you shouldn't have to use this property directly.
 	// Instead, use SpeechConfig.SetProxy.
-	// NOTE: This property id was added in version 1.1.0.
 	SpeechServiceConnectionProxyPassword PropertyID = 1103
 
 	// SpeechServiceConnectionURL is the URL string built from speech configuration. This property is intended to be read-only.
 	// The SDK is using it internally.
-	// NOTE: Added in version 1.5.0.
 	SpeechServiceConnectionURL PropertyID = 1104
 
 	// SpeechServiceConnectionTranslationToLanguages is the list of comma separated languages used as target translation
@@ -113,41 +108,32 @@ const (
 
 	// SpeechServiceConnectionUserDefinedQueryParameters are the query parameters provided by users. They will be passed
 	// to the service as URL query parameters.
-	// Added in version 1.5.0
 	SpeechServiceConnectionUserDefinedQueryParameters PropertyID = 3003
 
 	// SpeechServiceConnectionSynthLanguage is the spoken language to be synthesized (e.g. en-US)
-	/// Added in version 1.4.0
 	SpeechServiceConnectionSynthLanguage PropertyID = 3100
 
 	// SpeechServiceConnectionSynthVoice is the name of the TTS voice to be used for speech synthesis
-	// Added in version 1.4.0
 	SpeechServiceConnectionSynthVoice PropertyID = 3101
 
-	// SpeechServiceConnectionSynthOutputFormat is the string to specify TTS output audio format
-	// Added in version 1.4.0
+	// SpeechServiceConnectionSynthOutputFormat is the string to specify TTS output audio format.
 	SpeechServiceConnectionSynthOutputFormat PropertyID = 3102
 
 	// SpeechServiceConnectionInitialSilenceTimeoutMs is the initial silence timeout value (in milliseconds) used by the
 	// service.
-	// Added in version 1.5.0
 	SpeechServiceConnectionInitialSilenceTimeoutMs PropertyID = 3200
 
 	// SpeechServiceConnectionEndSilenceTimeoutMs is the end silence timeout value (in milliseconds) used by the service.
-	// Added in version 1.5.0
 	SpeechServiceConnectionEndSilenceTimeoutMs PropertyID = 3201
 
 	// SpeechServiceConnectionEnableAudioLogging is a boolean value specifying whether audio logging is enabled in the service
 	// or not.
-	// Added in version 1.5.0
 	SpeechServiceConnectionEnableAudioLogging PropertyID = 3202
 
-	// SpeechServiceConnectionAutoDetectSourceLanguages is the auto detect source languages
-	// Added in version 1.8.0
+	// SpeechServiceConnectionAutoDetectSourceLanguages is the auto detect source languages.
 	SpeechServiceConnectionAutoDetectSourceLanguages PropertyID = 3300
 
-	// SpeechServiceConnectionAutoDetectSourceLanguageResult is the auto detect source language result
-	// Added in version 1.8.0
+	// SpeechServiceConnectionAutoDetectSourceLanguageResult is the auto detect source language result.
 	SpeechServiceConnectionAutoDetectSourceLanguageResult PropertyID = 3301
 
 	// SpeechServiceResponseRequestDetailedResultTrueFalse the requested Cognitive Services Speech Service response output
@@ -162,33 +148,27 @@ const (
 	// SpeechServiceResponseProfanityOption is the requested Cognitive Services Speech Service response output profanity
 	// setting.
 	// Allowed values are "masked", "removed", and "raw".
-	// Added in version 1.5.0.
 	SpeechServiceResponseProfanityOption PropertyID = 4002
 
 	// SpeechServiceResponsePostProcessingOption a string value specifying which post processing option should be used
 	// by the service.
 	// Allowed values are "TrueText".
-	// Added in version 1.5.0
 	SpeechServiceResponsePostProcessingOption PropertyID = 4003
 
 	// SpeechServiceResponseRequestWordLevelTimestamps is a boolean value specifying whether to include word-level
 	// timestamps in the response result.
-	// Added in version 1.5.0
 	SpeechServiceResponseRequestWordLevelTimestamps PropertyID = 4004
 
 	// SpeechServiceResponseStablePartialResultThreshold is the number of times a word has to be in partial results
 	// to be returned.
-	// Added in version 1.5.0
 	SpeechServiceResponseStablePartialResultThreshold PropertyID = 4005
 
 	// SpeechServiceResponseOutputFormatOption is a string value specifying the output format option in the response
 	// result. Internal use only.
-	// Added in version 1.5.0.
 	SpeechServiceResponseOutputFormatOption PropertyID = 4006
 
 	// SpeechServiceResponseTranslationRequestStablePartialResult is a boolean value to request for stabilizing translation
 	// partial results by omitting words in the end.
-	// Added in version 1.5.0.
 	SpeechServiceResponseTranslationRequestStablePartialResult PropertyID = 4100
 
 	// SpeechServiceResponseJSONResult is the Cognitive Services Speech Service response output (in JSON format). This
@@ -205,7 +185,6 @@ const (
 	// the moment the final result is received from the service. The SDK computes the time difference between the last audio
 	// fragment from the audio input that is contributing to the final result, and the time the final result is received from
 	// the speech service.
-	// Added in version 1.3.0.
 	SpeechServiceResponseRecognitionLatencyMs PropertyID = 5002
 
 	// CancellationDetailsReason is the cancellation reason. Currently unused.
@@ -224,62 +203,48 @@ const (
 	// AudioConfigDeviceNameForCapture is the device name for audio capture. Under normal circumstances, you shouldn't have
 	// to use this property directly.
 	// Instead, use AudioConfig.FromMicrophoneInput.
-	// NOTE: This property id was added in version 1.3.0.
 	AudioConfigDeviceNameForCapture PropertyID = 8000
 
 	// AudioConfigNumberOfChannelsForCapture is the number of channels for audio capture. Internal use only.
-	// NOTE: This property id was added in version 1.3.0.
 	AudioConfigNumberOfChannelsForCapture PropertyID = 8001
 
 	// AudioConfigSampleRateForCapture is the sample rate (in Hz) for audio capture. Internal use only.
-	// NOTE: This property id was added in version 1.3.0.
 	AudioConfigSampleRateForCapture PropertyID = 8002
 
 	// AudioConfigBitsPerSampleForCapture is the number of bits of each sample for audio capture. Internal use only.
-	// NOTE: This property id was added in version 1.3.0.
 	AudioConfigBitsPerSampleForCapture PropertyID = 8003
 
 	// AudioConfigAudioSource is the audio source. Allowed values are "Microphones", "File", and "Stream".
-	// Added in version 1.3.0.
 	AudioConfigAudioSource PropertyID = 8004
 
 	// SpeechLogFilename is the file name to write logs.
-	// Added in version 1.4.0.
 	SpeechLogFilename PropertyID = 9001
 
 	// ConversationApplicationID is the identifier used to connect to the backend service.
-	/// Added in version 1.5.0.
 	ConversationApplicationID PropertyID = 10000
 
 	// ConversationDialogType is the type of dialog backend to connect to.
-	// Added in version 1.7.0.
 	ConversationDialogType PropertyID = 10001
 
-	// ConversationInitialSilenceTimeout is the silence timeout for listening
-	// Added in version 1.5.0.
+	// ConversationInitialSilenceTimeout is the silence timeout for listening.
 	ConversationInitialSilenceTimeout PropertyID = 10002
 
-	// ConversationFromID is the FromId to be used on speech recognition activities
-	// Added in version 1.5.0.
+	// ConversationFromID is the FromId to be used on speech recognition activities.
 	ConversationFromID PropertyID = 10003
 
 	// ConversationConversationID is the ConversationId for the session.
-	// Added in version 1.8.0.
 	ConversationConversationID PropertyID = 10004
 
 	// ConversationCustomVoiceDeploymentIDs is a comma separated list of custom voice deployment ids.
-	// Added in version 1.8.0.
 	ConversationCustomVoiceDeploymentIDs PropertyID = 10005
 
 	// DataBufferTimeStamp is the time stamp associated to data buffer written by client when using Pull/Push
 	// audio input streams.
 	// The time stamp is a 64-bit value with a resolution of 90 kHz. It is the same as the presentation timestamp
 	// in an MPEG transport stream. See https://en.wikipedia.org/wiki/Presentation_timestamp
-	// Added in version 1.5.0.
 	DataBufferTimeStamp PropertyID = 11001
 
 	// DataBufferUserID is the user id associated to data buffer written by client when using Pull/Push audio
 	// input streams.
-	// Added in version 1.5.0.
 	DataBufferUserID PropertyID = 11002
 )

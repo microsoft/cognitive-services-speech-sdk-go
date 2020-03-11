@@ -5,8 +5,10 @@
 package audio
 
 import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"sync"
+	"unsafe"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 // #include <stdlib.h>
@@ -20,7 +22,6 @@ import (
 // void cgo_audio_get_property_callback_wrapper(void* context, int id, uint8_t* value, uint32_t size);
 // void cgo_audio_close_callback_wrapper(void *context);
 import "C"
-import "unsafe"
 
 // AudioInputStream represents audio input stream used for custom audio input configurations
 type AudioInputStream interface {
@@ -82,7 +83,6 @@ func (stream PushAudioInputStream) Write(buffer []byte) error {
 }
 
 // SetProperty sets value of a property. The properties of the audio data should be set before writing the audio data.
-// Added in version 1.5.0.
 func (stream PushAudioInputStream) SetProperty(id common.PropertyID, value string) error {
 	v := C.CString(value)
 	defer C.free(unsafe.Pointer(v))

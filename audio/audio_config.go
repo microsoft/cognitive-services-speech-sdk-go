@@ -5,6 +5,8 @@
 package audio
 
 import (
+	"unsafe"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
@@ -13,7 +15,6 @@ import (
 // #include <speechapi_c_property_bag.h>
 // #include <speechapi_c_audio_config.h>
 import "C"
-import "unsafe"
 
 // AudioConfig represents specific audio configuration, such as microphone, file, or custom audio streams.
 type AudioConfig struct {
@@ -54,7 +55,6 @@ func NewAudioConfigFromDefaultMicrophoneInput() (*AudioConfig, error) {
 }
 
 // NewAudioConfigFromMicrophoneInput creates an AudioConfig object representing a specific microphone on the system.
-// Added in version 1.3.0.
 func NewAudioConfigFromMicrophoneInput(deviceName string) (*AudioConfig, error) {
 	var handle C.SPXHANDLE
 	dn := C.CString(deviceName)
@@ -90,7 +90,6 @@ func NewAudioConfigFromStreamInput(stream AudioInputStream) (*AudioConfig, error
 
 // NewAudioConfigFromDefaultSpeakerOutput creates an AudioConfig object representing the default audio output device
 // (speaker) on the system.
-// Added in version 1.4.0
 func NewAudioConfigFromDefaultSpeakerOutput() (*AudioConfig, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.audio_config_create_audio_output_from_default_speaker(&handle))
@@ -101,7 +100,6 @@ func NewAudioConfigFromDefaultSpeakerOutput() (*AudioConfig, error) {
 }
 
 // NewAudioConfigFromWavFileOutput creates an AudioConfig object representing the specified file for audio output.
-// Added in version 1.4.0
 func NewAudioConfigFromWavFileOutput(filename string) (*AudioConfig, error) {
 	var handle C.SPXHANDLE
 	fn := C.CString(filename)
@@ -114,7 +112,6 @@ func NewAudioConfigFromWavFileOutput(filename string) (*AudioConfig, error) {
 }
 
 // NewAudioConfigFromStreamOutput creates an AudioConfig object representing the specified output stream.
-// Added in version 1.4.0
 func NewAudioConfigFromStreamOutput(stream AudioOutputStream) (*AudioConfig, error) {
 	var handle C.SPXHANDLE
 	streamHandle := stream.getHandle()

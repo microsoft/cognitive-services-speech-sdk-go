@@ -104,7 +104,6 @@ func NewSpeechConfigFromEndpointWithSubscription(endpoint string, subscriptionKe
 // to pass the subscription key as parameter.
 // To use an authorization token with FromEndpoint, use this method to create a SpeechConfig instance, and then
 // call SetAuthorizationToken() on the created SpeechConfig instance.
-// Note: Added in version 1.5.0.
 func NewSpeechConfigFromEndpoint(endpoint string) (*SpeechConfig, error) {
 	var handle C.SPXHANDLE
 	e := C.CString(endpoint)
@@ -122,7 +121,6 @@ func NewSpeechConfigFromEndpoint(endpoint string) (*SpeechConfig, error) {
 // Note: Query parameters are not allowed in the host URI and must be set by other APIs.
 // Note: To use an authorization token with host, use NewSpeechConfigFromHost,
 // and then call SetAuthorizationToken() on the created SpeechConfig instance.
-// Note: Added in version 1.8.0.
 func NewSpeechConfigFromHostWithSubscription(host string, subscriptionKey string) (*SpeechConfig, error) {
 	var handle C.SPXHANDLE
 	h := C.CString(host)
@@ -144,7 +142,6 @@ func NewSpeechConfigFromHostWithSubscription(host string, subscriptionKey string
 // the subscription key as parameter.
 // To use an authorization token with FromHost, use this method to create a SpeechConfig instance, and then
 // call SetAuthorizationToken() on the created SpeechConfig instance.
-// Note: Added in version 1.8.0.
 func NewSpeechConfigFromHost(host string) (*SpeechConfig, error) {
 	var handle C.SPXHANDLE
 	h := C.CString(host)
@@ -224,37 +221,31 @@ func (config *SpeechConfig) SetEndpointID(endpointID string) error {
 }
 
 // SpeechSynthesisLanguage is the language of the speech synthesizer.
-// Added in version 1.4.0
 func (config *SpeechConfig) SpeechSynthesisLanguage() string {
 	return config.GetProperty(common.SpeechServiceConnectionSynthLanguage)
 }
 
 // SetSpeechSynthesisLanguage sets the language of the speech synthesizer.
-// Added in version 1.4.0
 func (config *SpeechConfig) SetSpeechSynthesisLanguage(language string) error {
 	return config.SetProperty(common.SpeechServiceConnectionSynthLanguage, language)
 }
 
 // SpeechSynthesisVoiceName is the voice of the speech synthesizer.
-// Added in version 1.4.0
 func (config *SpeechConfig) SpeechSynthesisVoiceName() string {
 	return config.GetProperty(common.SpeechServiceConnectionSynthVoice)
 }
 
 // SetSpeechSynthesisVoiceName sets the voice of the speech synthesizer.
-// Added in version 1.4.0
 func (config *SpeechConfig) SetSpeechSynthesisVoiceName(voiceName string) error {
 	return config.SetProperty(common.SpeechServiceConnectionSynthVoice, voiceName)
 }
 
 // SpeechSynthesisOutputFormat is the speech synthesis output format.
-// Added in version 1.4.0
 func (config *SpeechConfig) SpeechSynthesisOutputFormat() string {
 	return config.GetProperty(common.SpeechServiceConnectionSynthOutputFormat)
 }
 
 // SetSpeechSynthesisOutputFormat sets the speech synthesis output format (e.g. Riff16Khz16BitMonoPcm).
-// Added in version 1.4.0
 func (config *SpeechConfig) SetSpeechSynthesisOutputFormat(format common.SpeechSynthesisOutputFormat) error {
 	ret := uintptr(C.speech_config_set_audio_output_format(config.handle, (C.Speech_Synthesis_Output_Format)(format)))
 	if ret != C.SPX_NOERROR {
@@ -264,7 +255,6 @@ func (config *SpeechConfig) SetSpeechSynthesisOutputFormat(format common.SpeechS
 }
 
 // SetProxy sets proxy configuration
-// Added in version 1.1.0
 //
 // Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
 func (config *SpeechConfig) SetProxy(hostname string, port uint64) error {
@@ -276,7 +266,6 @@ func (config *SpeechConfig) SetProxy(hostname string, port uint64) error {
 }
 
 // SetProxyWithUsernameAndPassword sets proxy configuration with username and password
-// Added in version 1.1.0
 //
 // Note: Proxy functionality is not available on macOS. This function will have no effect on this platform.
 func (config *SpeechConfig) SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error {
@@ -312,7 +301,6 @@ func (config *SpeechConfig) GetPropertyByString(name string) string {
 }
 
 // SetServiceProperty sets a property value that will be passed to service using the specified channel.
-// Added in version 1.5.0.
 func (config *SpeechConfig) SetServiceProperty(name string, value string, channel common.ServicePropertyChannel) error {
 	n := C.CString(name)
 	defer C.free(unsafe.Pointer(n))
@@ -326,7 +314,6 @@ func (config *SpeechConfig) SetServiceProperty(name string, value string, channe
 }
 
 // SetProfanity sets profanity option.
-// Added in version 1.5.0.
 func (config *SpeechConfig) SetProfanity(profanity common.ProfanityOption) error {
 	ret := uintptr(C.speech_config_set_profanity(config.handle, (C.SpeechConfig_ProfanityOption)(profanity)))
 	if ret != C.SPX_NOERROR {
@@ -336,19 +323,16 @@ func (config *SpeechConfig) SetProfanity(profanity common.ProfanityOption) error
 }
 
 // EnableAudioLogging enables audio logging in service.
-// Added in version 1.5.0.
 func (config *SpeechConfig) EnableAudioLogging() error {
 	return config.SetProperty(common.SpeechServiceConnectionEnableAudioLogging, "true")
 }
 
 // RequestWordLevelTimestamps includes word-level timestamps in response result.
-// Added in version 1.5.0.
 func (config *SpeechConfig) RequestWordLevelTimestamps() error {
 	return config.SetProperty(common.SpeechServiceResponseRequestWordLevelTimestamps, "true")
 }
 
 // EnableDictation enables dictation mode. Only supported in speech continuous recognition.
-// Added in version 1.5.0.
 func (config *SpeechConfig) EnableDictation() error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoMode, "DICTATION")
 }
