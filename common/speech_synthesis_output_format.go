@@ -5,7 +5,6 @@
 package common
 
 // SpeechSynthesisOutputFormat defines the possible speech synthesis output audio formats.
-// Added in version 1.4.0
 type SpeechSynthesisOutputFormat int
 
 const (

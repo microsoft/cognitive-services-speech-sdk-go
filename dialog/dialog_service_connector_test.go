@@ -346,7 +346,8 @@ func TestFromPushInputStream(t *testing.T) {
 		return
 	}
 	defer connector.Close()
-	activityFuture := make(chan bool)
+	activityFuture := make(chan bool, 1)
+	activityReceived := false
 	activityReceivedHandler := func(event ActivityReceivedEventArgs) {
 		defer event.Close()
 		var activity map[string]interface{}
@@ -358,15 +359,14 @@ func TestFromPushInputStream(t *testing.T) {
 		}
 		t.Log(event.Activity)
 		t.Log("Received Activity")
-		select {
-		case activityFuture <- true:
-			t.Log("Notified listener.")
-		default:
-			t.Log("No one is listening, ignore...")
+		if activityReceived {
+			return
 		}
+		activityReceived = true
+		activityFuture <- true
 	}
 	connector.ActivityReceived(activityReceivedHandler)
-	recognizedFuture := make(chan bool)
+	recognizedFuture := make(chan bool, 1)
 	recognizedHandle := func(event speech.SpeechRecognitionEventArgs) {
 		defer event.Close()
 		t.Log("Recognized ", event.Result.Text)
@@ -393,8 +393,8 @@ func TestFromPushInputStream(t *testing.T) {
 		} else {
 			t.Error("Bad recognition")
 		}
-	case <-time.After(5 * time.Second):
-		t.Error("Timeout, no event recognition event received.")
+	case <-time.After(10 * time.Second):
+		t.Error("Timeout, no recognition event received.")
 	}
 	select {
 	case correct := <-activityFuture:

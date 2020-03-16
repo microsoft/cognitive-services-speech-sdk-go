@@ -14,6 +14,7 @@ import "C"
 
 // SpeechRecognitionEventArgs represents the speech recognition event arguments.
 type SpeechRecognitionEventArgs struct {
+	RecognitionEventArgs
 	handle C.SPXHANDLE
 	Result SpeechRecognitionResult
 }
@@ -26,7 +27,9 @@ func (event SpeechRecognitionEventArgs) Close() {
 
 // NewSpeechRecognitionEventArgsFromHandle creates the object from the handle (for internal use)
 func NewSpeechRecognitionEventArgsFromHandle(handle common.SPXHandle) (*SpeechRecognitionEventArgs, error) {
+	base, err := NewRecognitionEventArgsFromHandle(handle)
 	event := new(SpeechRecognitionEventArgs)
+	event.RecognitionEventArgs = *base
 	event.handle = uintptr2handle(handle)
 	var resultHandle C.SPXHANDLE
 	ret := uintptr(C.recognizer_recognition_event_get_result(event.handle, &resultHandle))

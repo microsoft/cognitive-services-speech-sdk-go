@@ -5,6 +5,8 @@
 package audio
 
 import (
+	"unsafe"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
@@ -18,7 +20,6 @@ import (
 // int cgo_audio_push_stream_write_callback_wrapper(void *context, uint8_t* buffer, uint32_t size);
 // void cgo_audio_push_stream_close_callback_wrapper(void *context);
 import "C"
-import "unsafe"
 
 // AudioOutputStream represents audio output stream used for custom audio output configurations.
 // Updated in version 1.7.0
@@ -85,7 +86,6 @@ type PushAudioOutputStream struct {
 
 // PushAudioOutputStreamCallback an interface that defines callback methods (Write() and CloseStream()) for custom audio output
 // streams).
-// Added in version 1.4.0
 type PushAudioOutputStreamCallback interface {
 	Write(buffer []byte) int
 	CloseStream()

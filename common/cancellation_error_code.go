@@ -5,7 +5,6 @@
 package common
 
 // CancellationErrorCode defines error code in case that CancellationReason is Error.
-// Added in version 1.1.0.
 type CancellationErrorCode int
 
 const (

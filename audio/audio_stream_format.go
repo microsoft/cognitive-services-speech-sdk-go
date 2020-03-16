@@ -53,7 +53,6 @@ func GetWaveFormatPCM(samplesPerSecond uint32, bitsPerSample uint8, channels uin
 
 // GetDefaultOutputFormat creates an audio stream format object representing the default audio stream format
 // (16 kHz, 16 bit, mono PCM).
-// Added in version 1.4.0
 func GetDefaultOutputFormat() (*AudioStreamFormat, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.audio_stream_format_create_from_default_output(&handle))
@@ -67,7 +66,6 @@ func GetDefaultOutputFormat() (*AudioStreamFormat, error) {
 
 // GetCompressedFormat creates an audio stream format object with the specified compressed audio container format, to be
 // used as input format.
-// Support added in 1.4.0.
 func GetCompressedFormat(compressedFormat AudioStreamContainerFormat) (*AudioStreamFormat, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.audio_stream_format_create_from_compressed_format(&handle, (C.Audio_Stream_Container_Format)(compressedFormat)))

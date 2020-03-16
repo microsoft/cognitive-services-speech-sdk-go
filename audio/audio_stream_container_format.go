@@ -5,7 +5,6 @@
 package audio
 
 // AudioStreamContainerFormat defines supported audio stream container format.
-// Changed in version 1.4.0.
 type AudioStreamContainerFormat int
 
 const (
@@ -15,13 +14,13 @@ const (
 	// MP3 Stream ContainerFormat definition for MP3.
 	MP3 AudioStreamContainerFormat = 0x102
 
-	// FLAC Stream ContainerFormat definition for FLAC. Added in version 1.7.0.
+	// FLAC Stream ContainerFormat definition for FLAC.
 	FLAC AudioStreamContainerFormat = 0x103
 
-	// ALAW Stream ContainerFormat definition for ALAW. Added in version 1.7.0.
+	// ALAW Stream ContainerFormat definition for ALAW.
 	ALAW AudioStreamContainerFormat = 0x104
 
-	// MULAW Stream ContainerFormat definition for MULAW. Added in version 1.7.0.>
+	// MULAW Stream ContainerFormat definition for MULAW.
 	MULAW AudioStreamContainerFormat = 0x105
 
 	// AMRNB Stream ContainerFormat definition for AMRNB. Currently not supported.
