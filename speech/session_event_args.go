@@ -16,12 +16,8 @@ import "C"
 
 // SessionEventArgs represents the session event arguments.
 type SessionEventArgs struct {
-	sessionID string
-}
-
-// SessionID Session identifier (a GUID in string format).
-func (event SessionEventArgs) SessionID() string {
-	return event.sessionID
+	// SessionID Session identifier (a GUID in string format).
+	SessionID string
 }
 
 // Close releases the underlying resources.
@@ -37,7 +33,7 @@ func NewSessionEventArgsFromHandle(handle common.SPXHandle) (*SessionEventArgs, 
 		return nil, common.NewCarbonError(ret)
 	}
 	event := new(SessionEventArgs)
-	event.sessionID = C.GoString((*C.char)(buffer))
+	event.SessionID = C.GoString((*C.char)(buffer))
 	return event, nil
 }
 

@@ -41,7 +41,6 @@ func (stream *audioOutputStreamBase) Close() {
 }
 
 // PullAudioOutputStream represents memory backed pull audio output stream used for custom audio output configurations.
-// Updated in version 1.7.0
 type PullAudioOutputStream struct {
 	audioOutputStreamBase
 }
@@ -79,7 +78,6 @@ func (stream PullAudioOutputStream) Read(size uint) ([]byte, error) {
 }
 
 // PushAudioOutputStream represents audio output stream used for custom audio output configurations.
-// Updated in version 1.7.0
 type PushAudioOutputStream struct {
 	audioOutputStreamBase
 }

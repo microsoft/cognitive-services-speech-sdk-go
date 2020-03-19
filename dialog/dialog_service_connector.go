@@ -5,6 +5,8 @@
 package dialog
 
 import (
+	"unsafe"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
@@ -22,9 +24,7 @@ import (
 // void cgo_dialog_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_dialog_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_dialog_activity_received(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
-//
 import "C"
-import "unsafe"
 
 // DialogServiceConnector connects to a speech enabled dialog backend.
 type DialogServiceConnector struct {
@@ -181,6 +181,17 @@ func (connector DialogServiceConnector) SetAuthorizationToken(token string) erro
 // AuthorizationToken is the authorization token.
 func (connector DialogServiceConnector) AuthorizationToken() string {
 	return connector.Properties.GetProperty(common.SpeechServiceAuthorizationToken, "")
+}
+
+// SetSpeechActivityTemplate sets the speech activity template. It is used to stamp properties from the template on the service generated
+// activty for speech.
+func (connector DialogServiceConnector) SetSpeechActivityTemplate(activityTemplate string) error {
+	return connector.Properties.SetProperty(common.ConversationSpeechActivityTemplate, activityTemplate)
+}
+
+// SpeechActivityTemplate is the used to stamp properties from the template on the service generated activities.
+func (connector DialogServiceConnector) SpeechActivityTemplate() string {
+	return connector.Properties.GetProperty(common.ConversationSpeechActivityTemplate, "")
 }
 
 // Recognized signals events containing speech recognition results.
