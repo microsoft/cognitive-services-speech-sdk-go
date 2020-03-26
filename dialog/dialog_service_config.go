@@ -28,7 +28,7 @@ type DialogServiceConfig interface {
 	SetProxy(hostname string, port uint64) error
 	SetProxyWithUsernameAndPassword(hostname string, port uint64, username string, password string) error
 	SetLanguage(lang string) error
-	GetLanguage() string
+	Language() string
 	Close()
 	getHandle() C.SPXHANDLE
 }
@@ -83,9 +83,9 @@ func (config *dialogServiceConfigBase) SetLanguage(lang string) error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, lang)
 }
 
-// GetLanguage gets the input language to the connector.
+// Language is the input language to the connector.
 // The language is specified in BCP-47 format.
-func (config *dialogServiceConfigBase) GetLanguage() string {
+func (config *dialogServiceConfigBase) Language() string {
 	return config.GetProperty(common.SpeechServiceConnectionRecoLanguage)
 }
 
@@ -137,7 +137,7 @@ func NewBotFrameworkConfigFromSubscriptionAndBotID(subscriptionKey string, regio
 	b := C.CString(botID)
 	defer C.free(unsafe.Pointer(b))
 
-	ret := uintptr(C.bot_framework_config_from_subscription(&handle, sk, r, nil))
+	ret := uintptr(C.bot_framework_config_from_subscription(&handle, sk, r, b))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
@@ -165,7 +165,37 @@ func NewBotFrameworkConfigFromAuthorizationToken(authorizationToken string, regi
 	defer C.free(unsafe.Pointer(at))
 	r := C.CString(region)
 	defer C.free(unsafe.Pointer(r))
-	ret := uintptr(C.bot_framework_config_from_authorization_token(&handle, at, r))
+	ret := uintptr(C.bot_framework_config_from_authorization_token(&handle, at, r, nil))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	speechConfig, err := speech.NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+	config := new(BotFrameworkConfig)
+	config.config = *speechConfig
+	config.handle = handle
+	return config, nil
+}
+
+// NewBotFrameworkConfigFromAuthorizationTokenAndBotID creates a bot framework service config instance with the specified authorization
+// token and region and botID.
+// Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
+// expires, the caller needs to refresh it by calling this setter with a new valid token.
+// As configuration values are copied when creating a new connector, the new token value will not apply to connectors that have
+// already been created.
+// For connectors that have been created before, you need to set authorization token of the corresponding connector
+// to refresh the token. Otherwise, the connectors will encounter errors during operation.
+func NewBotFrameworkConfigFromAuthorizationTokenAndBotID(authorizationToken string, region string, botID string) (*BotFrameworkConfig, error) {
+	var handle C.SPXHANDLE
+	at := C.CString(authorizationToken)
+	defer C.free(unsafe.Pointer(at))
+	r := C.CString(region)
+	defer C.free(unsafe.Pointer(r))
+	b := C.CString(botID)
+	defer C.free(unsafe.Pointer(b))
+	ret := uintptr(C.bot_framework_config_from_authorization_token(&handle, at, r, b))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}

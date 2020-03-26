@@ -66,8 +66,8 @@ func NewAudioConfigFromMicrophoneInput(deviceName string) (*AudioConfig, error) 
 	return newAudioConfigFromHandle(handle)
 }
 
-// NewAudioConfigFromFileInput creates an AudioConfig object representing the specified file.
-func NewAudioConfigFromFileInput(filename string) (*AudioConfig, error) {
+// NewAudioConfigFromWavFileInput creates an AudioConfig object representing the specified file.
+func NewAudioConfigFromWavFileInput(filename string) (*AudioConfig, error) {
 	var handle C.SPXHANDLE
 	fn := C.CString(filename)
 	defer C.free(unsafe.Pointer(fn))
@@ -120,4 +120,24 @@ func NewAudioConfigFromStreamOutput(stream AudioOutputStream) (*AudioConfig, err
 		return nil, common.NewCarbonError(ret)
 	}
 	return newAudioConfigFromHandle(handle)
+}
+
+// SetProperty sets a property value by ID.
+func (config AudioConfig) SetProperty(id common.PropertyID, value string) error {
+	return config.properties.SetProperty(id, value)
+}
+
+// GetProperty gets a property value by ID.
+func (config AudioConfig) GetProperty(id common.PropertyID) string {
+	return config.properties.GetProperty(id, "")
+}
+
+// SetPropertyByString sets a property value by name.
+func (config AudioConfig) SetPropertyByString(name string, value string) error {
+	return config.properties.SetPropertyByString(name, value)
+}
+
+// GetPropertyByString gets a property value by name.
+func (config AudioConfig) GetPropertyByString(name string) string {
+	return config.properties.GetPropertyByString(name, "")
 }
