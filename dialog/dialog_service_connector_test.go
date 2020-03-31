@@ -33,7 +33,7 @@ func createConnectorFromSubscriptionRegionAndAudioConfig(t *testing.T, subscript
 }
 
 func createConnectorFromSubscriptionRegionAndFileInput(t *testing.T, subscription string, region string, file string) *DialogServiceConnector {
-	audioConfig, err := audio.NewAudioConfigFromFileInput(file)
+	audioConfig, err := audio.NewAudioConfigFromWavFileInput(file)
 	if err != nil {
 		t.Error("Got an error: ", err.Error())
 		return nil
@@ -64,14 +64,14 @@ func TestSessionEvents(t *testing.T) {
 	sessionStartedHandler := func(event speech.SessionEventArgs) {
 		defer event.Close()
 		sessionStartedFuture <- true
-		id := event.SessionID()
+		id := event.SessionID
 		t.Log("Started ", id)
 	}
 	sessionStoppedFuture := make(chan bool)
 	sessionStoppedHandler := func(event speech.SessionEventArgs) {
 		defer event.Close()
 		sessionStoppedFuture <- true
-		id := event.SessionID()
+		id := event.SessionID
 		t.Log("Stopped ", id)
 	}
 	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {

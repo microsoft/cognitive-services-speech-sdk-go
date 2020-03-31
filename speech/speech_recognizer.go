@@ -279,7 +279,7 @@ func (recognizer SpeechRecognizer) SessionStarted(handler SessionEventHandler) {
 
 // SessionStopped signals events indicating the end of a recognition session (operation).
 func (recognizer SpeechRecognizer) SessionStopped(handler SessionEventHandler) {
-	registerSessionStartedCallback(handler, recognizer.handle)
+	registerSessionStoppedCallback(handler, recognizer.handle)
 	if handler != nil {
 		C.recognizer_session_stopped_set_callback(
 			recognizer.handle,

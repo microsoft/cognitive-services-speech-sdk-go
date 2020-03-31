@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/dialog_service_connector"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/recognizer"
 )
 
 type functionMap = map[string]func(string, string, string)
@@ -26,6 +27,8 @@ func printHelp(executableName string, samples functionMap) {
 
 func main() {
 	samples := functionMap{
+		"speech_recognizer:RecognizeOnceFromWavFile":    recognizer.RecognizeOnceFromWavFile,
+		"speech_recognizer:ContinuousFromMicrophone":    recognizer.ContinuousFromMicrophone,
 		"dialog_service_connector:ListenOnce":           dialog_service_connector.ListenOnce,
 		"dialog_service_connector:KWS":                  dialog_service_connector.KWS,
 		"dialog_service_connector:ListenOnceFromStream": dialog_service_connector.ListenOnceFromStream,

@@ -35,7 +35,7 @@ func createSpeechRecognizerFromAudioConfig(t *testing.T, audioConfig *audio.Audi
 }
 
 func createSpeechRecognizerFromFileInput(t *testing.T, file string) *SpeechRecognizer {
-	audioConfig, err := audio.NewAudioConfigFromFileInput(file)
+	audioConfig, err := audio.NewAudioConfigFromWavFileInput(file)
 	if err != nil {
 		t.Error("Got an error: ", err)
 	}
@@ -79,6 +79,38 @@ func pumpSilenceIntoStream(t *testing.T, stream *audio.PushAudioInputStream) {
 		if err != nil {
 			t.Error("Error writing to the stream")
 		}
+	}
+}
+
+func TestSessionEvents(t *testing.T) {
+	recognizer := createSpeechRecognizerFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
+	if recognizer == nil {
+		t.Error("Recognizer creation failed")
+		return
+	}
+	defer recognizer.Close()
+	sessionStartedFuture := make(chan bool)
+	sessionStoppedFuture := make(chan bool)
+	recognizer.SessionStarted(func(event SessionEventArgs) {
+		defer event.Close()
+		t.Log("SessionStarted")
+		sessionStartedFuture <- true
+	})
+	recognizer.SessionStopped(func(event SessionEventArgs) {
+		defer event.Close()
+		t.Log("SessionStarted")
+		sessionStoppedFuture <- true
+	})
+	recognizer.RecognizeOnceAsync()
+	select {
+	case <-sessionStartedFuture:
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout waiting for SessionStarted event.")
+	}
+	select {
+	case <-sessionStoppedFuture:
+	case <- time.After(5 * time.Second):
+		t.Error("Timeout waiting for SessionStopped event.")
 	}
 }
 

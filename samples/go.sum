@@ -1,2 +1,2 @@
-github.com/Microsoft/cognitive-services-speech-sdk-go v1.10.0-alpha1 h1:uH7knxcKtToA3dhovQwcmLTptzuurYDWc2HRYeSvos4=
-github.com/Microsoft/cognitive-services-speech-sdk-go v1.10.0-alpha1/go.mod h1:ct4bG95K1Lu/c5y60PVGI1XOjo9aAcl80DD5dvu6zsg=
+github.com/Microsoft/cognitive-services-speech-sdk-go v1.11.0-alpha1 h1:dOPa6u1Y8q25uWBayW47GFMAG2SWNx9vA2vS0k7CHEg=
+github.com/Microsoft/cognitive-services-speech-sdk-go v1.11.0-alpha1/go.mod h1:ct4bG95K1Lu/c5y60PVGI1XOjo9aAcl80DD5dvu6zsg=
