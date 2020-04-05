@@ -64,14 +64,14 @@ func TestSessionEvents(t *testing.T) {
 	sessionStartedHandler := func(event speech.SessionEventArgs) {
 		defer event.Close()
 		sessionStartedFuture <- true
-		id := event.SessionID()
+		id := event.SessionID
 		t.Log("Started ", id)
 	}
 	sessionStoppedFuture := make(chan bool)
 	sessionStoppedHandler := func(event speech.SessionEventArgs) {
 		defer event.Close()
 		sessionStoppedFuture <- true
-		id := event.SessionID()
+		id := event.SessionID
 		t.Log("Stopped ", id)
 	}
 	cancellationHandler := func(event speech.SpeechRecognitionCanceledEventArgs) {
