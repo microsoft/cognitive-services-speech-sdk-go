@@ -1,11 +1,14 @@
 name: Go
-on: [push]
+on:
+  push:
+    branches:
+      - master
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     env:
-      CARBON_VERSION: "1.10.0"
+      CARBON_VERSION: "1.11.0"
     steps:
     - name: Set up Go 1.13
       uses: actions/setup-go@v1
