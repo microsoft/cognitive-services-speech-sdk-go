@@ -38,6 +38,10 @@ export TEST_SUBSCRIPTION_KEY="your_subscription_key"
 export TEST_SUBSCRIPTION_REGION="your_region"
 ```
 
+# Reference
+
+Reference documentation for these packages is available at http://aka.ms/csspeech/goref
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
