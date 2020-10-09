@@ -31,6 +31,7 @@ func NewSpeechConfigFromHandle(handle common.SPXHandle) (*SpeechConfig, error) {
 	config := new(SpeechConfig)
 	config.handle = cHandle
 	config.properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
+	config.properties.SetPropertyByString("SPEECHSDK-SPEECH-CONFIG-SYSTEM-LANGUAGE", "Go")
 	return config, nil
 }
 
