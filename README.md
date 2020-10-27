@@ -34,8 +34,10 @@ export LD_LIBRARY_PATH="/path/to/SDKs/library:$LD_LIBRARY_PATH"
 In addition to the environment variables needed to run applications, running tests requires setting the following variables:
 
 ```bash
-export TEST_SUBSCRIPTION_KEY="your_subscription_key"
-export TEST_SUBSCRIPTION_REGION="your_region"
+export SR_SUBSCRIPTION_KEY="your_subscription_key"
+export SR_SUBSCRIPTION_REGION="your_region"
+export DIALOG_SUBSCRIPTION_KEY="your_dialog_subscription_key"
+export DIALOG_SUBSCRIPTION_REGION="your_dialog_region"
 ```
 
 # Reference
