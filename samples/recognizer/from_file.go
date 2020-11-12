@@ -6,9 +6,11 @@ package recognizer
 import (
 	"fmt"
 	"time"
+    "strings"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/helpers"
 )
 
 func RecognizeOnceFromWavFile(subscription string, region string, file string) {
@@ -43,6 +45,78 @@ func RecognizeOnceFromWavFile(subscription string, region string, file string) {
 	select {
 	case outcome = <-task:
 	case <-time.After(5 * time.Second):
+		fmt.Println("Timed out")
+		return
+	}
+	defer outcome.Close()
+	if outcome.Error != nil {
+		fmt.Println("Got an error: ", outcome.Error)
+	}
+	fmt.Println("Got a recognition!")
+	fmt.Println(outcome.Result.Text)
+}
+
+func RecognizeOnceFromCompressedFile(subscription string, region string, file string) {
+	var containerFormat audio.AudioStreamContainerFormat
+	if strings.Contains(file, ".mulaw") {
+		containerFormat = audio.MULAW
+	}
+	if strings.Contains(file, ".alaw") {
+		containerFormat = audio.ALAW
+	}
+	if strings.Contains(file, ".mp3") {
+		containerFormat = audio.MP3
+	}
+	if strings.Contains(file, ".flac") {
+		containerFormat = audio.FLAC
+	}
+	if strings.Contains(file, ".opus") {
+		containerFormat = audio.OGGOPUS
+	}
+	format, err := audio.GetCompressedFormat(containerFormat)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer format.Close()
+	stream, err := audio.CreatePushAudioInputStreamFromFormat(format)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer stream.Close()
+	audioConfig, err := audio.NewAudioConfigFromStreamInput(stream)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer audioConfig.Close()
+	config, err := speech.NewSpeechConfigFromSubscription(subscription, region)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer config.Close()
+	speechRecognizer, err := speech.NewSpeechRecognizerFromConfig(config, audioConfig)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer speechRecognizer.Close()
+	speechRecognizer.SessionStarted(func(event speech.SessionEventArgs) {
+		defer event.Close()
+		fmt.Println("Session Started (ID=", event.SessionID, ")")
+	})
+	speechRecognizer.SessionStopped(func(event speech.SessionEventArgs) {
+		defer event.Close()
+		fmt.Println("Session Stopped (ID=", event.SessionID, ")")
+	})
+	helpers.PumpFileIntoStream(file, stream)
+	task := speechRecognizer.RecognizeOnceAsync()
+	var outcome speech.SpeechRecognitionOutcome
+	select {
+	case outcome = <-task:
+	case <-time.After(40 * time.Second):
 		fmt.Println("Timed out")
 		return
 	}
