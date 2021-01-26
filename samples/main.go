@@ -28,6 +28,7 @@ func printHelp(executableName string, samples functionMap) {
 func main() {
 	samples := functionMap{
 		"speech_recognizer:RecognizeOnceFromWavFile":    recognizer.RecognizeOnceFromWavFile,
+		"speech_recognizer:RecognizeOnceFromCompressedFile":    recognizer.RecognizeOnceFromCompressedFile,
 		"speech_recognizer:ContinuousFromMicrophone":    recognizer.ContinuousFromMicrophone,
 		"dialog_service_connector:ListenOnce":           dialog_service_connector.ListenOnce,
 		"dialog_service_connector:KWS":                  dialog_service_connector.KWS,
