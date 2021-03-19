@@ -8,7 +8,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-      CARBON_VERSION: "1.15.0"
+      CARBON_VERSION: "1.16.0"
     steps:
     - name: Set up Go 1.13
       uses: actions/setup-go@v1
