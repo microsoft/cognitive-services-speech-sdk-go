@@ -1,3 +1,3 @@
 module github.com/Microsoft/cognitive-services-speech-sdk-go
 
-go 1.13
+go 1.16
