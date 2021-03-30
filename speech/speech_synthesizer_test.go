@@ -12,6 +12,8 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
+var timeout time.Duration = 20 * time.Second
+
 func createSpeechSynthesizerFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *SpeechSynthesizer {
 	config, err := NewSpeechConfigFromSubscription(subscription, region)
 	if err != nil {
@@ -94,26 +96,26 @@ func TestSynthesizerEvents(t *testing.T) {
 	resultFuture := synthesizer.SpeakTextAsync("test")
 	select {
 	case <-synthesisStartedFuture:
-	case <-time.After(10 * time.Second):
+	case <-time.After(timeout):
 		t.Error("Timeout waiting for SynthesisStarted event.")
 	}
 	select {
 	case <-synthesizingFuture:
 		t.Logf("Received at least one Synthesizing event.")
-	case <-time.After(10 * time.Second):
+	case <-time.After(timeout):
 		t.Error("Timeout waiting for Synthesizing event.")
 	}
 	select {
 	case <-synthesisCompletedFuture:
 		t.Logf("Received synthesisCompletedFuture event.")
-	case <-time.After(10 * time.Second):
+	case <-time.After(timeout):
 		t.Error("Timeout waiting for synthesisCompletedFuture event.")
 	}
 	select {
 	case result := <-resultFuture:
 		defer result.Close()
 		checkSynthesisResult(t, result.Result, common.SynthesizingAudioCompleted)
-	case <-time.After(10 * time.Second):
+	case <-time.After(timeout):
 		t.Error("Timeout waiting for synthesis result.")
 	}
 }
