@@ -35,15 +35,6 @@ func createSpeechSynthesizerFromAudioConfig(t *testing.T, audioConfig *audio.Aud
 	return createSpeechSynthesizerFromSubscriptionRegionAndAudioConfig(t, subscription, region, audioConfig)
 }
 
-func createSpeechSynthesizerFromFileInput(t *testing.T, file string) *SpeechSynthesizer {
-	audioConfig, err := audio.NewAudioConfigFromWavFileInput(file)
-	if err != nil {
-		t.Error("Got an error: ", err)
-	}
-	defer audioConfig.Close()
-	return createSpeechSynthesizerFromAudioConfig(t, audioConfig)
-}
-
 func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason common.ResultReason) {
 	if result == nil {
 		t.Error("Synthesis Result is nil.")

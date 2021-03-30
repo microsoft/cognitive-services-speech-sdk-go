@@ -22,7 +22,7 @@ jobs:
     - name: Set up Go ${{ matrix.go }}
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.node }}
+        go-version: ${{ matrix.go }}
       id: go
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
@@ -65,5 +65,12 @@ jobs:
         export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
         export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
         go test -v ./...
+    - name: 'Upload Test Logs'
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: Log-${{ matrix.os }}-${{ matrix.go }}
+        path: '**/*.log'
+        retention-days: 3
 
 
