@@ -62,7 +62,8 @@ func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason co
 	}
 }
 
-func TestSynthesizerEvents(t *testing.T) {
+// func TestSynthesizerEvents(t *testing.T) {
+func SynthesizerEvents(t *testing.T) {
 	synthesizer := createSpeechSynthesizerFromAudioConfig(t, nil)
 	if synthesizer == nil {
 		t.Error("synthesizer creation failed")
