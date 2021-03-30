@@ -56,4 +56,32 @@ package speech
 //     recognizerFireEventCanceled(handle, event);
 // }
 //
+// extern void synthesizerFireEventSynthesisStarted(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_synthesizer_synthesis_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     synthesizerFireEventSynthesisStarted(handle, event);
+// }
+//
+// extern void synthesizerFireEventSynthesizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_synthesizer_synthesizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     synthesizerFireEventSynthesizing(handle, event);
+// }
+//
+// extern void synthesizerFireEventSynthesisCompleted(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_synthesizer_synthesis_completed(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     synthesizerFireEventSynthesisCompleted(handle, event);
+// }
+//
+// extern void synthesizerFireEventSynthesisCanceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_synthesizer_synthesis_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     synthesizerFireEventSynthesisCanceled(handle, event);
+// }
+//
 import "C"

@@ -199,3 +199,111 @@ func recognizerFireEventCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTH
 	}
 	handler(*event)
 }
+
+var synthesisStartedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandler)
+
+func registerSynthesisStartedCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	synthesisStartedCallbacks[handle] = handler
+}
+
+func getSynthesisStartedCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return synthesisStartedCallbacks[handle]
+}
+
+//export synthesizerFireEventSynthesisStarted
+func synthesizerFireEventSynthesisStarted(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getSynthesisStartedCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}
+
+var synthesizingCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandler)
+
+func registerSynthesizingCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	synthesizingCallbacks[handle] = handler
+}
+
+func getSynthesizingCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return synthesizingCallbacks[handle]
+}
+
+//export synthesizerFireEventSynthesizing
+func synthesizerFireEventSynthesizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getSynthesizingCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}
+
+var synthesisCompletedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandler)
+
+func registerSynthesisCompletedCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	synthesisCompletedCallbacks[handle] = handler
+}
+
+func getSynthesisCompletedCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return synthesisCompletedCallbacks[handle]
+}
+
+//export synthesizerFireEventSynthesisCompleted
+func synthesizerFireEventSynthesisCompleted(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getSynthesisCompletedCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}
+
+var synthesisCanceledCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandler)
+
+func registerSynthesisCanceledCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	synthesisCanceledCallbacks[handle] = handler
+}
+
+func getSynthesisCanceledCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return synthesisCanceledCallbacks[handle]
+}
+
+//export synthesizerFireEventSynthesisCanceled
+func synthesizerFireEventSynthesisCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getSynthesisCanceledCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}
