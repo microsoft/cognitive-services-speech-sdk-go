@@ -64,6 +64,6 @@ jobs:
         export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
         export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
         export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
-        go test ./...
+        go test -v ./...
 
 
