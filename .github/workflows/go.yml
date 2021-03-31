@@ -53,17 +53,9 @@ jobs:
     - name: Get Speech SDK (macOS)
       if: ${{ startsWith(matrix.os, 'macOS') }}
       run: |
-        if [[ ${{ matrix.os }} == ubuntu* ]] ;
-        then
-          link="SpeechSDK-Linux"
-        else
-          link="MicrosoftCognitiveServicesSpeech-macOS"
-        fi
-        mkdir $HOME/carbon
-        pushd $HOME/carbon
+        cd ~
         wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-macOS-$CARBON_VERSION.zip -O MicrosoftCognitiveServicesSpeech.framework.zip
-        unzip MicrosoftCognitiveServicesSpeech.framework.zip -d current
-        popd
+        unzip MicrosoftCognitiveServicesSpeech.framework.zip -d speechsdk
     - name: Get Carbon Dependencies
       run: |
         sudo apt-get update
@@ -79,9 +71,9 @@ jobs:
           export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
         else
-          export CGO_CFLAGS="-I$HOME/carbon/current/MicrosoftCognitiveServicesSpeech.framework/Headers"
-          export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
-          export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
+          export CGO_CFLAGS="-I$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.framework/Headers"
+          export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
+          export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
         fi
         go build -v ./...
     - name: Test
@@ -97,11 +89,9 @@ jobs:
           export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
         else
-          export CGO_CFLAGS="-I$HOME/carbon/current/MicrosoftCognitiveServicesSpeech.framework/Headers"
-          export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
-          export DYLD_FRAMEWORK_PATH="$HOME/carbon/current"
-          export LC_RPATH="$HOME/carbon/current"
-          export PATH="$PATH:$HOME/carbon/current"
+          export CGO_CFLAGS="-I$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.framework/Headers"
+          export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
+          export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
         fi
         export
         DYLD_PRINT_LIBRARIES=1 go test -v ./...
