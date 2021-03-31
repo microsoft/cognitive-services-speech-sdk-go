@@ -37,15 +37,15 @@ jobs:
 
     - name: Get Carbon
       run: |
-        if [ {{ matrix.os }} == ubuntu* ]
+        if [[ {{ matrix.os }} == ubuntu* ]]
         then
-          os=Linux
+          link="SpeechSDK-Linux"
         else
-          os=macOS
+          link="MicrosoftCognitiveServicesSpeech-macOS"
         fi
         mkdir $HOME/carbon
         pushd $HOME/carbon
-        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-${os}-$CARBON_VERSION.tar.gz -O SpeechSDK.tar.gz
+        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/${link}-$CARBON_VERSION.tar.gz -O SpeechSDK.tar.gz
         tar xzf SpeechSDK.tar.gz
         rm SpeechSDK.tar.gz
         ln -s SpeechSDK current
