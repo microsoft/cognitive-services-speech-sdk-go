@@ -37,10 +37,11 @@ jobs:
 
     - name: Get Carbon
       run: |
-        if [ {{ matrix.os }} == ubuntu* ] then
-          os = Linux
+        if [ {{ matrix.os }} == ubuntu* ]
+        then
+          os=Linux
         else
-          os = macOS
+          os=macOS
         fi
         mkdir $HOME/carbon
         pushd $HOME/carbon
