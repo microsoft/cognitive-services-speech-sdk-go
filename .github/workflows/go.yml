@@ -99,10 +99,11 @@ jobs:
         else
           export CGO_CFLAGS="-I$HOME/carbon/current/MicrosoftCognitiveServicesSpeech.framework/Headers"
           export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
-          export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
+          export DYLD_FRAMEWORK_PATH="$$HOME/carbon/current"
+          export LC_RPATH="$$HOME/carbon/current"
         fi
         export
-        go test -v ./...
+        DYLD_PRINT_LIBRARIES=1 go test -v ./...
     - name: 'Upload Test Logs'
       uses: actions/upload-artifact@v2
       if: always()
