@@ -24,11 +24,11 @@ jobs:
       run: |
         export HOMEBREW_NO_INSTALL_CLEANUP=1
         brew config && brew install bash
-    - name: Set up Go ${{ matrix.go }}
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go }}
-      id: go
+    # - name: Set up Go ${{ matrix.go }}
+    #   uses: actions/setup-go@v2
+    #   with:
+    #     go-version: ${{ matrix.go }}
+    #   id: go
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
@@ -76,6 +76,7 @@ jobs:
           export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
         fi
         go build -v ./...
+        go test -v ./...
     - name: Test
       env:
         DIALOG_SUBSCRIPTION_KEY: ${{ secrets.DIALOG_SUBSCRIPTION_KEY }}
