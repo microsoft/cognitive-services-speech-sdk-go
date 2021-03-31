@@ -101,6 +101,7 @@ jobs:
           export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
           export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
         fi
+        export
         go test -v ./...
     - name: 'Upload Test Logs'
       uses: actions/upload-artifact@v2
