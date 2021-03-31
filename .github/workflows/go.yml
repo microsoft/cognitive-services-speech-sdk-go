@@ -19,6 +19,11 @@ jobs:
         os: [ubuntu-18.04, ubuntu-20.04, macos-latest]
         go: [1.13, 1.15, 1.16]
     steps:
+    - name: Install modern bash for macOS
+      if: ${{ startsWith(matrix.os, 'macOS') }}
+      run: |
+        export HOMEBREW_NO_INSTALL_CLEANUP=1
+        brew config && brew install bash
     - name: Set up Go ${{ matrix.go }}
       uses: actions/setup-go@v2
       with:
