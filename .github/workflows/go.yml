@@ -74,5 +74,3 @@ jobs:
         name: Log-${{ matrix.os }}-${{ matrix.go }}
         path: '**/*.log'
         retention-days: 3
-
-

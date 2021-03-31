@@ -110,6 +110,25 @@ func (synthesizer SpeechSynthesizer) SpeakTextAsync(text string) chan SpeechSynt
 	return outcome
 }
 
+// Execute the speech synthesis on SSML, asynchronously.
+func (synthesizer SpeechSynthesizer) SpeakSsmlAsync(ssml string) chan SpeechSynthesisOutcome {
+	outcome := make(chan SpeechSynthesisOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		cText := C.CString(ssml)
+		defer C.free(unsafe.Pointer(cText))
+		length := len(ssml)
+		ret := uintptr(C.synthesizer_speak_ssml(synthesizer.handle, cText, (C.uint32_t)(length), &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- SpeechSynthesisOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			result, err := NewSpeechSynthesisResultFromHandle(handle2uintptr(handle))
+			outcome <- SpeechSynthesisOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+		}
+	}()
+	return outcome
+}
+
 // SetAuthorizationToken sets the authorization token that will be used for connecting to the service.
 // Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
 // expires, the caller needs to refresh it by calling this setter with a new valid token.

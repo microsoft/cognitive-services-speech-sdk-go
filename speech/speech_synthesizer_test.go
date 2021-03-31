@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"bytes"
 	"os"
 	"testing"
 	"time"
@@ -39,6 +40,7 @@ func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason co
 	if result == nil {
 		t.Error("Synthesis Result is nil.")
 	}
+	t.Logf("checking synthesis result with result id of %v", result.ResultId)
 	if result.Reason != reason {
 		t.Errorf("Synthesis result reason mismatch. expected %v, got %v", reason, result.Reason)
 	}
@@ -50,6 +52,18 @@ func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason co
 		if len(result.AudioData) == 0 {
 			t.Errorf("Synthesized audio is empty")
 		}
+	}
+}
+
+func checkBinaryEqual(t *testing.T, result1 *SpeechSynthesisResult, result2 *SpeechSynthesisResult) {
+	if result1 == nil {
+		t.Error("result1 is nil.")
+	}
+	if result2 == nil {
+		t.Error("result1 is nil.")
+	}
+	if !bytes.Equal(result1.AudioData, result2.AudioData) {
+		t.Error("result1 is not binary equal with result2.")
 	}
 }
 
@@ -106,6 +120,38 @@ func TestSynthesizerEvents(t *testing.T) {
 	case result := <-resultFuture:
 		defer result.Close()
 		checkSynthesisResult(t, result.Result, common.SynthesizingAudioCompleted)
+	case <-time.After(timeout):
+		t.Error("Timeout waiting for synthesis result.")
+	}
+}
+
+func TestSynthesizerSpeakingSsml(t *testing.T) {
+	synthesizer := createSpeechSynthesizerFromAudioConfig(t, nil)
+	if synthesizer == nil {
+		t.Error("synthesizer creation failed")
+		return
+	}
+	defer synthesizer.Close()
+	synthesizer.Properties.SetProperty(common.SpeechServiceConnectionSynthVoice, "en-GB-George")
+	textResultFuture := synthesizer.SpeakTextAsync("text")
+
+	var textResult SpeechSynthesisOutcome
+	select {
+	case textResult = <-textResultFuture:
+		defer textResult.Close()
+		checkSynthesisResult(t, textResult.Result, common.SynthesizingAudioCompleted)
+	case <-time.After(timeout):
+		t.Error("Timeout waiting for synthesis result.")
+	}
+
+	ssml := "<speak xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xmlns:emo='http://www.w3.org/2009/10/emotionml' version='1.0' xml:lang='en-US'><voice name='en-GB-George'>text</voice></speak>"
+	ssmlResultFuture := synthesizer.SpeakSsmlAsync(ssml)
+
+	select {
+	case ssmlResult := <-ssmlResultFuture:
+		defer ssmlResult.Close()
+		checkSynthesisResult(t, ssmlResult.Result, common.SynthesizingAudioCompleted)
+		checkBinaryEqual(t, textResult.Result, ssmlResult.Result)
 	case <-time.After(timeout):
 		t.Error("Timeout waiting for synthesis result.")
 	}

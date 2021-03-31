@@ -21,8 +21,8 @@ import "C"
 type SpeechSynthesisResult struct {
 	handle C.SPXHANDLE
 
-	// ResultID specifies the result identifier.
-	ResultID string
+	// Result ID specifies the result identifier.
+	ResultId string
 
 	// Reason specifies status of speech synthesis result.
 	Reason common.ResultReason
@@ -50,7 +50,7 @@ func NewSpeechSynthesisResultFromHandle(handle common.SPXHandle) (*SpeechSynthes
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.ResultID = C.GoString((*C.char)(buffer))
+	result.ResultId = C.GoString((*C.char)(buffer))
 	/* Reason */
 	var cReason C.Result_Reason
 	ret = uintptr(C.synth_result_get_reason(result.handle, &cReason))
