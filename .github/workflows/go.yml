@@ -3,9 +3,9 @@ on:
   push:
     branches:
       - master
-  # pull_request:
-  #   branches:
-  #     - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       CARBON_VERSION: "1.16.0"
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
+        os: [ubuntu-18.04, ubuntu-20.04, macos-latest]
         go: [1.13, 1.15, 1.16]
     steps:
     - name: Set up Go ${{ matrix.go }}
@@ -37,12 +37,17 @@ jobs:
 
     - name: Get Carbon
       run: |
+        if [ {{ matrix.os }} == ubuntu* ] Test
+          os = Linux
+        else
+          os = macOS
+        fi
         mkdir $HOME/carbon
         pushd $HOME/carbon
-        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-Linux-$CARBON_VERSION.tar.gz
-        tar xzf SpeechSDK-Linux-$CARBON_VERSION.tar.gz
-        rm SpeechSDK-Linux-$CARBON_VERSION.tar.gz
-        ln -s SpeechSDK-Linux-$CARBON_VERSION current
+        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-${os}-$CARBON_VERSION.tar.gz -O SpeechSDK.tar.gz
+        tar xzf SpeechSDK.tar.gz
+        rm SpeechSDK.tar.gz
+        ln -s SpeechSDK current
         popd
     - name: Get Carbon Dependencies
       run: |
@@ -50,6 +55,7 @@ jobs:
         sudo apt-get install libasound2
         sudo apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-good
         dpkg -l | grep gstreamer
+      if: ${{ startsWith(${{ matrix.os }}, 'ubuntu') }}
     - name: Build
       run: |
         export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
