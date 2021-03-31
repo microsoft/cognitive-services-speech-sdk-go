@@ -76,7 +76,7 @@ jobs:
         else
           export CGO_CFLAGS="-I$HOME/carbon/current/MicrosoftCognitiveServicesSpeech.framework/Headers"
           export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
-          export DYLD_FRAMEWORK_PATH="DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
+          export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
         fi
         go build -v ./...
     - name: Test
@@ -94,7 +94,7 @@ jobs:
         else
           export CGO_CFLAGS="-I$HOME/carbon/current/MicrosoftCognitiveServicesSpeech.framework/Headers"
           export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
-          export DYLD_FRAMEWORK_PATH="DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
+          export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
         fi
         go test -v ./...
     - name: 'Upload Test Logs'
