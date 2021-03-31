@@ -37,7 +37,7 @@ jobs:
 
     - name: Get Carbon
       run: |
-        if [ {{ matrix.os }} == ubuntu* ] Test
+        if [ {{ matrix.os }} == ubuntu* ] then
           os = Linux
         else
           os = macOS
