@@ -56,7 +56,7 @@ jobs:
         fi
         mkdir $HOME/carbon
         pushd $HOME/carbon
-        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-macOS-$CARBON_VERSION.tar.gz -O MicrosoftCognitiveServicesSpeech.framework.zip
+        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-macOS-$CARBON_VERSION.zip -O MicrosoftCognitiveServicesSpeech.framework.zip
         unzip MicrosoftCognitiveServicesSpeech.framework.zip current
         popd
     - name: Get Carbon Dependencies
