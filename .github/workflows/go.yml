@@ -35,7 +35,18 @@ jobs:
             dep ensure
         fi
 
-    - name: Get Carbon
+    - name: Get Speech SDK (Linux)
+      if: ${{ startsWith(matrix.os, 'ubuntu') }}
+      run: |
+        mkdir $HOME/carbon
+        pushd $HOME/carbon
+        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+        tar xzf SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+        rm SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+        ln -s SpeechSDK-Linux-$CARBON_VERSION current
+        popd
+    - name: Get Speech SDK (macOS)
+      if: ${{ startsWith(matrix.os, 'macOS') }}
       run: |
         if [[ ${{ matrix.os }} == ubuntu* ]] ;
         then
@@ -45,10 +56,8 @@ jobs:
         fi
         mkdir $HOME/carbon
         pushd $HOME/carbon
-        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/${link}-$CARBON_VERSION.tar.gz -O SpeechSDK.tar.gz
-        tar xzf SpeechSDK.tar.gz
-        rm SpeechSDK.tar.gz
-        ln -s SpeechSDK current
+        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-macOS-$CARBON_VERSION.tar.gz -O MicrosoftCognitiveServicesSpeech.framework.zip
+        unzip MicrosoftCognitiveServicesSpeech.framework.zip current
         popd
     - name: Get Carbon Dependencies
       run: |
@@ -59,9 +68,16 @@ jobs:
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
     - name: Build
       run: |
-        export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
-        export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
-        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
+        if [[ ${{ matrix.os }} == ubuntu* ]] ;
+        then
+          export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
+          export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
+          export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
+        else
+          export CGO_CFLAGS="-I$HOME/carbon/current/MicrosoftCognitiveServicesSpeech.framework/Headers"
+          export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
+          export DYLD_FRAMEWORK_PATH="DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
+        fi
         go build -v ./...
     - name: Test
       env:
@@ -70,9 +86,16 @@ jobs:
         SR_SUBSCRIPTION_KEY: ${{ secrets.SR_SUBSCRIPTION_KEY }}
         SR_SUBSCRIPTION_REGION: ${{ secrets.SR_SUBSCRIPTION_REGION }}
       run: |
-        export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
-        export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
-        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
+        if [[ ${{ matrix.os }} == ubuntu* ]] ;
+        then
+          export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
+          export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
+          export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
+        else
+          export CGO_CFLAGS="-I$HOME/carbon/current/MicrosoftCognitiveServicesSpeech.framework/Headers"
+          export CGO_LDFLAGS="-F$HOME/carbon/current -framework MicrosoftCognitiveServicesSpeech"
+          export DYLD_FRAMEWORK_PATH="DYLD_FRAMEWORK_PATH:$HOME/carbon/current"
+        fi
         go test -v ./...
     - name: 'Upload Test Logs'
       uses: actions/upload-artifact@v2
