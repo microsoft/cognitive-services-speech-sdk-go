@@ -4,8 +4,10 @@
 package speech
 
 import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"time"
+	"unsafe"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 // #include <stdlib.h>
@@ -15,7 +17,6 @@ import (
 // #include <speechapi_c_recognizer.h>
 //
 import "C"
-import "unsafe"
 
 // SpeechRecognitionResult contains detailed information about result of a recognition operation.
 type SpeechRecognitionResult struct {
@@ -51,7 +52,7 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 	defer C.free(unsafe.Pointer(buffer))
 	result := new(SpeechRecognitionResult)
 	result.handle = uintptr2handle(handle)
-	/* ResultId */
+	/* ResultID */
 	ret := uintptr(C.result_get_result_id(result.handle, (*C.char)(buffer), 1024))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
