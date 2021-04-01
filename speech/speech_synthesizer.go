@@ -27,12 +27,8 @@ import "C"
 
 // SpeechSynthesizer is the class for speech synthesizer.
 type SpeechSynthesizer struct {
-	Properties                 common.PropertyCollection
-	handle                     C.SPXHANDLE
-	handleAsyncStartContinuous C.SPXASYNCHANDLE
-	handleAsyncStopContinuous  C.SPXASYNCHANDLE
-	handleAsyncStartKeyword    C.SPXASYNCHANDLE
-	handleAsyncStopKeyword     C.SPXASYNCHANDLE
+	Properties common.PropertyCollection
+	handle     C.SPXHANDLE
 }
 
 func newSpeechSynthesizerFromHandle(handle C.SPXHANDLE) (*SpeechSynthesizer, error) {
