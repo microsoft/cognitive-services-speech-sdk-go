@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
   workflow_dispatch:
 
 env:
@@ -80,7 +77,6 @@ jobs:
         export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
         export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
         go build -v ./...
-
     - name: Test
       env:
         DIALOG_SUBSCRIPTION_KEY: ${{ secrets.DIALOG_SUBSCRIPTION_KEY }}
@@ -127,7 +123,6 @@ jobs:
         cd ~
         wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-macOS-$CARBON_VERSION.zip -O MicrosoftCognitiveServicesSpeech.framework.zip
         unzip MicrosoftCognitiveServicesSpeech.framework.zip -d speechsdk
-
     - name: Build
       run: |
         export CGO_CFLAGS="-I$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.framework/Headers"
