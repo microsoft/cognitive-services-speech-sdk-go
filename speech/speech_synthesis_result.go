@@ -21,8 +21,8 @@ import "C"
 type SpeechSynthesisResult struct {
 	handle C.SPXHANDLE
 
-	// Result ID specifies the result identifier.
-	ResultId string
+	// ResultID specifies the result identifier.
+	ResultID string
 
 	// Reason specifies status of speech synthesis result.
 	Reason common.ResultReason
@@ -41,16 +41,27 @@ func (result SpeechSynthesisResult) Close() {
 
 // NewSpeechSynthesisResultFromHandle creates a SpeechSynthesisResult from a handle (for internal use)
 func NewSpeechSynthesisResultFromHandle(handle common.SPXHandle) (*SpeechSynthesisResult, error) {
-	buffer := C.malloc(C.sizeof_char * 1024)
-	defer C.free(unsafe.Pointer(buffer))
+
 	result := new(SpeechSynthesisResult)
 	result.handle = uintptr2handle(handle)
-	/* ResultId */
-	ret := uintptr(C.synth_result_get_result_id(result.handle, (*C.char)(buffer), 1024))
+	/* AudioData length */
+	var cAudioLength C.uint32_t
+	ret := uintptr(C.synth_result_get_audio_length(result.handle, &cAudioLength))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.ResultId = C.GoString((*C.char)(buffer))
+	// using max(1024, cAudioLength) as buffer size
+	if cAudioLength < 1024 {
+		cAudioLength = 1024
+	}
+	buffer := C.malloc(C.sizeof_char * (C.size_t)(cAudioLength))
+	defer C.free(unsafe.Pointer(buffer))
+	/* ResultID */
+	ret = uintptr(C.synth_result_get_result_id(result.handle, (*C.char)(buffer), 1024))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	result.ResultID = C.GoString((*C.char)(buffer))
 	/* Reason */
 	var cReason C.Result_Reason
 	ret = uintptr(C.synth_result_get_reason(result.handle, &cReason))
@@ -59,19 +70,12 @@ func NewSpeechSynthesisResultFromHandle(handle common.SPXHandle) (*SpeechSynthes
 	}
 	result.Reason = (common.ResultReason)(cReason)
 	/* AudioData */
-	var cAudioLength C.uint32_t
-	ret = uintptr(C.synth_result_get_audio_length(result.handle, &cAudioLength))
-	if ret != C.SPX_NOERROR {
-		return nil, common.NewCarbonError(ret)
-	}
-	cBuffer := C.malloc(C.sizeof_char * (C.size_t)(cAudioLength))
-	defer C.free(unsafe.Pointer(cBuffer))
 	var outSize C.uint32_t
-	ret = uintptr(C.synth_result_get_audio_data(result.handle, (*C.uint8_t)(cBuffer), cAudioLength, &outSize))
+	ret = uintptr(C.synth_result_get_audio_data(result.handle, (*C.uint8_t)(buffer), cAudioLength, &outSize))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.AudioData = C.GoBytes(cBuffer, (C.int)(outSize))
+	result.AudioData = C.GoBytes(buffer, (C.int)(outSize))
 	/* Properties */
 	var propBagHandle C.SPXHANDLE
 	ret = uintptr(C.synth_result_get_property_bag(uintptr2handle(handle), &propBagHandle))

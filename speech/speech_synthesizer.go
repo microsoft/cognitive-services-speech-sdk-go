@@ -27,12 +27,8 @@ import "C"
 
 // SpeechSynthesizer is the class for speech synthesizer.
 type SpeechSynthesizer struct {
-	Properties                 common.PropertyCollection
-	handle                     C.SPXHANDLE
-	handleAsyncStartContinuous C.SPXASYNCHANDLE
-	handleAsyncStopContinuous  C.SPXASYNCHANDLE
-	handleAsyncStartKeyword    C.SPXASYNCHANDLE
-	handleAsyncStopKeyword     C.SPXASYNCHANDLE
+	Properties common.PropertyCollection
+	handle     C.SPXHANDLE
 }
 
 func newSpeechSynthesizerFromHandle(handle C.SPXHANDLE) (*SpeechSynthesizer, error) {
@@ -91,7 +87,7 @@ func NewSpeechSynthesizerFomAutoDetectSourceLangConfig(config *SpeechConfig, lan
 	return newSpeechSynthesizerFromHandle(handle)
 }
 
-// Execute the speech synthesis on plain text, asynchronously.
+// SpeakTextAsync executes the speech synthesis on plain text, asynchronously.
 func (synthesizer SpeechSynthesizer) SpeakTextAsync(text string) chan SpeechSynthesisOutcome {
 	outcome := make(chan SpeechSynthesisOutcome)
 	go func() {
@@ -110,7 +106,7 @@ func (synthesizer SpeechSynthesizer) SpeakTextAsync(text string) chan SpeechSynt
 	return outcome
 }
 
-// Execute the speech synthesis on SSML, asynchronously.
+// SpeakSsmlAsync executes the speech synthesis on SSML, asynchronously.
 func (synthesizer SpeechSynthesizer) SpeakSsmlAsync(ssml string) chan SpeechSynthesisOutcome {
 	outcome := make(chan SpeechSynthesisOutcome)
 	go func() {
@@ -181,7 +177,7 @@ func (synthesizer SpeechSynthesizer) SynthesisCompleted(handler SpeechSynthesisE
 	}
 }
 
-// Canceled signals that a speech synthesis result is received when the synthesis is canceled.
+// SynthesisCanceled signals that a speech synthesis result is received when the synthesis is canceled.
 func (synthesizer SpeechSynthesizer) SynthesisCanceled(handler SpeechSynthesisEventHandler) {
 	registerSynthesisCanceledCallback(handler, synthesizer.handle)
 	if handler != nil {

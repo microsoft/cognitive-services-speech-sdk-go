@@ -40,7 +40,7 @@ func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason co
 	if result == nil {
 		t.Error("Synthesis Result is nil.")
 	}
-	t.Logf("checking synthesis result with result id of %v", result.ResultId)
+	t.Logf("checking synthesis result with result id of %v", result.ResultID)
 	if result.Reason != reason {
 		t.Errorf("Synthesis result reason mismatch. expected %v, got %v", reason, result.Reason)
 	}
