@@ -3,20 +3,50 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+
+env:
+  CARBON_VERSION: "1.16.0"
+
 jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Carbon
+        run: |
+          mkdir /tmp/carbon
+          pushd /tmp/carbon
+          wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+          tar xzf SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+          rm SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+          ln -s SpeechSDK-Linux-$CARBON_VERSION current
+          popd
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        env:
+          CGO_CFLAGS: "-I/tmp/carbon/current/include/c_api"
+          CGO_LDFLAGS: "-L/tmp/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
+        with:
+          version: latest
+          only-new-issues: true
+          args: -E golint --skip-files="_test.go" -e="type name will be used as" -e="OperationOutcome"
   build:
     name: Build
-    runs-on: ubuntu-latest
-    env:
-      CARBON_VERSION: "1.16.0"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+        go: [1.13, 1.15, 1.16]
     steps:
-    - name: Set up Go 1.13
-      uses: actions/setup-go@v1
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v2
       with:
-        go-version: 1.13
+        go-version: ${{ matrix.go }}
       id: go
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Get dependencies
       run: |
@@ -38,7 +68,9 @@ jobs:
     - name: Get Carbon Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install libssl1.0.0 libasound2
+        sudo apt-get install libasound2
+        sudo apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-good
+        dpkg -l | grep gstreamer
     - name: Build
       run: |
         export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
@@ -55,6 +87,11 @@ jobs:
         export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
         export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
         export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
-        go test ./...
-
-
+        go test -v ./...
+    - name: 'Upload Test Logs'
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: Log-${{ matrix.os }}-${{ matrix.go }}
+        path: '**/*.log'
+        retention-days: 3
