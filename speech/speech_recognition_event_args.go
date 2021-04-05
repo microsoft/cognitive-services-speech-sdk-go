@@ -27,6 +27,9 @@ func (event SpeechRecognitionEventArgs) Close() {
 // NewSpeechRecognitionEventArgsFromHandle creates the object from the handle (for internal use)
 func NewSpeechRecognitionEventArgsFromHandle(handle common.SPXHandle) (*SpeechRecognitionEventArgs, error) {
 	base, err := NewRecognitionEventArgsFromHandle(handle)
+	if err != nil {
+		return nil, err
+	}
 	event := new(SpeechRecognitionEventArgs)
 	event.RecognitionEventArgs = *base
 	event.handle = uintptr2handle(handle)
