@@ -1,0 +1,16 @@
+{
+    "cSpell.words": [
+        "NOERROR",
+        "SPXERR",
+        "SPXEVENTHANDLE",
+        "SPXHANDLE",
+        "SPXRESULTHANDLE",
+        "SPXSYNTHHANDLE",
+        "SSML",
+        "golangci",
+        "golint",
+        "govet",
+        "unstaged",
+        "untracked"
+    ]
+}
