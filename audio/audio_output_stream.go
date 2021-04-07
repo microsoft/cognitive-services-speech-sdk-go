@@ -4,7 +4,6 @@
 package audio
 
 import (
-	"io"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -63,20 +62,18 @@ func CreatePullAudioOutputStream() (*PullAudioOutputStream, error) {
 }
 
 // Read reads audio from the stream.
+// The maximal number of bytes to be read is determined from the size parameter.
 // If there is no data immediately available, read() blocks until the next data becomes available.
-func (stream PullAudioOutputStream) Read(buffer []byte) (int, error) {
-	if buffer == nil || len(buffer) == 0 {
-		return 0, common.NewCarbonError(0x005) // SPXERR_INVALID_ARG
-	}
+func (stream PullAudioOutputStream) Read(size uint) ([]byte, error) {
+	cBuffer := C.malloc(C.sizeof_char * (C.size_t)(size))
+	defer C.free(unsafe.Pointer(cBuffer))
 	var outSize C.uint32_t
-	ret := uintptr(C.pull_audio_output_stream_read(stream.handle, (*C.uint8_t)(unsafe.Pointer(&buffer[0])), (C.uint32_t)(len(buffer)), &outSize))
+	ret := uintptr(C.pull_audio_output_stream_read(stream.handle, (*C.uint8_t)(cBuffer), (C.uint32_t)(size), &outSize))
 	if ret != C.SPX_NOERROR {
-		return 0, common.NewCarbonError(ret)
+		return nil, common.NewCarbonError(ret)
 	}
-	if outSize == 0 {
-		return 0, io.EOF
-	}
-	return (int)(outSize), nil
+	buffer := C.GoBytes(cBuffer, (C.int)(outSize))
+	return buffer, nil
 }
 
 // PushAudioOutputStream represents audio output stream used for custom audio output configurations.

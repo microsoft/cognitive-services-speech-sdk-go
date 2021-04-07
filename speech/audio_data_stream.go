@@ -91,7 +91,7 @@ func (stream AudioDataStream) CanReadDataAt(bytesRequested uint, off int64) bool
 // Read reads a chunk of the audio data stream and fill it to given buffer.
 // It returns size of data filled to the buffer and any write error encountered.
 func (stream AudioDataStream) Read(buffer []byte) (int, error) {
-	if buffer == nil || len(buffer) == 0 {
+	if len(buffer) == 0 {
 		return 0, common.NewCarbonError(0x005) // SPXERR_INVALID_ARG
 	}
 	var outSize C.uint32_t
@@ -108,7 +108,7 @@ func (stream AudioDataStream) Read(buffer []byte) (int, error) {
 // ReadAt reads a chunk of the audio data stream and fill it to given buffer, at specified offset.
 // It returns size of data filled to the buffer and any write error encountered.
 func (stream AudioDataStream) ReadAt(buffer []byte, off int64) (int, error) {
-	if buffer == nil || len(buffer) == 0 {
+	if len(buffer) == 0 {
 		return 0, common.NewCarbonError(0x005) // SPXERR_INVALID_ARG
 	}
 	var outSize C.uint32_t
