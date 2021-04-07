@@ -5,7 +5,6 @@ package speech
 
 import (
 	"bytes"
-	"io"
 	"os"
 	"strings"
 	"testing"
@@ -303,18 +302,16 @@ func TestSynthesisToPullAudioOutputStream(t *testing.T) {
 	}
 
 	synthesizer.Close()
-	buf := make([]byte, 1024)
 	var bytes []byte
 	for {
-		count, err := stream.Read(buf)
-		if err == io.EOF {
+		buf, err := stream.Read(3200)
+		if err != nil || len(buf) == 0 {
 			break
 		}
-		curBytes := buf[:count]
-		bytes = append(bytes, curBytes...)
+		bytes = append(bytes, buf...)
 	}
 
 	if len(bytes) == 0 {
-		t.Log("error reading data from pull audio output stream.")
+		t.Error("error reading data from pull audio output stream.")
 	}
 }
