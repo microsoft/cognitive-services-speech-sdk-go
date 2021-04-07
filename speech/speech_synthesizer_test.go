@@ -144,7 +144,7 @@ func TestSynthesizerSpeakingSsml(t *testing.T) {
 		return
 	}
 	defer synthesizer.Close()
-	synthesizer.Properties.SetProperty(common.SpeechServiceConnectionSynthVoice, "en-GB-RyanNeural")
+	synthesizer.Properties.SetProperty(common.SpeechServiceConnectionSynthVoice, "en-GB-George")
 	textResultFuture := synthesizer.SpeakTextAsync("text")
 
 	var textResult SpeechSynthesisOutcome
@@ -156,7 +156,7 @@ func TestSynthesizerSpeakingSsml(t *testing.T) {
 		t.Error("Timeout waiting for synthesis result.")
 	}
 
-	ssml := "<speak xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xmlns:emo='http://www.w3.org/2009/10/emotionml' version='1.0' xml:lang='en-US'><voice name='en-GB-RyanNeural'>text</voice></speak>"
+	ssml := "<speak xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xmlns:emo='http://www.w3.org/2009/10/emotionml' version='1.0' xml:lang='en-US'><voice name='en-GB-George'>text</voice></speak>"
 	ssmlResultFuture := synthesizer.SpeakSsmlAsync(ssml)
 
 	select {
