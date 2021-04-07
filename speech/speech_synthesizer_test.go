@@ -277,7 +277,6 @@ func TestSynthesisWithInvalidVoice(t *testing.T) {
 	}
 }
 
-// to test pull audio output stream and start speaking
 func TestSynthesisToPullAudioOutputStream(t *testing.T) {
 	stream, err := audio.CreatePullAudioOutputStream()
 	if err != nil {
