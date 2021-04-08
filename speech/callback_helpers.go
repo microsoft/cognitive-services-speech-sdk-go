@@ -307,3 +307,84 @@ func synthesizerFireEventSynthesisCanceled(handle C.SPXRECOHANDLE, eventHandle C
 	}
 	handler(*event)
 }
+
+var synthesisWordBoundaryCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisWordBoundaryEventHandler)
+
+func registerSynthesisWordBoundaryCallback(handler SpeechSynthesisWordBoundaryEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	synthesisWordBoundaryCallbacks[handle] = handler
+}
+
+func getSynthesisWordBoundaryCallback(handle C.SPXHANDLE) SpeechSynthesisWordBoundaryEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return synthesisWordBoundaryCallbacks[handle]
+}
+
+//export synthesizerFireEventWordBoundary
+func synthesizerFireEventWordBoundary(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getSynthesisWordBoundaryCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewSpeechSynthesisWordBoundaryEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}
+
+var synthesisVisemeReceivedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisVisemeEventHandler)
+
+func registerSynthesisVisemeReceivedCallback(handler SpeechSynthesisVisemeEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	synthesisVisemeReceivedCallbacks[handle] = handler
+}
+
+func getSynthesisVisemeReceivedCallback(handle C.SPXHANDLE) SpeechSynthesisVisemeEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return synthesisVisemeReceivedCallbacks[handle]
+}
+
+//export synthesizerFireEventVisemeReceived
+func synthesizerFireEventVisemeReceived(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getSynthesisVisemeReceivedCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewSpeechSynthesisVisemeEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}
+
+var synthesisBookmarkReachedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisBookmarkEventHandler)
+
+func registerSynthesisBookmarkReachedCallback(handler SpeechSynthesisBookmarkEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	synthesisBookmarkReachedCallbacks[handle] = handler
+}
+
+func getSynthesisBookmarkReachedCallback(handle C.SPXHANDLE) SpeechSynthesisBookmarkEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return synthesisBookmarkReachedCallbacks[handle]
+}
+
+//export synthesizerFireEventBookmarkReached
+func synthesizerFireEventBookmarkReached(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getSynthesisBookmarkReachedCallback(handle)
+	if handler == nil {
+		return
+	}
+	event, err := NewSpeechSynthesisBookmarkEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil {
+		return
+	}
+	handler(*event)
+}

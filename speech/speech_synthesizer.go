@@ -245,12 +245,54 @@ func (synthesizer SpeechSynthesizer) SynthesisCanceled(handler SpeechSynthesisEv
 	}
 }
 
+// WordBoundary signals that a word boundary event is received.
+func (synthesizer SpeechSynthesizer) WordBoundary(handler SpeechSynthesisWordBoundaryEventHandler) {
+	registerSynthesisWordBoundaryCallback(handler, synthesizer.handle)
+	if handler != nil {
+		C.synthesizer_word_boundary_set_callback(
+			synthesizer.handle,
+			(C.PSYNTHESIS_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_synthesizer_word_boundary)),
+			nil)
+	} else {
+		C.synthesizer_word_boundary_set_callback(synthesizer.handle, nil, nil)
+	}
+}
+
+// VisemeReceived signals that a viseme event is received.
+func (synthesizer SpeechSynthesizer) VisemeReceived(handler SpeechSynthesisVisemeEventHandler) {
+	registerSynthesisVisemeReceivedCallback(handler, synthesizer.handle)
+	if handler != nil {
+		C.synthesizer_viseme_received_set_callback(
+			synthesizer.handle,
+			(C.PSYNTHESIS_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_synthesizer_viseme_received)),
+			nil)
+	} else {
+		C.synthesizer_viseme_received_set_callback(synthesizer.handle, nil, nil)
+	}
+}
+
+// BookmarkReached signals that a viseme event is received.
+func (synthesizer SpeechSynthesizer) BookmarkReached(handler SpeechSynthesisBookmarkEventHandler) {
+	registerSynthesisBookmarkReachedCallback(handler, synthesizer.handle)
+	if handler != nil {
+		C.synthesizer_bookmark_reached_set_callback(
+			synthesizer.handle,
+			(C.PSYNTHESIS_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_synthesizer_bookmark_reached)),
+			nil)
+	} else {
+		C.synthesizer_bookmark_reached_set_callback(synthesizer.handle, nil, nil)
+	}
+}
+
 // Close disposes the associated resources.
 func (synthesizer SpeechSynthesizer) Close() {
 	synthesizer.SynthesisStarted(nil)
 	synthesizer.Synthesizing(nil)
 	synthesizer.SynthesisCompleted(nil)
 	synthesizer.SynthesisCanceled(nil)
+	synthesizer.WordBoundary(nil)
+	synthesizer.VisemeReceived(nil)
+	synthesizer.BookmarkReached(nil)
 	synthesizer.Properties.Close()
 	if synthesizer.handle != C.SPXHANDLE_INVALID {
 		C.synthesizer_handle_release(synthesizer.handle)

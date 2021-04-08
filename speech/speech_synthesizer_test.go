@@ -14,7 +14,7 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
-var timeout time.Duration = 20 * time.Second
+var timeout time.Duration = 10 * time.Second
 
 func createSpeechSynthesizerFromSpeechConfigAndAudioConfig(t *testing.T, speechConfig *SpeechConfig, audioConfig *audio.AudioConfig) *SpeechSynthesizer {
 	speechConfig.SetProperty(common.SpeechLogFilename, "go_synthesizer.log")
@@ -312,5 +312,78 @@ func TestSynthesisToPullAudioOutputStream(t *testing.T) {
 
 	if len(bytes) == 0 {
 		t.Error("error reading data from pull audio output stream.")
+	}
+}
+
+// word boundary, viseme received, and bookmark reached
+func TestSynthesizerEvents2(t *testing.T) {
+	synthesizer := createSpeechSynthesizerFromAudioConfig(t, nil)
+	defer synthesizer.Close()
+	wordBoundaryFuture := make(chan bool)
+	synthesizer.WordBoundary(func(event SpeechSynthesisWordBoundaryEventArgs) {
+		t.Log("9999")
+		defer event.Close()
+		t.Logf("word boundary event, audio offset [%d], text offset [%d], word length [%d]", event.AudioOffset, event.TextOffset, event.WordLength)
+		if event.AudioOffset <= 0 {
+			t.Error("word boundary audio offset")
+		}
+		if event.TextOffset <= 0 {
+			t.Error("word boundary text offset")
+		}
+		if event.WordLength <= 0 {
+			t.Error("word boundary word length")
+		}
+		select {
+		case wordBoundaryFuture <- true:
+		default:
+		}
+	})
+	visemeReceivedFuture := make(chan string)
+	synthesizer.VisemeReceived(func(event SpeechSynthesisVisemeEventArgs) {
+		defer event.Close()
+		t.Logf("viseme received event, audio offset [%d], viseme ID [%d]", event.AudioOffset, event.VisemeID)
+		if event.AudioOffset <= 0 {
+			t.Error("viseme received audio offset")
+		}
+		select {
+		case visemeReceivedFuture <- "visemeReceivedFuture":
+		default:
+		}
+	})
+	bookmarkReachedFuture := make(chan string)
+	synthesizer.BookmarkReached(func(event SpeechSynthesisBookmarkEventArgs) {
+		defer event.Close()
+		t.Logf("Bookmark reached event, audio offset [%d], text [%sl", event.AudioOffset, event.Text)
+		if event.AudioOffset <= 0 {
+			t.Error("bookmark audio offset error")
+		}
+		if event.Text != "mark" {
+			t.Error("bookmark text error")
+		}
+		bookmarkReachedFuture <- "bookmarkReachedFuture"
+	})
+	resultFuture := synthesizer.SpeakSsmlAsync("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xmlns:emo='http://www.w3.org/2009/10/emotionml' xml:lang='en-US'><voice name='en-US-AriaNeural'><mstts:viseme type='redlips_front'>yet</mstts:viseme><bookmark mark='mark'/></voice></speak>")
+	select {
+	case <-visemeReceivedFuture:
+	case <-time.After(timeout):
+		t.Error("Timeout waiting for VisemeReceived event.")
+	}
+	select {
+	case <-bookmarkReachedFuture:
+		t.Logf("Received BookmarkReached event.")
+	case <-time.After(timeout):
+		t.Error("Timeout waiting for BookmarkReached event.")
+	}
+	select {
+	case <-wordBoundaryFuture:
+	case <-time.After(timeout):
+		t.Error("Timeout waiting for WordBoundary event.")
+	}
+	select {
+	case result := <-resultFuture:
+		defer result.Close()
+		checkSynthesisResult(t, result.Result, common.SynthesizingAudioCompleted)
+	case <-time.After(timeout):
+		t.Error("Timeout waiting for synthesis result.")
 	}
 }

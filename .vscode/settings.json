@@ -7,6 +7,7 @@
         "SPXRESULTHANDLE",
         "SPXSYNTHHANDLE",
         "SSML",
+        "Visemek",
         "golangci",
         "golint",
         "govet",
