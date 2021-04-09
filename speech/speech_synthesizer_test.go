@@ -387,3 +387,26 @@ func TestSynthesizerEvents2(t *testing.T) {
 		t.Error("Timeout waiting for synthesis result.")
 	}
 }
+
+func TestSynthesisGetAvailableVoices(t *testing.T) {
+	synthesizer := createSpeechSynthesizerFromAudioConfig(t, nil)
+	defer synthesizer.Close()
+	resultFuture := synthesizer.GetVoicesAsync("en-US")
+	select {
+	case outcome := <-resultFuture:
+		defer outcome.Close()
+		if outcome.Result.Reason != common.VoicesListRetrieved {
+			t.Error("synthesizer get voices failed")
+		}
+		if len(outcome.Result.Voices) == 0 {
+			t.Error("no voice")
+		}
+		for _, e := range outcome.Result.Voices {
+			if len(e.Name) == 0 {
+				t.Error("voice name error")
+			}
+		}
+	case <-time.After(timeout):
+		t.Error("Timeout waiting for synthesis voices result.")
+	}
+}

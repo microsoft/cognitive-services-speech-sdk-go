@@ -180,6 +180,25 @@ func (synthesizer SpeechSynthesizer) StopSpeakingAsync() chan error {
 	return outcome
 }
 
+// GetVoicesAsync gets the available voices, asynchronously.
+// The parameter locale specifies the locale of voices, in BCP-47 format; or leave it empty to get all available voices.
+func (synthesizer SpeechSynthesizer) GetVoicesAsync(locale string) chan SpeechSynthesisVoicesOutcome {
+	outcome := make(chan SpeechSynthesisVoicesOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		cLocale := C.CString(locale)
+		defer C.free(unsafe.Pointer(cLocale))
+		ret := uintptr(C.synthesizer_get_voices_list(synthesizer.handle, cLocale, &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- SpeechSynthesisVoicesOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			result, err := NewSynthesisVoicesResultFromHandle(handle2uintptr(handle))
+			outcome <- SpeechSynthesisVoicesOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+		}
+	}()
+	return outcome
+}
+
 // SetAuthorizationToken sets the authorization token that will be used for connecting to the service.
 // Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
 // expires, the caller needs to refresh it by calling this setter with a new valid token.
