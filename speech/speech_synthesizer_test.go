@@ -29,8 +29,8 @@ func createSpeechSynthesizerFromSpeechConfigAndAudioConfig(t *testing.T, speechC
 }
 
 func createSpeechConfig(t *testing.T) *SpeechConfig {
-	subscription := os.Getenv("SR_SUBSCRIPTION_KEY")
-	region := os.Getenv("SR_SUBSCRIPTION_REGION")
+	subscription := os.Getenv("SPEECH_SUBSCRIPTION_KEY")
+	region := os.Getenv("SPEECH_SUBSCRIPTION_REGION")
 	config, err := NewSpeechConfigFromSubscription(subscription, region)
 	if err != nil {
 		t.Error("Got an error: ", err)
