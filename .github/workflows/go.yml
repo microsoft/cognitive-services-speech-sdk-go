@@ -31,7 +31,6 @@ jobs:
         with:
           version: latest
           only-new-issues: true
-          args: -E golint --skip-files="_test.go" -e="type name will be used as" -e="OperationOutcome"
   linux:
     name: Build (Linux)
     runs-on: ${{ matrix.os }}
