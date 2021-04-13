@@ -321,7 +321,6 @@ func TestSynthesizerEvents2(t *testing.T) {
 	defer synthesizer.Close()
 	wordBoundaryFuture := make(chan bool)
 	synthesizer.WordBoundary(func(event SpeechSynthesisWordBoundaryEventArgs) {
-		t.Log("9999")
 		defer event.Close()
 		t.Logf("word boundary event, audio offset [%d], text offset [%d], word length [%d]", event.AudioOffset, event.TextOffset, event.WordLength)
 		if event.AudioOffset <= 0 {
