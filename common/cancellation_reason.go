@@ -7,9 +7,13 @@ package common
 type CancellationReason int
 
 const (
-	// Indicates that an error occurred during speech recognition.
+	// Error indicates that an error occurred during speech recognition.
 	Error CancellationReason = 1
 
-	// Indicates that the end of the audio stream was reached.
+	// EndOfStream indicates that the end of the audio stream was reached.
 	EndOfStream CancellationReason = 2
+
+	// CancelledByUser indicates that request was cancelled by the user.
+	// Added in version 1.17.0
+	CancelledByUser CancellationReason = 3
 )

@@ -41,6 +41,7 @@ func SynthesisToAudioDataStream(subscription string, region string, file string)
 			break
 		}
 
+		// StartSpeakingTextAsync sends the result to channel when the synthesis starts.
 		task := speechSynthesizer.StartSpeakingTextAsync(text)
 		var outcome speech.SpeechSynthesisOutcome
 		select {

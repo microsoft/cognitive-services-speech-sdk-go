@@ -98,6 +98,19 @@ func NewAudioConfigFromDefaultSpeakerOutput() (*AudioConfig, error) {
 	return newAudioConfigFromHandle(handle)
 }
 
+// NewAudioConfigFromSpeakerOutput creates an AudioConfig object representing the specific audio output device
+// (speaker) on the system.
+func NewAudioConfigFromSpeakerOutput(deviceName string) (*AudioConfig, error) {
+	var handle C.SPXHANDLE
+	dn := C.CString(deviceName)
+	defer C.free(unsafe.Pointer(dn))
+	ret := uintptr(C.audio_config_create_audio_output_from_a_speaker(&handle, dn))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	return newAudioConfigFromHandle(handle)
+}
+
 // NewAudioConfigFromWavFileOutput creates an AudioConfig object representing the specified file for audio output.
 func NewAudioConfigFromWavFileOutput(filename string) (*AudioConfig, error) {
 	var handle C.SPXHANDLE
