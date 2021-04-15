@@ -125,6 +125,61 @@ func (synthesizer SpeechSynthesizer) SpeakSsmlAsync(ssml string) chan SpeechSynt
 	return outcome
 }
 
+// StartSpeakingTextAsync starts the speech synthesis on plain text, asynchronously.
+// It returns when the synthesis request is started to process (the result reason is SynthesizingAudioStarted).
+func (synthesizer SpeechSynthesizer) StartSpeakingTextAsync(text string) chan SpeechSynthesisOutcome {
+	outcome := make(chan SpeechSynthesisOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		cText := C.CString(text)
+		defer C.free(unsafe.Pointer(cText))
+		length := len(text)
+		ret := uintptr(C.synthesizer_start_speaking_text(synthesizer.handle, cText, (C.uint32_t)(length), &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- SpeechSynthesisOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			result, err := NewSpeechSynthesisResultFromHandle(handle2uintptr(handle))
+			outcome <- SpeechSynthesisOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+		}
+	}()
+	return outcome
+}
+
+// StartSpeakingSsmlAsync starts the speech synthesis on SSML, asynchronously.
+// It returns when the synthesis request is started to process (the result reason is SynthesizingAudioStarted).
+func (synthesizer SpeechSynthesizer) StartSpeakingSsmlAsync(ssml string) chan SpeechSynthesisOutcome {
+	outcome := make(chan SpeechSynthesisOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		cText := C.CString(ssml)
+		defer C.free(unsafe.Pointer(cText))
+		length := len(ssml)
+		ret := uintptr(C.synthesizer_start_speaking_ssml(synthesizer.handle, cText, (C.uint32_t)(length), &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- SpeechSynthesisOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			result, err := NewSpeechSynthesisResultFromHandle(handle2uintptr(handle))
+			outcome <- SpeechSynthesisOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+		}
+	}()
+	return outcome
+}
+
+// StopSpeakingAsync stops the speech synthesis, asynchronously.
+// It stops audio speech synthesis and discards any unread data in audio.PullAudioOutputStream.
+func (synthesizer SpeechSynthesizer) StopSpeakingAsync() chan error {
+	outcome := make(chan error)
+	go func() {
+		ret := uintptr(C.synthesizer_stop_speaking(synthesizer.handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- common.NewCarbonError(ret)
+		} else {
+			outcome <- nil
+		}
+	}()
+	return outcome
+}
+
 // SetAuthorizationToken sets the authorization token that will be used for connecting to the service.
 // Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
 // expires, the caller needs to refresh it by calling this setter with a new valid token.
