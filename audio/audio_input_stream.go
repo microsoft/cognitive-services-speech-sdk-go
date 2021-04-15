@@ -165,7 +165,7 @@ func cgoAudioCallReadCallback(handle C.SPXRECOHANDLE, dataBuffer *C.uint8_t, siz
 func cgoAudioCallGetPropertyCallback(handle C.SPXHANDLE, id int, value *C.uint8_t, size C.uint32_t) {
 	callback := getCallback(handle)
 	if callback != nil {
-		propValue := (*callback).GetProperty((common.PropertyID)(size))
+		propValue := (*callback).GetProperty((common.PropertyID)(id))
 		buffer := C.CString(propValue)
 		defer C.free(unsafe.Pointer(buffer))
 		s := size
