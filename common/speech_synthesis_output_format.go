@@ -89,4 +89,10 @@ const (
 
 	// Raw24Khz16BitMonoTrueSilk stands for raw-24khz-16bit-mono-truesilk
 	Raw24Khz16BitMonoTrueSilk SpeechSynthesisOutputFormat = 27
+
+	// Raw8Khz8BitMonoALaw stands for raw-8khz-8bit-mono-alaw
+	Raw8Khz8BitMonoALaw SpeechSynthesisOutputFormat = 28
+
+	// Riff8Khz8BitMonoALaw stands for riff-8khz-8bit-mono-alaw
+	Riff8Khz8BitMonoALaw SpeechSynthesisOutputFormat = 29
 )

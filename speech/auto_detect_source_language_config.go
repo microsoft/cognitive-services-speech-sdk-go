@@ -33,6 +33,16 @@ func newAutoDetectSourceLanguageConfigFromHandle(handle C.SPXHANDLE) (*AutoDetec
 	return config, nil
 }
 
+// NewAutoDetectSourceLanguageConfigFromOpenRange creates an instance of the AutoDetectSourceLanguageConfig with open range as source languages
+func NewAutoDetectSourceLanguageConfigFromOpenRange() (*AutoDetectSourceLanguageConfig, error) {
+	var handle C.SPXHANDLE
+	ret := uintptr(C.create_auto_detect_source_lang_config_from_open_range(&handle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	return newAutoDetectSourceLanguageConfigFromHandle(handle)
+}
+
 // NewAutoDetectSourceLanguageConfigFromLanguages creates an instance of the AutoDetectSourceLanguageConfig with source languages
 func NewAutoDetectSourceLanguageConfigFromLanguages(languages []string) (*AutoDetectSourceLanguageConfig, error) {
 	var handle C.SPXHANDLE
