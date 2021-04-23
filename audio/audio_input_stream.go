@@ -205,6 +205,9 @@ func CreatePullStreamFromFormat(callback PullAudioInputStreamCallback, format *A
 		handle,
 		unsafe.Pointer(handle),
 		(C.CUSTOM_AUDIO_PULL_STREAM_GET_PROPERTY_CALLBACK)(unsafe.Pointer(C.cgo_audio_get_property_callback_wrapper))))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
 	registerCallback(handle, callback)
 	stream := new(PullAudioInputStream)
 	stream.handle = handle
