@@ -84,4 +84,25 @@ package speech
 //     synthesizerFireEventSynthesisCanceled(handle, event);
 // }
 //
+// extern void synthesizerFireEventWordBoundary(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_synthesizer_word_boundary(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     synthesizerFireEventWordBoundary(handle, event);
+// }
+//
+// extern void synthesizerFireEventVisemeReceived(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_synthesizer_viseme_received(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     synthesizerFireEventVisemeReceived(handle, event);
+// }
+//
+// extern void synthesizerFireEventBookmarkReached(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_synthesizer_bookmark_reached(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     synthesizerFireEventBookmarkReached(handle, event);
+// }
+//
 import "C"

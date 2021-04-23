@@ -180,6 +180,25 @@ func (synthesizer SpeechSynthesizer) StopSpeakingAsync() chan error {
 	return outcome
 }
 
+// GetVoicesAsync gets the available voices, asynchronously.
+// The parameter locale specifies the locale of voices, in BCP-47 format; or leave it empty to get all available voices.
+func (synthesizer SpeechSynthesizer) GetVoicesAsync(locale string) chan SpeechSynthesisVoicesOutcome {
+	outcome := make(chan SpeechSynthesisVoicesOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		cLocale := C.CString(locale)
+		defer C.free(unsafe.Pointer(cLocale))
+		ret := uintptr(C.synthesizer_get_voices_list(synthesizer.handle, cLocale, &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- SpeechSynthesisVoicesOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			result, err := NewSynthesisVoicesResultFromHandle(handle2uintptr(handle))
+			outcome <- SpeechSynthesisVoicesOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+		}
+	}()
+	return outcome
+}
+
 // SetAuthorizationToken sets the authorization token that will be used for connecting to the service.
 // Note: The caller needs to ensure that the authorization token is valid. Before the authorization token
 // expires, the caller needs to refresh it by calling this setter with a new valid token.
@@ -245,12 +264,54 @@ func (synthesizer SpeechSynthesizer) SynthesisCanceled(handler SpeechSynthesisEv
 	}
 }
 
+// WordBoundary signals that a word boundary event is received.
+func (synthesizer SpeechSynthesizer) WordBoundary(handler SpeechSynthesisWordBoundaryEventHandler) {
+	registerSynthesisWordBoundaryCallback(handler, synthesizer.handle)
+	if handler != nil {
+		C.synthesizer_word_boundary_set_callback(
+			synthesizer.handle,
+			(C.PSYNTHESIS_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_synthesizer_word_boundary)),
+			nil)
+	} else {
+		C.synthesizer_word_boundary_set_callback(synthesizer.handle, nil, nil)
+	}
+}
+
+// VisemeReceived signals that a viseme event is received.
+func (synthesizer SpeechSynthesizer) VisemeReceived(handler SpeechSynthesisVisemeEventHandler) {
+	registerSynthesisVisemeReceivedCallback(handler, synthesizer.handle)
+	if handler != nil {
+		C.synthesizer_viseme_received_set_callback(
+			synthesizer.handle,
+			(C.PSYNTHESIS_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_synthesizer_viseme_received)),
+			nil)
+	} else {
+		C.synthesizer_viseme_received_set_callback(synthesizer.handle, nil, nil)
+	}
+}
+
+// BookmarkReached signals that a viseme event is received.
+func (synthesizer SpeechSynthesizer) BookmarkReached(handler SpeechSynthesisBookmarkEventHandler) {
+	registerSynthesisBookmarkReachedCallback(handler, synthesizer.handle)
+	if handler != nil {
+		C.synthesizer_bookmark_reached_set_callback(
+			synthesizer.handle,
+			(C.PSYNTHESIS_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_synthesizer_bookmark_reached)),
+			nil)
+	} else {
+		C.synthesizer_bookmark_reached_set_callback(synthesizer.handle, nil, nil)
+	}
+}
+
 // Close disposes the associated resources.
 func (synthesizer SpeechSynthesizer) Close() {
 	synthesizer.SynthesisStarted(nil)
 	synthesizer.Synthesizing(nil)
 	synthesizer.SynthesisCompleted(nil)
 	synthesizer.SynthesisCanceled(nil)
+	synthesizer.WordBoundary(nil)
+	synthesizer.VisemeReceived(nil)
+	synthesizer.BookmarkReached(nil)
 	synthesizer.Properties.Close()
 	if synthesizer.handle != C.SPXHANDLE_INVALID {
 		C.synthesizer_handle_release(synthesizer.handle)

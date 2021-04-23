@@ -28,8 +28,8 @@ func createSpeechRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.T, su
 }
 
 func createSpeechRecognizerFromAudioConfig(t *testing.T, audioConfig *audio.AudioConfig) *SpeechRecognizer {
-	subscription := os.Getenv("SR_SUBSCRIPTION_KEY")
-	region := os.Getenv("SR_SUBSCRIPTION_REGION")
+	subscription := os.Getenv("SPEECH_SUBSCRIPTION_KEY")
+	region := os.Getenv("SPEECH_SUBSCRIPTION_REGION")
 	return createSpeechRecognizerFromSubscriptionRegionAndAudioConfig(t, subscription, region, audioConfig)
 }
 
@@ -103,12 +103,12 @@ func TestSessionEvents(t *testing.T) {
 	recognizer.RecognizeOnceAsync()
 	select {
 	case <-sessionStartedFuture:
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout waiting for SessionStarted event.")
 	}
 	select {
 	case <-sessionStoppedFuture:
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		t.Error("Timeout waiting for SessionStopped event.")
 	}
 }
