@@ -48,4 +48,7 @@ const (
 
 	// SynthesizingAudioStarted indicates the speech synthesis is now started
 	SynthesizingAudioStarted ResultReason = 12
+
+	// VoicesListRetrieved indicates the voices list has been retrieved successfully.
+	VoicesListRetrieved ResultReason = 23
 )

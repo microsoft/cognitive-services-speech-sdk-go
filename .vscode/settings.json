@@ -1,12 +1,17 @@
 {
     "cSpell.words": [
         "NOERROR",
+        "PSESSION",
+        "PSYNTHESIS",
+        "SPXASYNCHANDLE",
         "SPXERR",
         "SPXEVENTHANDLE",
         "SPXHANDLE",
+        "SPXRECOHANDLE",
         "SPXRESULTHANDLE",
         "SPXSYNTHHANDLE",
         "SSML",
+        "Visemek",
         "golangci",
         "golint",
         "govet",
