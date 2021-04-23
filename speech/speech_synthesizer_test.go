@@ -372,7 +372,7 @@ func TestSynthesizerEvents2(t *testing.T) {
 	bookmarkReachedFuture := make(chan string)
 	synthesizer.BookmarkReached(func(event SpeechSynthesisBookmarkEventArgs) {
 		defer event.Close()
-		t.Logf("Bookmark reached event, audio offset [%d], text [%sl", event.AudioOffset, event.Text)
+		t.Logf("Bookmark reached event, audio offset [%d], text [%s]", event.AudioOffset, event.Text)
 		if event.AudioOffset <= 0 {
 			t.Error("bookmark audio offset error")
 		}
