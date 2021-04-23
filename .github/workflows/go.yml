@@ -32,8 +32,8 @@ jobs:
         with:
           version: latest
           only-new-issues: true
-  build:
-    name: Build
+  linux:
+    name: Build (Linux)
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -56,7 +56,7 @@ jobs:
             dep ensure
         fi
 
-    - name: Get Carbon
+    - name: Get Speech SDK (Linux)
       run: |
         mkdir $HOME/carbon
         pushd $HOME/carbon
@@ -95,3 +95,48 @@ jobs:
         name: Log-${{ matrix.os }}-${{ matrix.go }}
         path: '**/*.log'
         retention-days: 3
+
+  macos:
+    name: Build (macOS)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-10.15, macos-11.0]
+    steps:
+    - name: Install modern bash for macOS
+      run: |
+        export HOMEBREW_NO_INSTALL_CLEANUP=1
+        brew config && brew install bash
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
+    - name: Get Speech SDK (macOS)
+      run: |
+        cd ~
+        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-macOS-$CARBON_VERSION.zip -O MicrosoftCognitiveServicesSpeech.framework.zip
+        unzip MicrosoftCognitiveServicesSpeech.framework.zip -d speechsdk
+    - name: Build
+      run: |
+        export CGO_CFLAGS="-I$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.framework/Headers"
+        export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
+        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
+        go build -v ./...
+    - name: Test
+      env:
+        DIALOG_SUBSCRIPTION_KEY: ${{ secrets.DIALOG_SUBSCRIPTION_KEY }}
+        DIALOG_SUBSCRIPTION_REGION: ${{ secrets.DIALOG_SUBSCRIPTION_REGION }}
+        SPEECH_SUBSCRIPTION_KEY: ${{ secrets.SR_SUBSCRIPTION_KEY }}
+        SPEECH_SUBSCRIPTION_REGION: ${{ secrets.SR_SUBSCRIPTION_REGION }}
+      run: |
+        export CGO_CFLAGS="-I$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.framework/Headers"
+        export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
+        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
+        go test -v ./...
