@@ -79,6 +79,9 @@ func NewAutoDetectSourceLanguageConfigFromLanguageConfigs(configs []*SourceLangu
 			}
 		} else {
 			ret = uintptr(C.add_source_lang_config_to_auto_detect_source_lang_config(handle, c.getHandle()))
+			if ret != C.SPX_NOERROR {
+				return nil, common.NewCarbonError(ret)
+			}
 		}
 	}
 	return newAutoDetectSourceLanguageConfigFromHandle(handle)
