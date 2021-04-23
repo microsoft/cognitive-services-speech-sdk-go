@@ -33,6 +33,9 @@ type VoiceInfo struct {
 	// LocalName specifies the local name of the voice
 	LocalName string
 
+	// Gender specifies the gender of the voice.
+	Gender common.SynthesisVoiceGender
+
 	// VoiceType specifies the voice type.
 	VoiceType common.SynthesisVoiceType
 
@@ -93,5 +96,13 @@ func NewVoiceInfoFromHandle(handle common.SPXHandle) (*VoiceInfo, error) {
 		return nil, common.NewCarbonError(ret)
 	}
 	voiceInfo.Properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
+	gender := voiceInfo.Properties.GetPropertyByString("Gender", "")
+	if gender == "Female" {
+		voiceInfo.Gender = common.Female
+	} else if gender == "Male" {
+		voiceInfo.Gender = common.Male
+	} else {
+		voiceInfo.Gender = common.GenderUnknown
+	}
 	return voiceInfo, nil
 }

@@ -420,6 +420,19 @@ func TestSynthesisGetAvailableVoices(t *testing.T) {
 				t.Error("voice name error")
 			}
 		}
+		jenny := outcome.Result.Voices[0]
+		if jenny.LocalName != "Jenny" {
+			t.Errorf("The first en-US voice [%s] is not Jenny.", jenny.LocalName)
+		}
+		if jenny.VoiceType != common.OnlineNeural {
+			t.Error("Jenny's voice type is incorrect.")
+		}
+		if len(jenny.StyleList) < 2 {
+			t.Error("Jenny's style list error.")
+		}
+		if jenny.Gender != common.Female {
+			t.Error("Jenny's gender error.")
+		}
 	case <-time.After(timeout):
 		t.Error("Timeout waiting for synthesis voices result.")
 	}
