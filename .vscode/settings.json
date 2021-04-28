@@ -16,6 +16,7 @@
         "golint",
         "govet",
         "unstaged",
-        "untracked"
+        "untracked",
+        "webm"
     ]
 }

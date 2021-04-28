@@ -11,9 +11,11 @@ const (
 	Raw8Khz8BitMonoMULaw SpeechSynthesisOutputFormat = 1
 
 	// Riff16Khz16KbpsMonoSiren stands for riff-16khz-16kbps-mono-siren
+	// Unsupported by the service. Do not use this value.
 	Riff16Khz16KbpsMonoSiren SpeechSynthesisOutputFormat = 2
 
 	// Audio16Khz16KbpsMonoSiren stands for audio-16khz-16kbps-mono-siren
+	// Unsupported by the service. Do not use this value.
 	Audio16Khz16KbpsMonoSiren SpeechSynthesisOutputFormat = 3
 
 	// Audio16Khz32KBitRateMonoMp3 stands for audio-16khz-32kbitrate-mono-mp3
@@ -57,4 +59,40 @@ const (
 
 	// Raw8Khz16BitMonoPcm stands for raw-8khz-16bit-mono-pcm
 	Raw8Khz16BitMonoPcm SpeechSynthesisOutputFormat = 17
+
+	// Ogg16Khz16BitMonoOpus stands for ogg-16khz-16bit-mono-opus
+	Ogg16Khz16BitMonoOpus SpeechSynthesisOutputFormat = 18
+
+	// Ogg24Khz16BitMonoOpus stands for ogg-24khz-16bit-mono-opus
+	Ogg24Khz16BitMonoOpus SpeechSynthesisOutputFormat = 19
+
+	// Raw48Khz16BitMonoPcm stands for raw-48khz-16bit-mono-pcm
+	Raw48Khz16BitMonoPcm SpeechSynthesisOutputFormat = 20
+
+	// Riff48Khz16BitMonoPcm stands for riff-48khz-16bit-mono-pcm
+	Riff48Khz16BitMonoPcm SpeechSynthesisOutputFormat = 21
+
+	// Audio48Khz96KBitRateMonoMp3 stands for audio-48khz-96kbitrate-mono-mp3
+	Audio48Khz96KBitRateMonoMp3 SpeechSynthesisOutputFormat = 22
+
+	// Audio48Khz192KBitRateMonoMp3 stands for audio-48khz-192kbitrate-mono-mp3
+	Audio48Khz192KBitRateMonoMp3 SpeechSynthesisOutputFormat = 23
+
+	// Ogg48Khz16BitMonoOpus stands for ogg-48khz-16bit-mono-opus
+	Ogg48Khz16BitMonoOpus SpeechSynthesisOutputFormat = 24
+
+	// Webm16Khz16BitMonoOpus stands for webm-16khz-16bit-mono-opus
+	Webm16Khz16BitMonoOpus SpeechSynthesisOutputFormat = 25
+
+	// Webm24Khz16BitMonoOpus stands for webm-24khz-16bit-mono-opus
+	Webm24Khz16BitMonoOpus SpeechSynthesisOutputFormat = 26
+
+	// Raw24Khz16BitMonoTrueSilk stands for raw-24khz-16bit-mono-truesilk
+	Raw24Khz16BitMonoTrueSilk SpeechSynthesisOutputFormat = 27
+
+	// Raw8Khz8BitMonoALaw stands for raw-8khz-8bit-mono-alaw
+	Raw8Khz8BitMonoALaw SpeechSynthesisOutputFormat = 28
+
+	// Riff8Khz8BitMonoALaw stands for riff-8khz-8bit-mono-alaw
+	Riff8Khz8BitMonoALaw SpeechSynthesisOutputFormat = 29
 )
