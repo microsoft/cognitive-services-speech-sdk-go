@@ -60,18 +60,16 @@ func RecognizeOnceFromCompressedFile(subscription string, region string, file st
 	var containerFormat audio.AudioStreamContainerFormat
 	if strings.Contains(file, ".mulaw") {
 		containerFormat = audio.MULAW
-	}
-	if strings.Contains(file, ".alaw") {
+	} else if strings.Contains(file, ".alaw") {
 		containerFormat = audio.ALAW
-	}
-	if strings.Contains(file, ".mp3") {
+	} else if strings.Contains(file, ".mp3") {
 		containerFormat = audio.MP3
-	}
-	if strings.Contains(file, ".flac") {
+	} else if strings.Contains(file, ".flac") {
 		containerFormat = audio.FLAC
-	}
-	if strings.Contains(file, ".opus") {
+	} else if strings.Contains(file, ".opus") {
 		containerFormat = audio.OGGOPUS
+	} else {
+		containerFormat = audio.ANY
 	}
 	format, err := audio.GetCompressedFormat(containerFormat)
 	if err != nil {

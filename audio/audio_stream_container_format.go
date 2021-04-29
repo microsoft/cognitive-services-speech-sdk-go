@@ -27,4 +27,7 @@ const (
 
 	// AMRWB Stream ContainerFormat definition for AMRWB. Currently not supported.
 	AMRWB AudioStreamContainerFormat = 0x107
+
+	// ANY Stream ContainerFormat definition when the actual stream format is not known.
+	ANY AudioStreamContainerFormat = 0x108
 )
