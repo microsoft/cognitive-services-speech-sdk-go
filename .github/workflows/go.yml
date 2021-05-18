@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  CARBON_VERSION: "1.16.0"
+  CARBON_VERSION: "1.17.0"
 
 jobs:
   golangci:
