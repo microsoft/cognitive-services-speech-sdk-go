@@ -226,8 +226,7 @@ func TestSynthesisToAudioDataStream(t *testing.T) {
 		t.Error("audio data is not equal.")
 	}
 
-	// todo: uncomment following lines after 1.17 released
-	/*saveOutcome := stream.SaveToWavFileAsync("tmp_synthesis.mp3")
+	saveOutcome := stream.SaveToWavFileAsync("tmp_synthesis.mp3")
 	select {
 	case err = <-saveOutcome:
 		if err != nil {
@@ -243,7 +242,7 @@ func TestSynthesisToAudioDataStream(t *testing.T) {
 	file.Read(audioData4)
 	if !bytes.Equal(audioData2, audioData4) {
 		t.Error("audio data is not equal.")
-	}*/
+	}
 }
 
 func TestSynthesisWithInvalidVoice(t *testing.T) {
