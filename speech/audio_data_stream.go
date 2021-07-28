@@ -29,6 +29,7 @@ type AudioDataStream struct {
 
 // Close disposes the associated resources.
 func (stream AudioDataStream) Close() {
+	stream.Properties.Close()
 	C.audio_stream_release(stream.handle)
 }
 
