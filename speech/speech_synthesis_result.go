@@ -36,6 +36,7 @@ type SpeechSynthesisResult struct {
 
 // Close releases the underlying resources
 func (result SpeechSynthesisResult) Close() {
+	result.Properties.Close()
 	C.synthesizer_result_handle_release(result.handle)
 }
 

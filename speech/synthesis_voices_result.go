@@ -42,6 +42,7 @@ func (result SynthesisVoicesResult) Close() {
 	for _, voice := range result.Voices {
 		voice.Close()
 	}
+	result.Properties.Close()
 	C.synthesizer_result_handle_release(result.handle)
 }
 

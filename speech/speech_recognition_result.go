@@ -43,6 +43,7 @@ type SpeechRecognitionResult struct {
 
 // Close releases the underlying resources
 func (result SpeechRecognitionResult) Close() {
+	result.Properties.Close()
 	C.recognizer_result_handle_release(result.handle)
 }
 
