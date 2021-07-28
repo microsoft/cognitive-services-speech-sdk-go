@@ -51,6 +51,7 @@ type VoiceInfo struct {
 
 // Close releases the underlying resources
 func (result VoiceInfo) Close() {
+	result.Properties.Close()
 	C.voice_info_handle_release(result.handle)
 }
 
