@@ -3,11 +3,14 @@
 
 package common
 
+// #include <speechapi_c_error.h>
+import "C"
+
 type CarbonError struct {
-	Code uintptr
+	Code int
 }
 
-var errorString = map[uintptr]string{
+var errorString = map[int]string{
 	0x000: "SPX_NOERROR",
 	0xfff: "SPXERR_NOT_IMPL",
 	0x001: "SPXERR_UNINITIALIZED",
@@ -59,12 +62,17 @@ var errorString = map[uintptr]string{
 	0x032: "SPXERR_CANCELED",
 }
 
-func NewCarbonError(code uintptr) CarbonError {
+func NewCarbonError(errorHandle uintptr) CarbonError {
 	var error CarbonError
-	error.Code = code
+	error.Code = GetErrorCode(errorHandle)
 	return error
 }
 
 func (e CarbonError) Error() string {
 	return errorString[e.Code]
+}
+
+func GetErrorCode(errorHandle uintptr) int {
+	ret := int(C.error_get_error_code(uintptr2handle(SPXHandle(errorHandle))))
+	return ret
 }
