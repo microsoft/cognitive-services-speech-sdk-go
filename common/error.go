@@ -4,7 +4,7 @@
 package common
 
 import (
-    "strconv"
+	"fmt"
 )
 
 // #include <speechapi_c_error.h>
@@ -69,10 +69,12 @@ var errorString = map[int]string{
 
 func NewCarbonError(errorHandle uintptr) CarbonError {
 	var error CarbonError
-	error.Code = GetErrorCode(errorHandle)
-	error.Message = GetErrorMessage(errorHandle)
+	error.Code = GetErrorCode(SPXHandle(errorHandle))
+	error.Message = GetErrorMessage(SPXHandle(errorHandle))
+	// When the message is empty, construct the error message using the errorHandle value directly.
 	if (error.Message == "") {
-		error.Message = "Exception with an error code: " + strconv.Itoa(error.Code)
+		codeAsHexString := fmt.Sprintf("0x%0x", error.Code)
+		error.Message = "Exception with an error code: " + codeAsHexString + " (" + errorString[error.Code] + ")"
 	}
 	return error
 }
@@ -81,12 +83,18 @@ func (e CarbonError) Error() string {
 	return e.Message
 }
 
-func GetErrorCode(errorHandle uintptr) int {
-	ret := int(C.error_get_error_code(uintptr2handle(SPXHandle(errorHandle))))
+func GetErrorCode(errorHandle SPXHandle) int {
+	ret := int(C.error_get_error_code(uintptr2handle(errorHandle)))
+	// A 0 means there was no corresponding event stored.
+	// So this must be a SPX_* error and not a stored exception.
+	// Return the HR as the error.
+	if (ret == 0) {
+		return int(errorHandle)
+	}
 	return ret
 }
 
-func GetErrorMessage(errorHandle uintptr) string {
-	ret := C.GoString(C.error_get_message(uintptr2handle(SPXHandle(errorHandle))))
+func GetErrorMessage(errorHandle SPXHandle) string {
+	ret := C.GoString(C.error_get_message(uintptr2handle(errorHandle)))
 	return ret
 }
