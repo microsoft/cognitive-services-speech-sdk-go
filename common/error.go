@@ -3,11 +3,16 @@
 
 package common
 
+import (
+    "strconv"
+)
+
 // #include <speechapi_c_error.h>
 import "C"
 
 type CarbonError struct {
 	Code int
+	Message string
 }
 
 var errorString = map[int]string{
@@ -65,14 +70,23 @@ var errorString = map[int]string{
 func NewCarbonError(errorHandle uintptr) CarbonError {
 	var error CarbonError
 	error.Code = GetErrorCode(errorHandle)
+	error.Message = GetErrorMessage(errorHandle)
+	if (error.Message == "") {
+		error.Message = "Exception with an error code: " + strconv.Itoa(error.Code)
+	}
 	return error
 }
 
 func (e CarbonError) Error() string {
-	return errorString[e.Code]
+	return e.Message
 }
 
 func GetErrorCode(errorHandle uintptr) int {
 	ret := int(C.error_get_error_code(uintptr2handle(SPXHandle(errorHandle))))
+	return ret
+}
+
+func GetErrorMessage(errorHandle uintptr) string {
+	ret := C.GoString(C.error_get_message(uintptr2handle(SPXHandle(errorHandle))))
 	return ret
 }
