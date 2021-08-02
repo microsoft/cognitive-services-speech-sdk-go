@@ -4,9 +4,9 @@ This project contains Golang binding for the Microsoft Cognitive Service Speech 
 
 # Getting Started
 
-Check the Speech SDK Setup documentation for Go at https://docs.microsoft.com/azure/cognitive-services/speech-service/quickstarts/setup-platform?tabs=dotnet%2Cwindows%2Cjre%2Cbrowser&pivots=programming-language-go
+Check the [Speech SDK Setup documentation for Go](https://docs.microsoft.com/azure/cognitive-services/speech-service/quickstarts/setup-platform?tabs=dotnet%2Cwindows%2Cjre%2Cbrowser&pivots=programming-language-go)
 
-Check how to run Speech SDK samples for Go at https://docs.microsoft.com/azure/cognitive-services/speech-service/get-started-speech-to-text?tabs=windowsinstall&pivots=programming-language-go
+Check how to run [Speech SDK samples for Go](https://docs.microsoft.com/azure/cognitive-services/speech-service/get-started-speech-to-text?tabs=windowsinstall&pivots=programming-language-go)
 
 This project requires Go 1.13
 
