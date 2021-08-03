@@ -4,41 +4,13 @@ This project contains Golang binding for the Microsoft Cognitive Service Speech 
 
 # Getting Started
 
+Check the [Speech SDK Setup documentation for Go](https://docs.microsoft.com/azure/cognitive-services/speech-service/quickstarts/setup-platform?tabs=dotnet%2Cwindows%2Cjre%2Cbrowser&pivots=programming-language-go)
+
+Get started with [speech-to-text sample for Go](https://docs.microsoft.com/azure/cognitive-services/speech-service/get-started-speech-to-text?tabs=windowsinstall&pivots=programming-language-go)
+
+Get started with [text-to-speech sample for Go](https://docs.microsoft.com/azure/cognitive-services/speech-service/get-started-text-to-speech?tabs=script%2Cwindowsinstall&pivots=programming-language-go)
+
 This project requires Go 1.13
-
-## Linux
-
-### Compiling
-
-First, you new need to set the environment variables for Go to find the SDK:
-
-
-```bash
-export CGO_CFLAGS="-I/path/to/SDKs/include/c_api"
-export CGO_LDFLAGS="-L/path/to/SDKs/library -lMicrosoft.CognitiveServices.Speech.core"
-
-```
-
-After that we are ready to compile the package
-
-### Running
-
-To run applications consuming this project, we need to add the library to the path (if it is not there already)
-
-```bash
-export LD_LIBRARY_PATH="/path/to/SDKs/library:$LD_LIBRARY_PATH"
-```
-
-### Running Tests
-
-In addition to the environment variables needed to run applications, running tests requires setting the following variables:
-
-```bash
-export SPEECH_SUBSCRIPTION_KEY="your_subscription_key"
-export SPEECH_SUBSCRIPTION_REGION="your_region"
-export DIALOG_SUBSCRIPTION_KEY="your_dialog_subscription_key"
-export DIALOG_SUBSCRIPTION_REGION="your_dialog_region"
-```
 
 # Reference
 
