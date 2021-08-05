@@ -8,6 +8,8 @@ import (
 )
 
 // #include <speechapi_c_common.h>
+// #include <speechapi_c_recognizer.h>
+// #include <speechapi_c_synthesizer.h>
 import "C"
 
 var mu sync.Mutex
@@ -28,11 +30,9 @@ func getSessionStartedCallback(handle C.SPXHANDLE) SessionEventHandler {
 //export recognizerFireEventSessionStarted
 func recognizerFireEventSessionStarted(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSessionStartedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSessionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -55,11 +55,9 @@ func getSessionStoppedCallback(handle C.SPXHANDLE) SessionEventHandler {
 //export recognizerFireEventSessionStopped
 func recognizerFireEventSessionStopped(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSessionStoppedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSessionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -82,11 +80,9 @@ func getSpeechStartDetectedCallback(handle C.SPXHANDLE) RecognitionEventHandler 
 //export recognizerFireEventSpeechStartDetected
 func recognizerFireEventSpeechStartDetected(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSpeechStartDetectedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -109,11 +105,9 @@ func getSpeechEndDetectedCallback(handle C.SPXHANDLE) RecognitionEventHandler {
 //export recognizerFireEventSpeechEndDetected
 func recognizerFireEventSpeechEndDetected(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSpeechEndDetectedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -136,11 +130,9 @@ func getRecognizedCallback(handle C.SPXHANDLE) SpeechRecognitionEventHandler {
 //export recognizerFireEventRecognized
 func recognizerFireEventRecognized(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getRecognizedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -163,11 +155,9 @@ func getRecognizingCallback(handle C.SPXHANDLE) SpeechRecognitionEventHandler {
 //export recognizerFireEventRecognizing
 func recognizerFireEventRecognizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getRecognizingCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -190,11 +180,9 @@ func getCanceledCallback(handle C.SPXHANDLE) SpeechRecognitionCanceledEventHandl
 //export recognizerFireEventCanceled
 func recognizerFireEventCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getCanceledCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechRecognitionCanceledEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -217,11 +205,9 @@ func getSynthesisStartedCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler
 //export synthesizerFireEventSynthesisStarted
 func synthesizerFireEventSynthesisStarted(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSynthesisStartedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.synthesizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -244,11 +230,9 @@ func getSynthesizingCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
 //export synthesizerFireEventSynthesizing
 func synthesizerFireEventSynthesizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSynthesizingCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.synthesizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -271,11 +255,9 @@ func getSynthesisCompletedCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandl
 //export synthesizerFireEventSynthesisCompleted
 func synthesizerFireEventSynthesisCompleted(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSynthesisCompletedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.synthesizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -298,11 +280,9 @@ func getSynthesisCanceledCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandle
 //export synthesizerFireEventSynthesisCanceled
 func synthesizerFireEventSynthesisCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSynthesisCanceledCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.synthesizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -325,11 +305,9 @@ func getSynthesisWordBoundaryCallback(handle C.SPXHANDLE) SpeechSynthesisWordBou
 //export synthesizerFireEventWordBoundary
 func synthesizerFireEventWordBoundary(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSynthesisWordBoundaryCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechSynthesisWordBoundaryEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.synthesizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -352,11 +330,9 @@ func getSynthesisVisemeReceivedCallback(handle C.SPXHANDLE) SpeechSynthesisVisem
 //export synthesizerFireEventVisemeReceived
 func synthesizerFireEventVisemeReceived(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSynthesisVisemeReceivedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechSynthesisVisemeEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.synthesizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -379,11 +355,9 @@ func getSynthesisBookmarkReachedCallback(handle C.SPXHANDLE) SpeechSynthesisBook
 //export synthesizerFireEventBookmarkReached
 func synthesizerFireEventBookmarkReached(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSynthesisBookmarkReachedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewSpeechSynthesisBookmarkEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.synthesizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)

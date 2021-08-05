@@ -29,6 +29,7 @@ func (config AudioConfig) GetHandle() common.SPXHandle {
 // Close releases the underlying resources
 func (config AudioConfig) Close() {
 	config.properties.Close()
+	C.audio_config_release(config.handle)
 }
 
 func newAudioConfigFromHandle(handle C.SPXHANDLE) (*AudioConfig, error) {
