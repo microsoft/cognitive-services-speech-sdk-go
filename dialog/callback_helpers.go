@@ -4,11 +4,14 @@
 package dialog
 
 import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 	"sync"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
 
 // #include <speechapi_c_common.h>
+// #include <speechapi_c_recognizer.h>
+// #include <speechapi_c_dialog_service_connector.h>
 import "C"
 
 var mu sync.Mutex
@@ -29,11 +32,9 @@ func getSessionStartedCallback(handle C.SPXHANDLE) speech.SessionEventHandler {
 //export dialogFireEventSessionStarted
 func dialogFireEventSessionStarted(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSessionStartedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := speech.NewSessionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -56,11 +57,9 @@ func getSessionStoppedCallback(handle C.SPXHANDLE) speech.SessionEventHandler {
 //export dialogFireEventSessionStopped
 func dialogFireEventSessionStopped(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getSessionStoppedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := speech.NewSessionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -83,11 +82,9 @@ func getRecognizedCallback(handle C.SPXHANDLE) speech.SpeechRecognitionEventHand
 //export dialogFireEventRecognized
 func dialogFireEventRecognized(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getRecognizedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := speech.NewSpeechRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -110,11 +107,9 @@ func getRecognizingCallback(handle C.SPXHANDLE) speech.SpeechRecognitionEventHan
 //export dialogFireEventRecognizing
 func dialogFireEventRecognizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getRecognizingCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := speech.NewSpeechRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -137,11 +132,9 @@ func getCanceledCallback(handle C.SPXHANDLE) speech.SpeechRecognitionCanceledEve
 //export dialogFireEventCanceled
 func dialogFireEventCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getCanceledCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := speech.NewSpeechRecognitionCanceledEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
 		return
 	}
 	handler(*event)
@@ -164,11 +157,9 @@ func getActivityReceivedCallback(handle C.SPXHANDLE) ActivityReceivedEventHandle
 //export dialogFireEventActivityReceived
 func dialogFireEventActivityReceived(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	handler := getActivityReceivedCallback(handle)
-	if handler == nil {
-		return
-	}
 	event, err := NewActivityReceivedEventArgsFromHandle(handle2uintptr(eventHandle))
-	if err != nil {
+	if err != nil || handler == nil {
+		C.dialog_service_connector_activity_received_event_release(handle)
 		return
 	}
 	handler(*event)

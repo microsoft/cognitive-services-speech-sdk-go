@@ -20,8 +20,8 @@ type SpeechRecognitionEventArgs struct {
 
 // Close releases the underlying resources
 func (event SpeechRecognitionEventArgs) Close() {
+	event.RecognitionEventArgs.Close()
 	event.Result.Close()
-	C.recognizer_event_handle_release(event.handle)
 }
 
 // NewSpeechRecognitionEventArgsFromHandle creates the object from the handle (for internal use)
