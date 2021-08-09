@@ -4,6 +4,7 @@
 package audio
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -36,6 +37,7 @@ func (stream *audioOutputStreamBase) getHandle() C.SPXHANDLE {
 }
 
 func (stream *audioOutputStreamBase) Close() {
+	runtime.SetFinalizer(stream, nil)
 	C.audio_stream_release(stream.handle)
 }
 
@@ -48,6 +50,7 @@ type PullAudioOutputStream struct {
 func NewPullAudioOutputStreamFromHandle(handle common.SPXHandle) *PullAudioOutputStream {
 	stream := new(PullAudioOutputStream)
 	stream.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(stream, (*PullAudioOutputStream).Close)
 	return stream
 }
 
@@ -110,6 +113,7 @@ func deregisterPushStreamCallback(handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
 	pushStreamCallbacks[handle] = nil
+	delete(pushStreamCallbacks, handle)
 }
 
 //export cgoAudioOutputCallWriteCallback
@@ -149,5 +153,6 @@ func CreatePushAudioOutputStream(callback PushAudioOutputStreamCallback) (*PushA
 	registerPushStreamCallback(handle, callback)
 	stream := new(PushAudioOutputStream)
 	stream.handle = handle
+	runtime.SetFinalizer(stream, (*PushAudioOutputStream).Close)
 	return stream, nil
 }

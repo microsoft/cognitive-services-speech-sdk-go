@@ -4,6 +4,7 @@
 package dialog
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
@@ -40,6 +41,7 @@ func newDialogServiceConnectorFromHandle(handle C.SPXHANDLE) (*DialogServiceConn
 	connector := new(DialogServiceConnector)
 	connector.handle = handle
 	connector.Properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
+	runtime.SetFinalizer(connector, (*DialogServiceConnector).Close)
 	return connector, nil
 }
 
@@ -65,7 +67,8 @@ func NewDialogServiceConnectorFromConfig(config DialogServiceConfig, audioConfig
 }
 
 // Close performs cleanup of resources.
-func (connector DialogServiceConnector) Close() {
+func (connector *DialogServiceConnector) Close() {
+	runtime.SetFinalizer(connector, nil)
 	connector.Properties.Close()
 	C.dialog_service_connector_handle_release(connector.handle)
 }

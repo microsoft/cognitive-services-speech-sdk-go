@@ -5,6 +5,7 @@ package speech
 
 import (
 	"io"
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -28,7 +29,8 @@ type AudioDataStream struct {
 }
 
 // Close disposes the associated resources.
-func (stream AudioDataStream) Close() {
+func (stream *AudioDataStream) Close() {
+	runtime.SetFinalizer(stream, nil)
 	stream.Properties.Close()
 	C.audio_stream_release(stream.handle)
 }
@@ -37,6 +39,7 @@ func (stream AudioDataStream) Close() {
 func NewAudioDataStreamFromHandle(handle common.SPXHandle) (*AudioDataStream, error) {
 	stream := new(AudioDataStream)
 	stream.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(stream, (*AudioDataStream).Close)
 	/* Properties */
 	var propBagHandle C.SPXHANDLE
 	ret := uintptr(C.audio_data_stream_get_property_bag(uintptr2handle(handle), &propBagHandle))

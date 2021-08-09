@@ -4,6 +4,7 @@
 package dialog
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -90,6 +91,7 @@ func (config *dialogServiceConfigBase) Language() string {
 
 // Close disposes the associated resources.
 func (config *dialogServiceConfigBase) Close() {
+	runtime.SetFinalizer(config, nil)
 	config.config.Close()
 }
 
@@ -100,6 +102,14 @@ func (config *dialogServiceConfigBase) getHandle() C.SPXHANDLE {
 // BotFrameworkConfig defines configurations for the dialog service connector object for using a Bot Framework backend.
 type BotFrameworkConfig struct {
 	dialogServiceConfigBase
+}
+
+func newBotFrameworkConfigFromSpeechConfigAndHandle(speechConfig speech.SpeechConfig, handle C.SPXHANDLE) *BotFrameworkConfig {
+	config := new(BotFrameworkConfig)
+	config.config = speechConfig
+	config.handle = handle
+	runtime.SetFinalizer(config, (*BotFrameworkConfig).Close)
+	return config
 }
 
 // NewBotFrameworkConfigFromSubscription creates a bot framework service config instance with the specified subscription
@@ -119,10 +129,7 @@ func NewBotFrameworkConfigFromSubscription(subscriptionKey string, region string
 	if err != nil {
 		return nil, err
 	}
-	config := new(BotFrameworkConfig)
-	config.config = *speechConfig
-	config.handle = handle
-	return config, nil
+	return newBotFrameworkConfigFromSpeechConfigAndHandle(*speechConfig, handle), nil
 }
 
 // NewBotFrameworkConfigFromSubscriptionAndBotID creates a bot framework service config instance with the specified subscription
@@ -144,10 +151,7 @@ func NewBotFrameworkConfigFromSubscriptionAndBotID(subscriptionKey string, regio
 	if err != nil {
 		return nil, err
 	}
-	config := new(BotFrameworkConfig)
-	config.config = *speechConfig
-	config.handle = handle
-	return config, nil
+	return newBotFrameworkConfigFromSpeechConfigAndHandle(*speechConfig, handle), nil
 }
 
 // NewBotFrameworkConfigFromAuthorizationToken creates a bot framework service config instance with the specified authorization
@@ -172,10 +176,7 @@ func NewBotFrameworkConfigFromAuthorizationToken(authorizationToken string, regi
 	if err != nil {
 		return nil, err
 	}
-	config := new(BotFrameworkConfig)
-	config.config = *speechConfig
-	config.handle = handle
-	return config, nil
+	return newBotFrameworkConfigFromSpeechConfigAndHandle(*speechConfig, handle), nil
 }
 
 // NewBotFrameworkConfigFromAuthorizationTokenAndBotID creates a bot framework service config instance with the specified authorization
@@ -202,15 +203,20 @@ func NewBotFrameworkConfigFromAuthorizationTokenAndBotID(authorizationToken stri
 	if err != nil {
 		return nil, err
 	}
-	config := new(BotFrameworkConfig)
-	config.config = *speechConfig
-	config.handle = handle
-	return config, nil
+	return newBotFrameworkConfigFromSpeechConfigAndHandle(*speechConfig, handle), nil
 }
 
 // CustomCommandsConfig defines configurations for the dialog service connector object for using a CustomCommands backend.
 type CustomCommandsConfig struct {
 	dialogServiceConfigBase
+}
+
+func newCustomCommandsConfigFromSpeechConfigAndHandle(speechConfig speech.SpeechConfig, handle C.SPXHANDLE) *CustomCommandsConfig {
+	config := new(CustomCommandsConfig)
+	config.config = speechConfig
+	config.handle = handle
+	runtime.SetFinalizer(config, (*CustomCommandsConfig).Close)
+	return config
 }
 
 // NewCustomCommandsConfigFromSubscription creates a Custom Commands config instance with the specified application id,
@@ -231,10 +237,7 @@ func NewCustomCommandsConfigFromSubscription(applicationID string, subscriptionK
 	if err != nil {
 		return nil, err
 	}
-	config := new(CustomCommandsConfig)
-	config.config = *speechConfig
-	config.handle = handle
-	return config, nil
+	return newCustomCommandsConfigFromSpeechConfigAndHandle(*speechConfig, handle), nil
 }
 
 // NewCustomCommandsConfigFromAuthorizationToken creates a Custom Commands config instance with the specified application id
@@ -261,10 +264,7 @@ func NewCustomCommandsConfigFromAuthorizationToken(applicationID string, authori
 	if err != nil {
 		return nil, err
 	}
-	config := new(CustomCommandsConfig)
-	config.config = *speechConfig
-	config.handle = handle
-	return config, nil
+	return newCustomCommandsConfigFromSpeechConfigAndHandle(*speechConfig, handle), nil
 }
 
 // ApplicationID is the corresponding backend application identifier.

@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"strings"
 	"unsafe"
 
@@ -29,6 +30,7 @@ func newAutoDetectSourceLanguageConfigFromHandle(handle C.SPXHANDLE) (*AutoDetec
 	}
 	config := new(AutoDetectSourceLanguageConfig)
 	config.handle = handle
+	runtime.SetFinalizer(config, (*AutoDetectSourceLanguageConfig).Close)
 	config.properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
 	return config, nil
 }
@@ -92,7 +94,8 @@ func (config AutoDetectSourceLanguageConfig) getHandle() C.SPXHANDLE {
 }
 
 // Close performs cleanup of resources.
-func (config AutoDetectSourceLanguageConfig) Close() {
+func (config *AutoDetectSourceLanguageConfig) Close() {
+	runtime.SetFinalizer(config, nil)
 	config.properties.Close()
 	C.auto_detect_source_lang_config_release(config.handle)
 }

@@ -5,6 +5,7 @@ package speech
 
 import (
 	"math"
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
@@ -44,6 +45,7 @@ func newSpeechRecognizerFromHandle(handle C.SPXHANDLE) (*SpeechRecognizer, error
 	}
 	recognizer := new(SpeechRecognizer)
 	recognizer.handle = handle
+	runtime.SetFinalizer(recognizer, (*SpeechRecognizer).Close)
 	recognizer.handleAsyncStartContinuous = C.SPXHANDLE_INVALID
 	recognizer.handleAsyncStopContinuous = C.SPXHANDLE_INVALID
 	recognizer.handleAsyncStartKeyword = C.SPXHANDLE_INVALID
@@ -358,7 +360,8 @@ func (recognizer SpeechRecognizer) Canceled(handler SpeechRecognitionCanceledEve
 }
 
 // Close disposes the associated resources.
-func (recognizer SpeechRecognizer) Close() {
+func (recognizer *SpeechRecognizer) Close() {
+	runtime.SetFinalizer(recognizer, nil)
 	recognizer.SessionStarted(nil)
 	recognizer.SessionStopped(nil)
 	recognizer.SpeechStartDetected(nil)

@@ -4,6 +4,8 @@
 package speech
 
 import (
+	"runtime"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
@@ -21,7 +23,8 @@ type SpeechSynthesisWordBoundaryEventArgs struct {
 }
 
 // Close releases the underlying resources
-func (event SpeechSynthesisWordBoundaryEventArgs) Close() {
+func (event *SpeechSynthesisWordBoundaryEventArgs) Close() {
+	runtime.SetFinalizer(event, nil)
 	C.synthesizer_event_handle_release(event.handle)
 }
 
@@ -29,6 +32,7 @@ func (event SpeechSynthesisWordBoundaryEventArgs) Close() {
 func NewSpeechSynthesisWordBoundaryEventArgsFromHandle(handle common.SPXHandle) (*SpeechSynthesisWordBoundaryEventArgs, error) {
 	event := new(SpeechSynthesisWordBoundaryEventArgs)
 	event.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(event, (*SpeechSynthesisWordBoundaryEventArgs).Close)
 	var cAudioOffset C.uint64_t
 	var cTextOffset, cWordLength C.uint32_t
 	ret := uintptr(C.synthesizer_word_boundary_event_get_values(event.handle, &cAudioOffset, &cTextOffset, &cWordLength))

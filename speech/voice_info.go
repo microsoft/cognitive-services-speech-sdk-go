@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"strings"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -50,7 +51,8 @@ type VoiceInfo struct {
 }
 
 // Close releases the underlying resources
-func (result VoiceInfo) Close() {
+func (result *VoiceInfo) Close() {
+	runtime.SetFinalizer(result, nil)
 	result.Properties.Close()
 	C.voice_info_handle_release(result.handle)
 }
@@ -59,6 +61,7 @@ func (result VoiceInfo) Close() {
 func NewVoiceInfoFromHandle(handle common.SPXHandle) (*VoiceInfo, error) {
 	voiceInfo := new(VoiceInfo)
 	voiceInfo.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(voiceInfo, (*VoiceInfo).Close)
 	/* Name */
 	value := C.voice_info_get_name(voiceInfo.handle)
 	voiceInfo.Name = C.GoString(value)

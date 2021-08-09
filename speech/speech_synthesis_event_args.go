@@ -4,6 +4,8 @@
 package speech
 
 import (
+	"runtime"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
@@ -18,7 +20,8 @@ type SpeechSynthesisEventArgs struct {
 }
 
 // Close releases the underlying resources
-func (event SpeechSynthesisEventArgs) Close() {
+func (event *SpeechSynthesisEventArgs) Close() {
+	runtime.SetFinalizer(event, nil)
 	event.Result.Close()
 	C.synthesizer_event_handle_release(event.handle)
 }
@@ -27,6 +30,7 @@ func (event SpeechSynthesisEventArgs) Close() {
 func NewSpeechSynthesisEventArgsFromHandle(handle common.SPXHandle) (*SpeechSynthesisEventArgs, error) {
 	event := new(SpeechSynthesisEventArgs)
 	event.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(event, (*SpeechSynthesisEventArgs).Close)
 	var resultHandle C.SPXHANDLE
 	ret := uintptr(C.synthesizer_synthesis_event_get_result(event.handle, &resultHandle))
 	if ret != C.SPX_NOERROR {

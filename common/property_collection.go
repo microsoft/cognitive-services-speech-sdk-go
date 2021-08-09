@@ -7,7 +7,10 @@ package common
 // #include <speechapi_c_common.h>
 // #include <speechapi_c_property_bag.h>
 import "C"
-import "unsafe"
+import (
+	"runtime"
+	"unsafe"
+)
 
 // PropertyCollection is a class to retrieve or set a property value from a property collection.
 type PropertyCollection struct {
@@ -63,7 +66,8 @@ func (properties PropertyCollection) SetPropertyByString(name string, value stri
 }
 
 // Close disposes the associated resources.
-func (properties PropertyCollection) Close() {
+func (properties *PropertyCollection) Close() {
+	runtime.SetFinalizer(properties, nil)
 	C.property_bag_release(properties.handle)
 }
 
@@ -71,5 +75,6 @@ func (properties PropertyCollection) Close() {
 func NewPropertyCollectionFromHandle(handle SPXHandle) PropertyCollection {
 	propertyCollection := new(PropertyCollection)
 	propertyCollection.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(propertyCollection, (*PropertyCollection).Close)
 	return *propertyCollection
 }

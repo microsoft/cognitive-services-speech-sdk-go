@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
@@ -39,6 +40,7 @@ func newSpeechSynthesizerFromHandle(handle C.SPXHANDLE) (*SpeechSynthesizer, err
 	}
 	synthesizer := new(SpeechSynthesizer)
 	synthesizer.handle = handle
+	runtime.SetFinalizer(synthesizer, (*SpeechSynthesizer).Close)
 	synthesizer.Properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
 	return synthesizer, nil
 }
@@ -304,7 +306,8 @@ func (synthesizer SpeechSynthesizer) BookmarkReached(handler SpeechSynthesisBook
 }
 
 // Close disposes the associated resources.
-func (synthesizer SpeechSynthesizer) Close() {
+func (synthesizer *SpeechSynthesizer) Close() {
+	runtime.SetFinalizer(synthesizer, nil)
 	synthesizer.SynthesisStarted(nil)
 	synthesizer.Synthesizing(nil)
 	synthesizer.SynthesisCompleted(nil)
