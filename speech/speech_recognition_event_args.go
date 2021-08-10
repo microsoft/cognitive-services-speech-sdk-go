@@ -17,7 +17,7 @@ import "C"
 type SpeechRecognitionEventArgs struct {
 	RecognitionEventArgs
 	handle C.SPXHANDLE
-	Result SpeechRecognitionResult
+	Result *SpeechRecognitionResult
 }
 
 // Close releases the underlying resources
@@ -46,7 +46,7 @@ func NewSpeechRecognitionEventArgsFromHandle(handle common.SPXHandle) (*SpeechRe
 	if err != nil {
 		return nil, err
 	}
-	event.Result = *result
+	event.Result = result
 	return event, nil
 }
 

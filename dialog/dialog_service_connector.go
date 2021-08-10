@@ -28,7 +28,7 @@ import "C"
 
 // DialogServiceConnector connects to a speech enabled dialog backend.
 type DialogServiceConnector struct {
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 	handle     C.SPXHANDLE
 }
 

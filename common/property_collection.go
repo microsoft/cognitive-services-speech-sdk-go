@@ -72,9 +72,9 @@ func (properties *PropertyCollection) Close() {
 }
 
 // NewPropertyCollectionFromHandle creates a PropertyCollection from a handle (for internal use)
-func NewPropertyCollectionFromHandle(handle SPXHandle) PropertyCollection {
+func NewPropertyCollectionFromHandle(handle SPXHandle) *PropertyCollection {
 	propertyCollection := new(PropertyCollection)
 	propertyCollection.handle = uintptr2handle(handle)
 	runtime.SetFinalizer(propertyCollection, (*PropertyCollection).Close)
-	return *propertyCollection
+	return propertyCollection
 }

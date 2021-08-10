@@ -28,7 +28,7 @@ import "C"
 
 // SpeechSynthesizer is the class for speech synthesizer.
 type SpeechSynthesizer struct {
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 	handle     C.SPXHANDLE
 }
 

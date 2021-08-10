@@ -25,7 +25,7 @@ type AudioDataStream struct {
 	handle C.SPXHANDLE
 
 	// Properties represents the collection of additional properties.
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 }
 
 // Close disposes the associated resources.

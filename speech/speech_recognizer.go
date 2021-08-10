@@ -29,7 +29,7 @@ import "C"
 
 // SpeechRecognizer is the class for speech recognizers.
 type SpeechRecognizer struct {
-	Properties                 common.PropertyCollection
+	Properties                 *common.PropertyCollection
 	handle                     C.SPXHANDLE
 	handleAsyncStartContinuous C.SPXASYNCHANDLE
 	handleAsyncStopContinuous  C.SPXASYNCHANDLE
