@@ -31,6 +31,7 @@ func main() {
 		"speech_recognizer:RecognizeOnceFromWavFile":        recognizer.RecognizeOnceFromWavFile,
 		"speech_recognizer:RecognizeOnceFromCompressedFile": recognizer.RecognizeOnceFromCompressedFile,
 		"speech_recognizer:ContinuousFromMicrophone":        recognizer.ContinuousFromMicrophone,
+		"speech_recognizer:RecognizeContinuousUsingWrapper": recognizer.RecognizeContinuousUsingWrapper,
 		"dialog_service_connector:ListenOnce":               dialog_service_connector.ListenOnce,
 		"dialog_service_connector:KWS":                      dialog_service_connector.KWS,
 		"dialog_service_connector:ListenOnceFromStream":     dialog_service_connector.ListenOnceFromStream,
