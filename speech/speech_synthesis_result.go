@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -31,20 +32,21 @@ type SpeechSynthesisResult struct {
 	AudioData []byte
 
 	// Collection of additional synthesisResult properties.
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 }
 
 // Close releases the underlying resources
-func (result SpeechSynthesisResult) Close() {
+func (result *SpeechSynthesisResult) Close() {
+	runtime.SetFinalizer(result, nil)
 	result.Properties.Close()
 	C.synthesizer_result_handle_release(result.handle)
 }
 
 // NewSpeechSynthesisResultFromHandle creates a SpeechSynthesisResult from a handle (for internal use)
 func NewSpeechSynthesisResultFromHandle(handle common.SPXHandle) (*SpeechSynthesisResult, error) {
-
 	result := new(SpeechSynthesisResult)
 	result.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(result, (*SpeechSynthesisResult).Close)
 	/* AudioData length */
 	var cAudioLength C.uint32_t
 	ret := uintptr(C.synth_result_get_audio_length(result.handle, &cAudioLength))

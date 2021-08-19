@@ -4,13 +4,15 @@
 package speech
 
 import (
+	"runtime"
+	"unsafe"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 // #include <stdlib.h>
 // #include <speechapi_c_keyword_recognition_model.h>
 import "C"
-import "unsafe"
 
 // KeywordRecognitionModel represents the keyword recognition model used with StartKeywordRecognitionAsync methods.
 type KeywordRecognitionModel struct {
@@ -18,7 +20,8 @@ type KeywordRecognitionModel struct {
 }
 
 // Close disposes the associated resources.
-func (model KeywordRecognitionModel) Close() {
+func (model *KeywordRecognitionModel) Close() {
+	runtime.SetFinalizer(model, nil)
 	C.keyword_recognition_model_handle_release(model.handle)
 }
 
@@ -38,5 +41,6 @@ func NewKeywordRecognitionModelFromFile(filename string) (*KeywordRecognitionMod
 	}
 	model := new(KeywordRecognitionModel)
 	model.handle = handle
+	runtime.SetFinalizer(model, (*KeywordRecognitionModel).Close)
 	return model, nil
 }

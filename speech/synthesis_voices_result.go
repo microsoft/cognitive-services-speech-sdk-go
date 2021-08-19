@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -34,11 +35,12 @@ type SynthesisVoicesResult struct {
 	ErrorDetails string
 
 	// Collection of additional properties.
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 }
 
 // Close releases the underlying resources
-func (result SynthesisVoicesResult) Close() {
+func (result *SynthesisVoicesResult) Close() {
+	runtime.SetFinalizer(result, nil)
 	for _, voice := range result.Voices {
 		voice.Close()
 	}
@@ -50,6 +52,7 @@ func (result SynthesisVoicesResult) Close() {
 func NewSynthesisVoicesResultFromHandle(handle common.SPXHandle) (*SynthesisVoicesResult, error) {
 	result := new(SynthesisVoicesResult)
 	result.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(result, (*SynthesisVoicesResult).Close)
 	buffer := C.malloc(C.sizeof_char * 1024)
 	defer C.free(unsafe.Pointer(buffer))
 	/* ResultID */

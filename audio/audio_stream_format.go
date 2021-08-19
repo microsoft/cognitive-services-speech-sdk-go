@@ -4,6 +4,8 @@
 package audio
 
 import (
+	"runtime"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
@@ -19,6 +21,13 @@ type AudioStreamFormat struct {
 	handle C.SPXHANDLE
 }
 
+func newAudioStreamFormatFromHandle(handle C.SPXHANDLE) (*AudioStreamFormat, error) {
+	format := new(AudioStreamFormat)
+	format.handle = handle
+	runtime.SetFinalizer(format, (*AudioStreamFormat).Close)
+	return format, nil
+}
+
 // GetDefaultInputFormat creates an audio stream format object representing the default audio stream format
 // (16 kHz, 16 bit, mono PCM).
 func GetDefaultInputFormat() (*AudioStreamFormat, error) {
@@ -27,9 +36,7 @@ func GetDefaultInputFormat() (*AudioStreamFormat, error) {
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	format := new(AudioStreamFormat)
-	format.handle = handle
-	return format, nil
+	return newAudioStreamFormatFromHandle(handle)
 }
 
 // GetWaveFormatPCM creates an audio stream format object with the specified PCM waveformat characteristics.
@@ -45,9 +52,7 @@ func GetWaveFormatPCM(samplesPerSecond uint32, bitsPerSample uint8, channels uin
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	format := new(AudioStreamFormat)
-	format.handle = handle
-	return format, nil
+	return newAudioStreamFormatFromHandle(handle)
 }
 
 // GetDefaultOutputFormat creates an audio stream format object representing the default audio stream format
@@ -58,9 +63,7 @@ func GetDefaultOutputFormat() (*AudioStreamFormat, error) {
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	format := new(AudioStreamFormat)
-	format.handle = handle
-	return format, nil
+	return newAudioStreamFormatFromHandle(handle)
 }
 
 // GetCompressedFormat creates an audio stream format object with the specified compressed audio container format, to be
@@ -71,12 +74,11 @@ func GetCompressedFormat(compressedFormat AudioStreamContainerFormat) (*AudioStr
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	format := new(AudioStreamFormat)
-	format.handle = handle
-	return format, nil
+	return newAudioStreamFormatFromHandle(handle)
 }
 
 // Close disposes the associated resources.
 func (format *AudioStreamFormat) Close() {
+	runtime.SetFinalizer(format, nil)
 	C.audio_stream_format_release(format.handle)
 }

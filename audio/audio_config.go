@@ -4,6 +4,7 @@
 package audio
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -18,7 +19,7 @@ import "C"
 // AudioConfig represents specific audio configuration, such as microphone, file, or custom audio streams.
 type AudioConfig struct {
 	handle     C.SPXHANDLE
-	properties common.PropertyCollection
+	properties *common.PropertyCollection
 }
 
 // GetHandle gets the handle to the resource (for internal use)
@@ -27,7 +28,8 @@ func (config AudioConfig) GetHandle() common.SPXHandle {
 }
 
 // Close releases the underlying resources
-func (config AudioConfig) Close() {
+func (config *AudioConfig) Close() {
+	runtime.SetFinalizer(config, nil)
 	config.properties.Close()
 	C.audio_config_release(config.handle)
 }
@@ -41,6 +43,7 @@ func newAudioConfigFromHandle(handle C.SPXHANDLE) (*AudioConfig, error) {
 	config := new(AudioConfig)
 	config.handle = handle
 	config.properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
+	runtime.SetFinalizer(config, (*AudioConfig).Close)
 	return config, nil
 }
 

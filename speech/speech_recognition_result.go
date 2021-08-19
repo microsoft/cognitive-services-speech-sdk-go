@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"time"
 	"unsafe"
 
@@ -38,11 +39,12 @@ type SpeechRecognitionResult struct {
 	Offset time.Duration
 
 	// Collection of additional RecognitionResult properties.
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 }
 
 // Close releases the underlying resources
-func (result SpeechRecognitionResult) Close() {
+func (result *SpeechRecognitionResult) Close() {
+	runtime.SetFinalizer(result, nil)
 	result.Properties.Close()
 	C.recognizer_result_handle_release(result.handle)
 }
@@ -53,6 +55,7 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 	defer C.free(unsafe.Pointer(buffer))
 	result := new(SpeechRecognitionResult)
 	result.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(result, (*SpeechRecognitionResult).Close)
 	/* ResultID */
 	ret := uintptr(C.result_get_result_id(result.handle, (*C.char)(buffer), 1024))
 	if ret != C.SPX_NOERROR {

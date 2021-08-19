@@ -4,6 +4,7 @@
 package audio
 
 import (
+	"runtime"
 	"sync"
 	"unsafe"
 
@@ -36,7 +37,8 @@ func (stream audioInputStreamBase) getHandle() C.SPXHANDLE {
 	return stream.handle
 }
 
-func (stream audioInputStreamBase) Close() {
+func (stream *audioInputStreamBase) Close() {
+	runtime.SetFinalizer(stream, nil)
 	C.audio_stream_release(stream.handle)
 }
 
@@ -56,6 +58,7 @@ func CreatePushAudioInputStreamFromFormat(format *AudioStreamFormat) (*PushAudio
 	}
 	stream := new(PushAudioInputStream)
 	stream.handle = handle
+	runtime.SetFinalizer(stream, (*PushAudioInputStream).Close)
 	return stream, nil
 }
 
@@ -211,6 +214,7 @@ func CreatePullStreamFromFormat(callback PullAudioInputStreamCallback, format *A
 	registerCallback(handle, callback)
 	stream := new(PullAudioInputStream)
 	stream.handle = handle
+	runtime.SetFinalizer(stream, (*PullAudioInputStream).Close)
 	return stream, nil
 }
 

@@ -4,6 +4,9 @@
 package dialog
 
 import (
+	"runtime"
+	"unsafe"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
@@ -12,7 +15,6 @@ import (
 // #include <stdint.h>
 // #include <speechapi_c_dialog_service_connector.h>
 import "C"
-import "unsafe"
 
 type ActivityReceivedEventArgs struct {
 	handle   C.SPXHANDLE
@@ -20,7 +22,8 @@ type ActivityReceivedEventArgs struct {
 }
 
 // Close releases the underlying resources
-func (event ActivityReceivedEventArgs) Close() {
+func (event *ActivityReceivedEventArgs) Close() {
+	runtime.SetFinalizer(event, nil)
 	C.dialog_service_connector_activity_received_event_release(event.handle)
 }
 
@@ -43,6 +46,7 @@ func (event ActivityReceivedEventArgs) GetAudio() (*audio.PullAudioOutputStream,
 func NewActivityReceivedEventArgsFromHandle(handle common.SPXHandle) (*ActivityReceivedEventArgs, error) {
 	event := new(ActivityReceivedEventArgs)
 	event.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(event, (*ActivityReceivedEventArgs).Close)
 	var size C.size_t
 	ret := uintptr(C.dialog_service_connector_activity_received_event_get_activity_size(event.handle, &size))
 	if ret != C.SPX_NOERROR {

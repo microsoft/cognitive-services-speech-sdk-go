@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -16,7 +17,7 @@ import "C"
 // SourceLanguageConfig defines source language configuration.
 type SourceLanguageConfig struct {
 	handle     C.SPXHANDLE
-	properties common.PropertyCollection
+	properties *common.PropertyCollection
 }
 
 func newSourceLanguageConfigFromHandle(handle C.SPXHANDLE) (*SourceLanguageConfig, error) {
@@ -28,6 +29,7 @@ func newSourceLanguageConfigFromHandle(handle C.SPXHANDLE) (*SourceLanguageConfi
 	}
 	config := new(SourceLanguageConfig)
 	config.handle = handle
+	runtime.SetFinalizer(config, (*SourceLanguageConfig).Close)
 	config.properties = common.NewPropertyCollectionFromHandle(handle2uintptr(propBagHandle))
 	return config, nil
 }
@@ -63,7 +65,8 @@ func (config SourceLanguageConfig) getHandle() C.SPXHANDLE {
 }
 
 // Close performs cleanup of resources.
-func (config SourceLanguageConfig) Close() {
+func (config *SourceLanguageConfig) Close() {
+	runtime.SetFinalizer(config, nil)
 	config.properties.Close()
 	C.source_lang_config_release(config.handle)
 }

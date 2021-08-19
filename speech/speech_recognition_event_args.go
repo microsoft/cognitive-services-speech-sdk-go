@@ -4,6 +4,8 @@
 package speech
 
 import (
+	"runtime"
+
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
@@ -15,11 +17,12 @@ import "C"
 type SpeechRecognitionEventArgs struct {
 	RecognitionEventArgs
 	handle C.SPXHANDLE
-	Result SpeechRecognitionResult
+	Result *SpeechRecognitionResult
 }
 
 // Close releases the underlying resources
-func (event SpeechRecognitionEventArgs) Close() {
+func (event *SpeechRecognitionEventArgs) Close() {
+	runtime.SetFinalizer(event, nil)
 	event.RecognitionEventArgs.Close()
 	event.Result.Close()
 }
@@ -33,6 +36,7 @@ func NewSpeechRecognitionEventArgsFromHandle(handle common.SPXHandle) (*SpeechRe
 	event := new(SpeechRecognitionEventArgs)
 	event.RecognitionEventArgs = *base
 	event.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(event, (*SpeechRecognitionEventArgs).Close)
 	var resultHandle C.SPXHANDLE
 	ret := uintptr(C.recognizer_recognition_event_get_result(event.handle, &resultHandle))
 	if ret != C.SPX_NOERROR {
@@ -42,7 +46,7 @@ func NewSpeechRecognitionEventArgsFromHandle(handle common.SPXHandle) (*SpeechRe
 	if err != nil {
 		return nil, err
 	}
-	event.Result = *result
+	event.Result = result
 	return event, nil
 }
 

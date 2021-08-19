@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -21,7 +22,8 @@ type SessionEventArgs struct {
 }
 
 // Close releases the underlying resources.
-func (event SessionEventArgs) Close() {
+func (event *SessionEventArgs) Close() {
+	runtime.SetFinalizer(event, nil)
 	C.recognizer_event_handle_release(event.handle)
 }
 
@@ -35,6 +37,7 @@ func NewSessionEventArgsFromHandle(handle common.SPXHandle) (*SessionEventArgs, 
 	}
 	event := new(SessionEventArgs)
 	event.handle = uintptr2handle(handle)
+	runtime.SetFinalizer(event, (*SessionEventArgs).Close)
 	event.SessionID = C.GoString((*C.char)(buffer))
 	return event, nil
 }
