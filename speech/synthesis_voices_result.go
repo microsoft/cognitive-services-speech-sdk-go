@@ -34,7 +34,7 @@ type SynthesisVoicesResult struct {
 	ErrorDetails string
 
 	// Collection of additional properties.
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 }
 
 // Close releases the underlying resources

@@ -17,7 +17,7 @@ import "C"
 // AutoDetectSourceLanguageConfig defines auto detection source configuration
 type AutoDetectSourceLanguageConfig struct {
 	handle     C.SPXHANDLE
-	properties common.PropertyCollection
+	properties *common.PropertyCollection
 }
 
 func newAutoDetectSourceLanguageConfigFromHandle(handle C.SPXHANDLE) (*AutoDetectSourceLanguageConfig, error) {

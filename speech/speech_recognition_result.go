@@ -38,7 +38,7 @@ type SpeechRecognitionResult struct {
 	Offset time.Duration
 
 	// Collection of additional RecognitionResult properties.
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 }
 
 // Close releases the underlying resources

@@ -27,7 +27,7 @@ import "C"
 
 // SpeechSynthesizer is the class for speech synthesizer.
 type SpeechSynthesizer struct {
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 	handle     C.SPXHANDLE
 }
 
@@ -304,7 +304,7 @@ func (synthesizer SpeechSynthesizer) BookmarkReached(handler SpeechSynthesisBook
 }
 
 // Close disposes the associated resources.
-func (synthesizer SpeechSynthesizer) Close() {
+func (synthesizer *SpeechSynthesizer) Close() {
 	synthesizer.SynthesisStarted(nil)
 	synthesizer.Synthesizing(nil)
 	synthesizer.SynthesisCompleted(nil)

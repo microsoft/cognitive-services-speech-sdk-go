@@ -17,7 +17,7 @@ import "C"
 // SpeechConfig is the class that defines configurations for speech / intent recognition, or speech synthesis.
 type SpeechConfig struct {
 	handle     C.SPXHANDLE
-	properties common.PropertyCollection
+	properties *common.PropertyCollection
 }
 
 // NewSpeechConfigFromHandle creates a SpeechConfig instance from a valid handle. This is for internal use only.
