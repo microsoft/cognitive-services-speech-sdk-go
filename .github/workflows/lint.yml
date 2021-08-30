@@ -29,5 +29,3 @@ jobs:
         env:
           CGO_CFLAGS: "-I/tmp/carbon/current/include/c_api"
           CGO_LDFLAGS: "-L/tmp/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
-        with:
-          args: --enable=revive
