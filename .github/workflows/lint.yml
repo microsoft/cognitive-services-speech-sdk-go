@@ -13,7 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Get Carbon
+        run: |
+          mkdir /tmp/carbon
+          pushd /tmp/carbon
+          wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+          tar xzf SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+          rm SpeechSDK-Linux-$CARBON_VERSION.tar.gz
+          ln -s SpeechSDK-Linux-$CARBON_VERSION current
+          popd
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
+        env:
+          CGO_CFLAGS: "-I/tmp/carbon/current/include/c_api"
+          CGO_LDFLAGS: "-L/tmp/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
         with:
-          args: --enable revive
+          args: --enable=revive
