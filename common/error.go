@@ -89,7 +89,7 @@ func getErrorCode(errorHandle SPXHandle) int {
 	// So this must be a SPX_* error and not a stored exception.
 	// Return the HR as the error.
 	if ret == 0 {
-		return int(uintptr(errorHandle))
+		return int(errorHandle)
 	}
 	return ret
 }
