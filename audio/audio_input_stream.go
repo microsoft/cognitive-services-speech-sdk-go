@@ -142,6 +142,7 @@ func getCallback(handle C.SPXHANDLE) *PullAudioInputStreamCallback {
 	return nil
 }
 
+//nolint:deadcode
 func deregisterCallback(handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
