@@ -11,7 +11,7 @@ import (
 import "C"
 
 type CarbonError struct {
-	Code int
+	Code    int
 	Message string
 }
 
@@ -72,7 +72,7 @@ func NewCarbonError(errorHandle uintptr) CarbonError {
 	error.Code = getErrorCode(SPXHandle(errorHandle))
 	error.Message = getErrorMessage(SPXHandle(errorHandle))
 	// When the message is empty, construct the error message using the errorHandle value directly.
-	if (error.Message == "") {
+	if error.Message == "" {
 		codeAsHexString := fmt.Sprintf("0x%0x", error.Code)
 		error.Message = "Exception with an error code: " + codeAsHexString + " (" + errorString[error.Code] + ")"
 	}
@@ -88,8 +88,8 @@ func getErrorCode(errorHandle SPXHandle) int {
 	// A 0 means there was no corresponding event stored.
 	// So this must be a SPX_* error and not a stored exception.
 	// Return the HR as the error.
-	if (ret == 0) {
-		return int(errorHandle)
+	if ret == 0 {
+		return int(uintptr(errorHandle))
 	}
 	return ret
 }
@@ -97,7 +97,7 @@ func getErrorCode(errorHandle SPXHandle) int {
 func getErrorMessage(errorHandle SPXHandle) string {
 	var message string = ""
 	ret := C.error_get_message(uintptr2handle(errorHandle))
-	if (ret != nil) {
+	if ret != nil {
 		message = C.GoString(ret)
 	}
 	return message

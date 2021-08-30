@@ -8,7 +8,7 @@ import "C"
 import "unsafe"
 
 // SPXHandle is the internal handle type
-type SPXHandle uintptr
+type SPXHandle unsafe.Pointer
 
 func uintptr2handle(h SPXHandle) C.SPXHANDLE {
 	return (C.SPXHANDLE)(unsafe.Pointer(h))
