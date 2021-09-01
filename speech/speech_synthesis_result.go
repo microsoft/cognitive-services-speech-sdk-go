@@ -31,7 +31,7 @@ type SpeechSynthesisResult struct {
 	AudioData []byte
 
 	// Collection of additional synthesisResult properties.
-	Properties common.PropertyCollection
+	Properties *common.PropertyCollection
 }
 
 // Close releases the underlying resources

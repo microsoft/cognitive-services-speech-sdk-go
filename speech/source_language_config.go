@@ -16,7 +16,7 @@ import "C"
 // SourceLanguageConfig defines source language configuration.
 type SourceLanguageConfig struct {
 	handle     C.SPXHANDLE
-	properties common.PropertyCollection
+	properties *common.PropertyCollection
 }
 
 func newSourceLanguageConfigFromHandle(handle C.SPXHANDLE) (*SourceLanguageConfig, error) {

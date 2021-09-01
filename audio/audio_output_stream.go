@@ -106,6 +106,7 @@ func getPushStreamCallback(handle C.SPXHANDLE) *PushAudioOutputStreamCallback {
 	return nil
 }
 
+//nolint:deadcode
 func deregisterPushStreamCallback(handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
