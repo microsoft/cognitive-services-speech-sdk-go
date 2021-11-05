@@ -17,5 +17,5 @@ func uintptr2handle(h common.SPXHandle) C.SPXHANDLE {
 }
 
 func handle2uintptr(h C.SPXHANDLE) common.SPXHandle {
-	return (common.SPXHandle)(unsafe.Pointer(h))
+	return (common.SPXHandle)(unsafe.Pointer(h)) //nolint:govet
 }
