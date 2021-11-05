@@ -13,7 +13,3 @@ type SPXHandle uintptr
 func uintptr2handle(h SPXHandle) C.SPXHANDLE {
 	return (C.SPXHANDLE)(unsafe.Pointer(h)) //nolint:govet
 }
-
-func handle2uintptr(h C.SPXHANDLE) SPXHandle {
-	return (SPXHandle)(unsafe.Pointer(h)) //nolint:govet
-}
