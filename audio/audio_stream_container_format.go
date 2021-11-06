@@ -4,7 +4,7 @@
 package audio
 
 // AudioStreamContainerFormat defines supported audio stream container format.
-type AudioStreamContainerFormat int
+type AudioStreamContainerFormat int //nolint:revive
 
 const (
 	// OGGOPUS Stream ContainerFormat definition for OGG OPUS.
