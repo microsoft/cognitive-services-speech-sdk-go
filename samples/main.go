@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/dialog_service_connector"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/recognizer"
@@ -52,5 +53,10 @@ func main() {
 		printHelp(os.Args[0], samples)
 		return
 	}
-	sampleFunction(subscription, region, file)
+	for i := 0; i < 10; i++ {
+		count := runtime.NumGoroutine()
+		fmt.Println("[BEFORE SAMPLE] Goroutine count: ", count)
+		sampleFunction(subscription, region, file)
+		fmt.Println("[AFTER SAMPLE] Goroutine count: ", count)
+	}
 }
