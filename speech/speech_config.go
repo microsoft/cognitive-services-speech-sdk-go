@@ -20,6 +20,11 @@ type SpeechConfig struct {
 	properties *common.PropertyCollection
 }
 
+// GetHandle gets the handle to the resource (for internal use)
+func (config SpeechConfig) GetHandle() common.SPXHandle {
+	return handle2uintptr(config.handle)
+}
+
 // NewSpeechConfigFromHandle creates a SpeechConfig instance from a valid handle. This is for internal use only.
 func NewSpeechConfigFromHandle(handle common.SPXHandle) (*SpeechConfig, error) {
 	var cHandle = uintptr2handle(handle)

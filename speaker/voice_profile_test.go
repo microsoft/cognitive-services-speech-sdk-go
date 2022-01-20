@@ -8,23 +8,7 @@ import (
 	"testing"
 	//"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
-
-func TestFromSubscription(t *testing.T) {
-	subscription := "test"
-	region := "region"
-	config, err := speech.NewSpeechConfigFromSubscription(subscription, region)
-	if err != nil {
-		t.Error("Unexpected error")
-	}
-	if config.SubscriptionKey() != subscription {
-		t.Error("Subscription not properly set")
-	}
-	if config.Region() != region {
-		t.Error("Region not properly set")
-	}
-}
 
 func TestNewVoiceProfile(t *testing.T) {
 	id := "12345678-abcd-abcd-abcd-12345678abcd"
@@ -33,6 +17,7 @@ func TestNewVoiceProfile(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error")
 	}
+	defer profile.Close()
 	profileId, err := profile.Id()
 	if err != nil {
 		t.Error("id not properly set")
