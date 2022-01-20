@@ -68,13 +68,23 @@ func TestVoiceProfileClientCreateAndDeleteProfile(t *testing.T) {
 		t.Error("Profile type does not match expected type")
 	}
 	t.Log("Profile id: ", id)
+	resetFuture := client.ResetProfileAsync(profile)
+	resetOutcome := <-resetFuture
+	if resetOutcome.Failed() {
+		t.Error("Got an error resetting profile: ", resetOutcome.Error.Error())
+		return
+	}
+	result := resetOutcome.Result
+	if result.Reason != common.ResetVoiceProfile {
+		t.Error("Unexpected result resetting profile: ", result)
+	}
 	deleteFuture := client.DeleteProfileAsync(profile)
 	deleteOutcome := <-deleteFuture
 	if deleteOutcome.Failed() {
 		t.Error("Got an error deleting profile: ", deleteOutcome.Error.Error())
 		return
 	}
-	result := deleteOutcome.Result
+	result = deleteOutcome.Result
 	if result.Reason != common.DeletedVoiceProfile {
 		t.Error("Unexpected result deleting profile: ", result)
 	}

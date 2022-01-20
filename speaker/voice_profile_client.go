@@ -101,3 +101,20 @@ func (client VoiceProfileClient) DeleteProfileAsync(profile *VoiceProfile) <-cha
 	return outcome
 }
 
+// ResetProfileAsync sends a profile reset request to the service.
+func (client VoiceProfileClient) ResetProfileAsync(profile *VoiceProfile) <-chan VoiceProfileOutcome {
+	outcome := make(chan VoiceProfileOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		profileHandle := profile.GetHandle()
+		ret := uintptr(C.reset_voice_profile(client.handle, uintptr2handle(profileHandle), &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- VoiceProfileOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			result, err := NewVoiceProfileResultFromHandle(handle2uintptr(handle))
+			outcome <- VoiceProfileOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+		}
+	}()
+	return outcome
+}
+
