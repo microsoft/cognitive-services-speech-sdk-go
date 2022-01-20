@@ -83,3 +83,21 @@ func (client VoiceProfileClient) CreateProfileAsync(profileType common.VoiceProf
 	}()
 	return outcome
 }
+
+// DeleteProfileAsync sends a profile delete request to the service.
+func (client VoiceProfileClient) DeleteProfileAsync(profile *VoiceProfile) <-chan VoiceProfileOutcome {
+	outcome := make(chan VoiceProfileOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		profileHandle := profile.GetHandle()
+		ret := uintptr(C.delete_voice_profile(client.handle, uintptr2handle(profileHandle), &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- VoiceProfileOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			result, err := NewVoiceProfileResultFromHandle(handle2uintptr(handle))
+			outcome <- VoiceProfileOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+		}
+	}()
+	return outcome
+}
+

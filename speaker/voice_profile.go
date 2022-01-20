@@ -68,6 +68,6 @@ func (profile *VoiceProfile) Close() {
 	C.voice_profile_release_handle(profile.handle)
 }
 
-func (profile *VoiceProfile) getHandle() C.SPXHANDLE {
-	return profile.handle
+func (profile *VoiceProfile) GetHandle() common.SPXHandle {
+	return handle2uintptr(profile.handle)
 }

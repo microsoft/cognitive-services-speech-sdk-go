@@ -49,6 +49,24 @@ const (
 	// SynthesizingAudioStarted indicates the speech synthesis is now started
 	SynthesizingAudioStarted ResultReason = 12
 
+	// EnrollingVoiceProfile indicates the voice profile is being enrolling and customers need to send more audio to create a voice profile.
+	EnrollingVoiceProfile ResultReason = 17
+
+	// EnrolledVoiceProfile indicates the voice profile has been enrolled.
+	EnrolledVoiceProfile ResultReason = 18
+
+	// RecognizedSpeakers indicates some speakers have been successfully identified.
+	RecognizedSpeakers ResultReason = 19
+
+	// RecognizedSpeaker indicates one speaker has been successfully verified.
+	RecognizedSpeaker ResultReason = 20
+
+	// ResetVoiceProfile indicates the voice profile has been reset successfully.
+	ResetVoiceProfile ResultReason = 21
+
+	// DeletedVoiceProfile indicates the voice profile has been deleted successfully.
+	DeletedVoiceProfile ResultReason = 22
+
 	// VoicesListRetrieved indicates the voices list has been retrieved successfully.
 	VoicesListRetrieved ResultReason = 23
 )

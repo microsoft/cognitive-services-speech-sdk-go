@@ -41,7 +41,7 @@ func TestNewVoiceProfileClient(t *testing.T) {
 	defer client.Close()
 }
 
-func TestVoiceProfileClientCreateProfile(t *testing.T) {
+func TestVoiceProfileClientCreateAndDeleteProfile(t *testing.T) {
 	client := createClient(t)
 	if client == nil {
 		t.Error("Unexpected error: nil voice profile client")
@@ -51,7 +51,7 @@ func TestVoiceProfileClientCreateProfile(t *testing.T) {
 	future := client.CreateProfileAsync(expectedType, "en-US")
 	outcome := <-future
 	if outcome.Failed() {
-		t.Error("Got an error: ", outcome.Error.Error())
+		t.Error("Got an error creating profile: ", outcome.Error.Error())
 		return
 	}
 	profile := outcome.profile
@@ -68,4 +68,14 @@ func TestVoiceProfileClientCreateProfile(t *testing.T) {
 		t.Error("Profile type does not match expected type")
 	}
 	t.Log("Profile id: ", id)
+	deleteFuture := client.DeleteProfileAsync(profile)
+	deleteOutcome := <-deleteFuture
+	if deleteOutcome.Failed() {
+		t.Error("Got an error deleting profile: ", deleteOutcome.Error.Error())
+		return
+	}
+	result := deleteOutcome.Result
+	if result.Reason != common.DeletedVoiceProfile {
+		t.Error("Unexpected result deleting profile: ", result)
+	}
 }
