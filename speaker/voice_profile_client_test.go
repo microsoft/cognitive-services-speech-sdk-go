@@ -72,7 +72,6 @@ func TestVoiceProfileClientCreateAndDeleteProfile(t *testing.T) {
 	resetOutcome := <-resetFuture
 	if resetOutcome.Failed() {
 		t.Error("Got an error resetting profile: ", resetOutcome.Error.Error())
-		return
 	}
 	result := resetOutcome.Result
 	if result.Reason != common.ResetVoiceProfile {
@@ -87,5 +86,29 @@ func TestVoiceProfileClientCreateAndDeleteProfile(t *testing.T) {
 	result = deleteOutcome.Result
 	if result.Reason != common.DeletedVoiceProfile {
 		t.Error("Unexpected result deleting profile: ", result)
+	}
+}
+
+func TestGetActivationPhrases(t *testing.T) {
+	client := createClient(t)
+	if client == nil {
+		t.Error("Unexpected error: nil voice profile client")
+	}
+	defer client.Close()
+	expectedType := common.VoiceProfileType(2)
+	future := client.GetActivationPhrasesAsync(expectedType, "en-US")
+	outcome := <-future
+	if outcome.Failed() {
+		t.Error("Got an error getting activation phrases: ", outcome.Error.Error())
+		return
+	}
+	result := outcome.Result
+	defer result.Close()
+	phrases := result.Phrases
+	if len(phrases) < 1 {
+		t.Error("Unexpected error getting phrases, no phrases received")
+	}
+	for _, phrase := range phrases {
+		t.Log("Phrase received: ", phrase)
 	}
 }

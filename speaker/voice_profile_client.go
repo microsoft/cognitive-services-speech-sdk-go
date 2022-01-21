@@ -118,3 +118,25 @@ func (client VoiceProfileClient) ResetProfileAsync(profile *VoiceProfile) <-chan
 	return outcome
 }
 
+// GetActivationPhrasesAsync returns a result containing a list of activation phrases required for voice profile enrollment.
+func (client VoiceProfileClient) GetActivationPhrasesAsync(profileType common.VoiceProfileType, locale string) chan VoiceProfilePhraseOutcome {
+	outcome := make(chan VoiceProfilePhraseOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		loc := C.CString(locale)
+		defer C.free(unsafe.Pointer(loc))
+		ret := uintptr(C.get_activation_phrases(client.handle, loc, (C.int)(profileType), &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- VoiceProfilePhraseOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			newResult, err := NewVoiceProfilePhraseResultFromHandle(handle2uintptr(handle))
+			if err != nil {
+				outcome <- VoiceProfilePhraseOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
+			} else {
+				outcome <- VoiceProfilePhraseOutcome{Result: newResult, OperationOutcome: common.OperationOutcome{nil}}
+			}
+		}
+	}()
+	return outcome
+}
+
