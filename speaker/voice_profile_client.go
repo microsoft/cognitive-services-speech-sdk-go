@@ -6,7 +6,7 @@ package speaker
 import (
 	"unsafe"
 
-	// "github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
@@ -140,3 +140,29 @@ func (client VoiceProfileClient) GetActivationPhrasesAsync(profileType common.Vo
 	return outcome
 }
 
+// EnrollProfileAsync sends audio for voice profile enrollment returns a result detailing enrollment status for the given profile
+func (client VoiceProfileClient) EnrollProfileAsync(profile *VoiceProfile, audioConfig *audio.AudioConfig) chan VoiceProfileEnrollmentOutcome {
+	outcome := make(chan VoiceProfileEnrollmentOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		profileHandle := profile.GetHandle()
+		var audioHandle C.SPXHANDLE
+		if audioConfig == nil {
+			audioHandle = nil
+		} else {
+			audioHandle = uintptr2handle(audioConfig.GetHandle())
+		}
+		ret := uintptr(C.enroll_voice_profile(client.handle, uintptr2handle(profileHandle), audioHandle, &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			newResult, err := NewVoiceProfileEnrollmentResultFromHandle(handle2uintptr(handle))
+			if err != nil {
+				outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
+			} else {
+				outcome <- VoiceProfileEnrollmentOutcome{Result: newResult, OperationOutcome: common.OperationOutcome{nil}}
+			}
+		}
+	}()
+	return outcome
+}

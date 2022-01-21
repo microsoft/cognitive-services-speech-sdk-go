@@ -7,7 +7,7 @@ import (
 	// "fmt"
 	"os"
 	"testing"
-	//"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
@@ -27,6 +27,14 @@ func createClientFromSubscriptionRegion(t *testing.T, subscription string, regio
 	return client
 }
 
+func createAudioConfigFromFileInput(t *testing.T, file string) *audio.AudioConfig {
+	audioConfig, err := audio.NewAudioConfigFromWavFileInput(file)
+	if err != nil {
+		t.Error("Got an error: ", err)
+	}
+	return audioConfig
+}
+
 func createClient(t *testing.T) *VoiceProfileClient {
 	subscription := os.Getenv("SPEAKER_RECOGNITION_SUBSCRIPTION_KEY")
 	region := os.Getenv("SPEAKER_RECOGNITION_SUBSCRIPTION_REGION")
@@ -41,33 +49,50 @@ func TestNewVoiceProfileClient(t *testing.T) {
 	defer client.Close()
 }
 
-func TestVoiceProfileClientCreateAndDeleteProfile(t *testing.T) {
+func GetNewVoiceProfileFromClient(t *testing.T, client *VoiceProfileClient) *VoiceProfile {
+	/* Test profile creation */
+	expectedType := common.VoiceProfileType(1)
+	future := client.CreateProfileAsync(expectedType, "en-US")
+	outcome := <-future
+	if outcome.Failed() {
+		t.Error("Got an error creating profile: ", outcome.Error.Error())
+		return nil
+	}
+	profile := outcome.profile
+	id, err := profile.Id()
+	if err != nil {
+		t.Error("Unexpected error creating profile id: ", err)
+		return nil
+	}
+	profileType, err := profile.Type();
+	if err != nil {
+		t.Error("Unexpected error getting profile type: ", err)
+		return nil
+	}
+	if profileType != expectedType {
+		t.Error("Profile type does not match expected type")
+		return nil
+	}
+	t.Log("Profile id: ", id)
+	return profile
+}
+
+
+func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
 	client := createClient(t)
 	if client == nil {
 		t.Error("Unexpected error: nil voice profile client")
 	}
 	defer client.Close()
-	expectedType := common.VoiceProfileType(2)
-	future := client.CreateProfileAsync(expectedType, "en-US")
-	outcome := <-future
-	if outcome.Failed() {
-		t.Error("Got an error creating profile: ", outcome.Error.Error())
+	
+	profile := GetNewVoiceProfileFromClient(t, client)
+	if profile == nil {
+		t.Error("Error creating profile")
 		return
 	}
-	profile := outcome.profile
 	defer profile.Close()
-	id, err := profile.Id()
-	if err != nil {
-		t.Error("Unexpected error creating profile id: ", err)
-	}
-	profileType, err := profile.Type();
-	if err != nil {
-		t.Error("Unexpected error getting profile type: ", err)
-	}
-	if profileType != expectedType {
-		t.Error("Profile type does not match expected type")
-	}
-	t.Log("Profile id: ", id)
+
+	/* Test profile reset */
 	resetFuture := client.ResetProfileAsync(profile)
 	resetOutcome := <-resetFuture
 	if resetOutcome.Failed() {
@@ -77,6 +102,35 @@ func TestVoiceProfileClientCreateAndDeleteProfile(t *testing.T) {
 	if result.Reason != common.ResetVoiceProfile {
 		t.Error("Unexpected result resetting profile: ", result)
 	}
+
+	/* Test profile enrollment */
+	audioConfig := createAudioConfigFromFileInput(t, "../test_files/TalkForAFewSeconds16.wav")
+	defer audioConfig.Close()
+	enrollmentReason, currentReason := common.EnrollingVoiceProfile, common.EnrollingVoiceProfile
+	var currentResult *VoiceProfileEnrollmentResult
+	expectedEnrollmentCount := 1
+	for currentReason == enrollmentReason {
+		enrollFuture := client.EnrollProfileAsync(profile, audioConfig)
+		enrollOutcome := <-enrollFuture
+		if enrollOutcome.Failed() {
+			t.Error("Got an error enrolling profile: ", enrollOutcome.Error.Error())
+			return
+		}
+		currentResult = enrollOutcome.Result
+		currentReason = currentResult.Reason
+		if currentResult.EnrollmentsCount != expectedEnrollmentCount {
+			t.Error("Unexpected enrollments for profile: ", currentResult.RemainingEnrollmentsCount)
+		}
+		expectedEnrollmentCount += 1
+	}
+	if currentReason != common.EnrolledVoiceProfile {
+		t.Error("Unexpected result enrolling profile: ", result)
+	}
+	if currentResult.RemainingEnrollmentsCount != 0 {
+		t.Error("Unexpected remaining enrollments for profile: ", currentResult.RemainingEnrollmentsCount)
+	}
+
+	/* Test profile deletion */
 	deleteFuture := client.DeleteProfileAsync(profile)
 	deleteOutcome := <-deleteFuture
 	if deleteOutcome.Failed() {
