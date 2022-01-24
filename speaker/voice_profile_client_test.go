@@ -5,6 +5,7 @@ package speaker
 
 import (
 	// "fmt"
+	"math/big"
 	"os"
 	"testing"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
@@ -126,8 +127,9 @@ func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
 	if currentReason != common.EnrolledVoiceProfile {
 		t.Error("Unexpected result enrolling profile: ", result)
 	}
-	if currentResult.RemainingEnrollmentsCount != 0 {
-		t.Error("Unexpected remaining enrollments for profile: ", currentResult.RemainingEnrollmentsCount)
+	expectedEnrollmentsLength := big.NewInt(0)
+	if currentResult.RemainingEnrollmentsLength.Int64() != expectedEnrollmentsLength.Int64() {
+		t.Error("Unexpected remaining enrollment length for profile: ", currentResult.RemainingEnrollmentsLength)
 	}
 
 	/* Test profile deletion */
