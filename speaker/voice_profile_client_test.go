@@ -50,9 +50,8 @@ func TestNewVoiceProfileClient(t *testing.T) {
 	defer client.Close()
 }
 
-func GetNewVoiceProfileFromClient(t *testing.T, client *VoiceProfileClient) *VoiceProfile {
+func GetNewVoiceProfileFromClient(t *testing.T, client *VoiceProfileClient, expectedType common.VoiceProfileType) *VoiceProfile {
 	/* Test profile creation */
-	expectedType := common.VoiceProfileType(1)
 	future := client.CreateProfileAsync(expectedType, "en-US")
 	outcome := <-future
 	if outcome.Failed() {
@@ -85,8 +84,9 @@ func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
 		t.Error("Unexpected error: nil voice profile client")
 	}
 	defer client.Close()
+	expectedType := common.VoiceProfileType(1)
 	
-	profile := GetNewVoiceProfileFromClient(t, client)
+	profile := GetNewVoiceProfileFromClient(t, client, expectedType)
 	if profile == nil {
 		t.Error("Error creating profile")
 		return
@@ -130,6 +130,17 @@ func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
 	expectedEnrollmentsLength := big.NewInt(0)
 	if currentResult.RemainingEnrollmentsLength.Int64() != expectedEnrollmentsLength.Int64() {
 		t.Error("Unexpected remaining enrollment length for profile: ", currentResult.RemainingEnrollmentsLength)
+	}
+
+
+	/* Test identification */
+	profiles := []*VoiceProfile{profile}
+	model, err := NewSpeakerIdentificationModelFromProfiles(profiles)
+	if err != nil {
+		t.Error("Error creating Identification model: ", err)
+	}
+	if model == nil {
+		t.Error("Error creating Identification model: nil model")
 	}
 
 	/* Test profile deletion */

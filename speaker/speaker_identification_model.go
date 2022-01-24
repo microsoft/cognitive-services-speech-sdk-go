@@ -18,15 +18,15 @@ type SpeakerIdentificationModel struct {
 	handle     C.SPXHANDLE
 }
 
-// NewSpeakerIdenticationModelFromHandle creates a SpeakerIdentificationModel instance from a valid handle. This is for internal use only.
-func NewSpeakerIdenticationModelFromHandle(handle common.SPXHandle) (*SpeakerIdentificationModel, error) {
+// NewSpeakerIdentificationModelFromHandle creates a SpeakerIdentificationModel instance from a valid handle. This is for internal use only.
+func NewSpeakerIdentificationModelFromHandle(handle common.SPXHandle) (*SpeakerIdentificationModel, error) {
 	model := new(SpeakerIdentificationModel)
 	model.handle = uintptr2handle(handle)
 	return model, nil
 }
 
-// NewSpeakerIdenticationModelFromProfile creates an instance of the identification model using the given voice profiles.
-func NewSpeakerIdenticationModelFromProfiles(profiles ...*VoiceProfile) (*SpeakerIdentificationModel, error) {
+// NewSpeakerIdentificationModelFromProfile creates an instance of the identification model using the given voice profiles.
+func NewSpeakerIdentificationModelFromProfiles(profiles []*VoiceProfile) (*SpeakerIdentificationModel, error) {
 	var handle C.SPXHANDLE
 	ret := uintptr(C.speaker_identification_model_create(&handle))
 	if ret != C.SPX_NOERROR {
@@ -42,7 +42,7 @@ func NewSpeakerIdenticationModelFromProfiles(profiles ...*VoiceProfile) (*Speake
 		}
 	}
 	
-	return NewSpeakerIdenticationModelFromHandle(handle2uintptr(handle))
+	return NewSpeakerIdentificationModelFromHandle(handle2uintptr(handle))
 }
 
 // Close disposes the associated resources.
