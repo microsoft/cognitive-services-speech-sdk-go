@@ -104,8 +104,5 @@ func (recognizer SpeakerRecognizer) AuthorizationToken() string {
 // Close disposes the associated resources.
 func (recognizer SpeakerRecognizer) Close() {
 	recognizer.Properties.Close()
-	if recognizer.handle != C.SPXHANDLE_INVALID {
-		C.speaker_recognizer_release_handle(recognizer.handle)
-		recognizer.handle = C.SPXHANDLE_INVALID
-	}
+	C.speaker_recognizer_release_handle(recognizer.handle)
 }
