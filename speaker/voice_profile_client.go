@@ -4,6 +4,7 @@
 package speaker
 
 import (
+	"strings"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
@@ -192,6 +193,36 @@ func (client VoiceProfileClient) RetrieveEnrollmentResultAsync(profile *VoicePro
 			} else {
 				outcome <- VoiceProfileEnrollmentOutcome{Result: newResult, OperationOutcome: common.OperationOutcome{nil}}
 			}
+		}
+	}()
+	return outcome
+}
+
+type GetAllProfilesOutcome struct {
+	common.OperationOutcome
+
+	profiles []*VoiceProfile
+}
+
+// GetAllProfilesAsync attempts to create a new voice profile on the service.
+func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoiceProfileType) chan GetAllProfilesOutcome {
+	outcome := make(chan GetAllProfilesOutcome)
+	go func() {
+		rawProfileJson := C.get_profiles_json(client.handle, (C.int)(profileType))
+		if rawProfileJson == nil {
+			outcome <- GetAllProfilesOutcome{profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
+		} else {
+			goProfilesJson := C.GoString(rawProfileJson)
+			splitProfileIds := strings.Split(goProfilesJson, "|")
+			profileList := make([]*VoiceProfile, len(splitProfileIds))
+			for index, id := range splitProfileIds {
+				profile, err := NewVoiceProfileFromIdAndType(id, profileType)
+				if err != nil {
+					outcome <- GetAllProfilesOutcome{profiles: nil, OperationOutcome: common.OperationOutcome{err}}
+				}
+				profileList[index] = profile
+			}
+			outcome <- GetAllProfilesOutcome{profiles: profileList, OperationOutcome: common.OperationOutcome{nil}}
 		}
 	}()
 	return outcome

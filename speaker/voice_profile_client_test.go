@@ -335,3 +335,50 @@ func TestGetActivationPhrases(t *testing.T) {
 		t.Log("Phrase received: ", phrase)
 	}
 }
+
+func TestGetAllProfiles(t *testing.T) {
+	client := createClient(t)
+	if client == nil {
+		t.Error("Unexpected error: nil voice profile client")
+	}
+	defer client.Close()
+	expectedType := common.VoiceProfileType(2)
+	
+	profile := GetNewVoiceProfileFromClient(t, client, expectedType)
+	if profile == nil {
+		t.Error("Error creating profile")
+		return
+	}
+	defer profile.Close()
+
+	expectedID, _ := profile.Id()
+	profileType, _ := profile.Type()
+
+	future := client.GetAllProfilesAsync(profileType)
+	outcome := <-future
+	if outcome.Failed() {
+		t.Error("Error getting all profiles: ", outcome.Error.Error())
+		return
+	}
+	profiles := outcome.profiles
+	if len(profiles) < 1 {
+		t.Error("Unexpected error getting profiles, no profiles received")
+	}
+	profileFound := false
+	for _, p := range profiles {
+		id, _ := p.Id()
+		t.Log("Profile id in list: ", id)
+		
+		if id == expectedID {
+			profileFound = true
+		} else {
+			p.Close() // Not closing all unused profiles may produce memory issues
+		}
+	}
+
+	if !profileFound {
+		t.Error("Unexpected error getting profiles, added profile not found")
+	}
+
+	DeleteProfile(t, client, profile)
+}
