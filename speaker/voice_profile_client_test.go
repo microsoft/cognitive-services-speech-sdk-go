@@ -42,6 +42,24 @@ func createClient(t *testing.T) *VoiceProfileClient {
 	return createClientFromSubscriptionRegion(t, subscription, region)
 }
 
+func createSpeakerRecognizerFromFile(t *testing.T, file string) *SpeakerRecognizer {
+	subscription := os.Getenv("SPEAKER_RECOGNITION_SUBSCRIPTION_KEY")
+	region := os.Getenv("SPEAKER_RECOGNITION_SUBSCRIPTION_REGION")
+	config, err := speech.NewSpeechConfigFromSubscription(subscription, region)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return nil
+	}
+	defer config.Close()
+	audioConfig := createAudioConfigFromFileInput(t, file)
+	reco, err := NewSpeakerRecognizerFromConfig(config, audioConfig)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return nil
+	}
+	return reco
+}
+
 func TestNewVoiceProfileClient(t *testing.T) {
 	client := createClient(t)
 	if client == nil {
@@ -141,6 +159,25 @@ func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
 	}
 	if model == nil {
 		t.Error("Error creating Identification model: nil model")
+		return
+	}
+	speakerRecognizer := createSpeakerRecognizerFromFile(t, "../test_files/TalkForAFewSeconds16.wav")
+	identifyFuture := speakerRecognizer.IdentifyOnceAsync(model)
+	identifyOutcome := <-identifyFuture
+	if identifyOutcome.Failed() {
+		t.Error("Got an error identifying profile: ", identifyOutcome.Error.Error())
+		return
+	}
+	identifyResult := identifyOutcome.Result
+	if identifyResult.Reason != common.RecognizedSpeakers {
+		t.Error("Got an unexpected result identifying profile: ", identifyResult)
+	}
+	expectedID, _ := profile.Id()
+	if identifyResult.ProfileID != expectedID {
+		t.Error("Got an unexpected profile id identifying profile: ", identifyResult.ProfileID)
+	}
+	if identifyResult.Score < 1.0 {
+		t.Error("Got an unexpected score identifying profile: ", identifyResult.Score)
 	}
 
 	/* Test profile deletion */
