@@ -43,6 +43,9 @@ func NewVoiceProfileFromIdAndType(id string, profileType common.VoiceProfileType
 func (profile *VoiceProfile) Id() (string, error) {
 	var sz C.uint32_t
 	ret := uintptr(C.voice_profile_get_id(profile.handle, nil, &sz))
+	if ret != C.SPX_NOERROR {
+		return "", common.NewCarbonError(ret)
+	}
 	buffer := C.malloc(C.sizeof_char * (C.size_t)(sz))
 	defer C.free(unsafe.Pointer(buffer))
 	ret = uintptr(C.voice_profile_get_id(profile.handle, (*C.char)(buffer), &sz))
