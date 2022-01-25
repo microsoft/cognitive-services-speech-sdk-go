@@ -26,7 +26,7 @@ func NewSpeakerVerificationModelFromHandle(handle common.SPXHandle) (*SpeakerVer
 }
 
 // NewSpeakerVerificationModelFromProfile creates an instance of the verification model using the given voice profile.
-func NewSpeakerVerificationModelFromProfile(profile VoiceProfile) (*SpeakerVerificationModel, error) {
+func NewSpeakerVerificationModelFromProfile(profile *VoiceProfile) (*SpeakerVerificationModel, error) {
 	var handle C.SPXHANDLE
 	profileHandle := profile.GetHandle()
 	ret := uintptr(C.speaker_verification_model_create(&handle, uintptr2handle(profileHandle)))

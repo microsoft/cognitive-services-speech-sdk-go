@@ -166,3 +166,33 @@ func (client VoiceProfileClient) EnrollProfileAsync(profile *VoiceProfile, audio
 	}()
 	return outcome
 }
+
+// RetrieveEnrollmentResultAsync returns a result detailing enrollment status for the given profile
+func (client VoiceProfileClient) RetrieveEnrollmentResultAsync(profile *VoiceProfile) chan VoiceProfileEnrollmentOutcome {
+	outcome := make(chan VoiceProfileEnrollmentOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+		id, err := profile.Id()
+		if err != nil {
+			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
+		}
+		cId := C.CString(id)
+		defer C.free(unsafe.Pointer(cId))
+		profileType, err := profile.Type()
+		if err != nil {
+			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
+		}
+		ret := uintptr(C.retrieve_enrollment_result(client.handle, cId, (C.int)(profileType), &handle))
+		if ret != C.SPX_NOERROR {
+			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+			newResult, err := NewVoiceProfileEnrollmentResultFromHandle(handle2uintptr(handle))
+			if err != nil {
+				outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
+			} else {
+				outcome <- VoiceProfileEnrollmentOutcome{Result: newResult, OperationOutcome: common.OperationOutcome{nil}}
+			}
+		}
+	}()
+	return outcome
+}

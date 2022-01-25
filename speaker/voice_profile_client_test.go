@@ -95,8 +95,51 @@ func GetNewVoiceProfileFromClient(t *testing.T, client *VoiceProfileClient, expe
 	return profile
 }
 
+func EnrollProfile(t *testing.T, client *VoiceProfileClient, profile *VoiceProfile, file string) {
+	/* Test profile enrollment */
+	audioConfig := createAudioConfigFromFileInput(t, file)
+	defer audioConfig.Close()
+	enrollmentReason, currentReason := common.EnrollingVoiceProfile, common.EnrollingVoiceProfile
+	var currentResult *VoiceProfileEnrollmentResult
+	expectedEnrollmentCount := 1
+	for currentReason == enrollmentReason {
+		enrollFuture := client.EnrollProfileAsync(profile, audioConfig)
+		enrollOutcome := <-enrollFuture
+		if enrollOutcome.Failed() {
+			t.Error("Got an error enrolling profile: ", enrollOutcome.Error.Error())
+			return
+		}
+		currentResult = enrollOutcome.Result
+		currentReason = currentResult.Reason
+		if currentResult.EnrollmentsCount != expectedEnrollmentCount {
+			t.Error("Unexpected enrollments for profile: ", currentResult.RemainingEnrollmentsCount)
+		}
+		expectedEnrollmentCount += 1
+	}
+	if currentReason != common.EnrolledVoiceProfile {
+		t.Error("Unexpected result enrolling profile: ", currentResult)
+	}
+	expectedEnrollmentsLength := big.NewInt(0)
+	if currentResult.RemainingEnrollmentsLength.Int64() != expectedEnrollmentsLength.Int64() {
+		t.Error("Unexpected remaining enrollment length for profile: ", currentResult.RemainingEnrollmentsLength)
+	}
+}
 
-func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
+func DeleteProfile(t *testing.T, client *VoiceProfileClient, profile *VoiceProfile) {
+	/* Test profile deletion */
+	deleteFuture := client.DeleteProfileAsync(profile)
+	deleteOutcome := <-deleteFuture
+	if deleteOutcome.Failed() {
+		t.Error("Got an error deleting profile: ", deleteOutcome.Error.Error())
+		return
+	}
+	result := deleteOutcome.Result
+	if result.Reason != common.DeletedVoiceProfile {
+		t.Error("Unexpected result deleting profile: ", result)
+	}
+}
+
+func TestVoiceProfileClientIdentification(t *testing.T) {
 	client := createClient(t)
 	if client == nil {
 		t.Error("Unexpected error: nil voice profile client")
@@ -121,35 +164,8 @@ func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
 	if result.Reason != common.ResetVoiceProfile {
 		t.Error("Unexpected result resetting profile: ", result)
 	}
-
-	/* Test profile enrollment */
-	audioConfig := createAudioConfigFromFileInput(t, "../test_files/TalkForAFewSeconds16.wav")
-	defer audioConfig.Close()
-	enrollmentReason, currentReason := common.EnrollingVoiceProfile, common.EnrollingVoiceProfile
-	var currentResult *VoiceProfileEnrollmentResult
-	expectedEnrollmentCount := 1
-	for currentReason == enrollmentReason {
-		enrollFuture := client.EnrollProfileAsync(profile, audioConfig)
-		enrollOutcome := <-enrollFuture
-		if enrollOutcome.Failed() {
-			t.Error("Got an error enrolling profile: ", enrollOutcome.Error.Error())
-			return
-		}
-		currentResult = enrollOutcome.Result
-		currentReason = currentResult.Reason
-		if currentResult.EnrollmentsCount != expectedEnrollmentCount {
-			t.Error("Unexpected enrollments for profile: ", currentResult.RemainingEnrollmentsCount)
-		}
-		expectedEnrollmentCount += 1
-	}
-	if currentReason != common.EnrolledVoiceProfile {
-		t.Error("Unexpected result enrolling profile: ", result)
-	}
-	expectedEnrollmentsLength := big.NewInt(0)
-	if currentResult.RemainingEnrollmentsLength.Int64() != expectedEnrollmentsLength.Int64() {
-		t.Error("Unexpected remaining enrollment length for profile: ", currentResult.RemainingEnrollmentsLength)
-	}
-
+    
+	EnrollProfile(t, client, profile, "../test_files/TalkForAFewSeconds16.wav")
 
 	/* Test identification */
 	profiles := []*VoiceProfile{profile}
@@ -180,17 +196,120 @@ func TestVoiceProfileClientCreateEnrollAndDeleteProfile(t *testing.T) {
 		t.Error("Got an unexpected score identifying profile: ", identifyResult.Score)
 	}
 
-	/* Test profile deletion */
-	deleteFuture := client.DeleteProfileAsync(profile)
-	deleteOutcome := <-deleteFuture
-	if deleteOutcome.Failed() {
-		t.Error("Got an error deleting profile: ", deleteOutcome.Error.Error())
+	DeleteProfile(t, client, profile)
+}
+
+func TestVoiceProfileClientIndependentVerification(t *testing.T) {
+	client := createClient(t)
+	if client == nil {
+		t.Error("Unexpected error: nil voice profile client")
+	}
+	defer client.Close()
+	expectedType := common.VoiceProfileType(3)
+	
+	profile := GetNewVoiceProfileFromClient(t, client, expectedType)
+	if profile == nil {
+		t.Error("Error creating profile")
 		return
 	}
-	result = deleteOutcome.Result
-	if result.Reason != common.DeletedVoiceProfile {
-		t.Error("Unexpected result deleting profile: ", result)
+	defer profile.Close()
+
+	EnrollProfile(t, client, profile, "../test_files/TalkForAFewSeconds16.wav")
+
+	/* Test enrollment result */
+	enrollFuture := client.RetrieveEnrollmentResultAsync(profile)
+	enrollOutcome := <-enrollFuture
+	if enrollOutcome.Failed() {
+		t.Error("Got an error enrolling profile: ", enrollOutcome.Error.Error())
+		return
 	}
+	enrollResult := enrollOutcome.Result
+	enrollReason := enrollResult.Reason
+	if enrollReason != common.EnrolledVoiceProfile {
+		t.Error("Unexpected result enrolling profile: ", enrollResult)
+	}
+	expectedEnrollmentsLength := big.NewInt(0)
+	if enrollResult.RemainingEnrollmentsLength.Int64() != expectedEnrollmentsLength.Int64() {
+		t.Error("Unexpected remaining enrollment length for profile: ", enrollResult.RemainingEnrollmentsLength)
+	}
+
+	/* Test verification */
+	model, err := NewSpeakerVerificationModelFromProfile(profile)
+	if err != nil {
+		t.Error("Error creating Verification model: ", err)
+	}
+	if model == nil {
+		t.Error("Error creating Verification model: nil model")
+		return
+	}
+	speakerRecognizer := createSpeakerRecognizerFromFile(t, "../test_files/TalkForAFewSeconds16.wav")
+	verifyFuture := speakerRecognizer.VerifyOnceAsync(model)
+	verifyOutcome := <-verifyFuture
+	if verifyOutcome.Failed() {
+		t.Error("Got an error verifying profile: ", verifyOutcome.Error.Error())
+		return
+	}
+	verifyResult := verifyOutcome.Result
+	if verifyResult.Reason != common.RecognizedSpeaker {
+		t.Error("Got an unexpected result verifying profile: ", verifyResult)
+	}
+	expectedID, _ := profile.Id()
+	if verifyResult.ProfileID != expectedID {
+		t.Error("Got an unexpected profile id verifying profile: ", verifyResult.ProfileID)
+	}
+	if verifyResult.Score < 1.0 {
+		t.Error("Got an unexpected score verifying profile: ", verifyResult.Score)
+	}
+
+	DeleteProfile(t, client, profile)
+}
+
+func TestVoiceProfileClientDependentVerification(t *testing.T) {
+	client := createClient(t)
+	if client == nil {
+		t.Error("Unexpected error: nil voice profile client")
+	}
+	defer client.Close()
+	expectedType := common.VoiceProfileType(2)
+	
+	profile := GetNewVoiceProfileFromClient(t, client, expectedType)
+	if profile == nil {
+		t.Error("Error creating profile")
+		return
+	}
+	defer profile.Close()
+
+	EnrollProfile(t, client, profile, "../test_files/myVoiceIsMyPassportVerifyMe01.wav")
+
+	/* Test verification */
+	model, err := NewSpeakerVerificationModelFromProfile(profile)
+	if err != nil {
+		t.Error("Error creating Verification model: ", err)
+	}
+	if model == nil {
+		t.Error("Error creating Verification model: nil model")
+		return
+	}
+	speakerRecognizer := createSpeakerRecognizerFromFile(t, "../test_files/myVoiceIsMyPassportVerifyMe01.wav")
+	verifyFuture := speakerRecognizer.VerifyOnceAsync(model)
+	verifyOutcome := <-verifyFuture
+	if verifyOutcome.Failed() {
+		t.Error("Got an error verifying profile: ", verifyOutcome.Error.Error())
+		return
+	}
+	verifyResult := verifyOutcome.Result
+	if verifyResult.Reason != common.RecognizedSpeaker {
+		t.Error("Got an unexpected result verifying profile: ", verifyResult)
+	}
+	expectedID, _ := profile.Id()
+	if verifyResult.ProfileID != expectedID {
+		t.Error("Got an unexpected profile id verifying profile: ", verifyResult.ProfileID)
+	}
+	if verifyResult.Score < 1.0 {
+		t.Error("Got an unexpected score verifying profile: ", verifyResult.Score)
+	}
+
+	DeleteProfile(t, client, profile)
 }
 
 func TestGetActivationPhrases(t *testing.T) {
