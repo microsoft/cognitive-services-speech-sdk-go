@@ -269,7 +269,7 @@ func TestSynthesisWithInvalidVoice(t *testing.T) {
 	if details.Reason != common.Error {
 		t.Error("reason")
 	}
-	if details.ErrorCode != common.ConnectionFailure {
+	if details.ErrorCode != common.BadRequest {
 		t.Error("error code")
 	}
 	if !strings.Contains(details.ErrorDetails, "invalid") {
