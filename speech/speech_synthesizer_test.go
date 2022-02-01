@@ -70,9 +70,11 @@ func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason co
 func checkBinaryEqual(t *testing.T, result1 *SpeechSynthesisResult, result2 *SpeechSynthesisResult) {
 	if result1 == nil {
 		t.Error("result1 is nil.")
+		return
 	}
 	if result2 == nil {
 		t.Error("result1 is nil.")
+		return
 	}
 	if !bytes.Equal(result1.AudioData, result2.AudioData) {
 		t.Error("result1 is not binary equal with result2.")
