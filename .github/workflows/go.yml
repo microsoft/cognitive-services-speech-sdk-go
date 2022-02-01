@@ -103,8 +103,8 @@ jobs:
         unzip SpeechSDK.zip -d speechsdk
     - name: Build
       run: |
-        export SDK_HOME="$HOME/speechsdk"
-        export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64/MicrosoftCognitiveServicesSpeech.framework/Headers"
+        export SDK_HOME="$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64"
+        export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.framework/Headers"
         export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
         export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
         go build -v ./...
@@ -115,8 +115,8 @@ jobs:
         SPEECH_SUBSCRIPTION_KEY: ${{ secrets.SR_SUBSCRIPTION_KEY }}
         SPEECH_SUBSCRIPTION_REGION: ${{ secrets.SR_SUBSCRIPTION_REGION }}
       run: |
-        export SDK_HOME="$HOME/speechsdk"
-        export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64/MicrosoftCognitiveServicesSpeech.framework/Headers"
+        export SDK_HOME="$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64"
+        export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.framework/Headers"
         export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
         export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
         go test -v ./...
