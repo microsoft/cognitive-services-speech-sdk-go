@@ -105,8 +105,8 @@ jobs:
       run: |
         export SDK_HOME="$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64"
         export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.framework/Headers"
-        export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
-        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
+        export CGO_LDFLAGS="-F$SDK_HOME -framework MicrosoftCognitiveServicesSpeech"
+        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$SDK_HOME"
         go build -v ./...
     - name: Test
       env:
@@ -117,6 +117,6 @@ jobs:
       run: |
         export SDK_HOME="$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64"
         export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.framework/Headers"
-        export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
-        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
+        export CGO_LDFLAGS="-F$SDK_HOME -framework MicrosoftCognitiveServicesSpeech"
+        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$SDK_HOME"
         go test -v ./...
