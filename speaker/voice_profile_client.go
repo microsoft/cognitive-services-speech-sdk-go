@@ -63,6 +63,13 @@ type CreateProfileOutcome struct {
 	profile *VoiceProfile
 }
 
+// Close releases the underlying resources
+func (outcome CreateProfileOutcome) Close() {
+	if outcome.profile != nil {
+		outcome.profile.Close()
+	}
+}
+
 // CreateProfileAsync attempts to create a new voice profile on the service.
 func (client VoiceProfileClient) CreateProfileAsync(profileType common.VoiceProfileType, locale string) chan CreateProfileOutcome {
 	outcome := make(chan CreateProfileOutcome)
@@ -203,6 +210,16 @@ type GetAllProfilesOutcome struct {
 
 	profiles []*VoiceProfile
 }
+
+// Close releases the underlying resources
+func (outcome GetAllProfilesOutcome) Close() {
+	for _, profile := range outcome.profiles {
+		if profile != nil {
+			profile.Close()
+		}
+	}
+}
+
 
 // GetAllProfilesAsync attempts to create a new voice profile on the service.
 func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoiceProfileType) chan GetAllProfilesOutcome {

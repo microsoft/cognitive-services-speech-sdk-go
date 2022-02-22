@@ -4,7 +4,6 @@
 package speaker
 
 import (
-	// "fmt"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
