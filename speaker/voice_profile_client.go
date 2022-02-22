@@ -220,7 +220,6 @@ func (outcome GetAllProfilesOutcome) Close() {
 	}
 }
 
-
 // GetAllProfilesAsync attempts to create a new voice profile on the service.
 func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoiceProfileType) chan GetAllProfilesOutcome {
 	outcome := make(chan GetAllProfilesOutcome)
