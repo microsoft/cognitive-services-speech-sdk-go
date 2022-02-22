@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  CARBON_VERSION: "1.19.0"
+  CARBON_VERSION: "1.20.0"
 
 jobs:
   linux:
@@ -99,13 +99,14 @@ jobs:
     - name: Get Speech SDK (macOS)
       run: |
         cd ~
-        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-macOS-$CARBON_VERSION.zip -O MicrosoftCognitiveServicesSpeech.framework.zip
-        unzip MicrosoftCognitiveServicesSpeech.framework.zip -d speechsdk
+        wget https://csspeechstorage.blob.core.windows.net/drop/$CARBON_VERSION/MicrosoftCognitiveServicesSpeech-XCFramework-$CARBON_VERSION.zip -O SpeechSDK.zip
+        unzip SpeechSDK.zip -d speechsdk
     - name: Build
       run: |
-        export CGO_CFLAGS="-I$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.framework/Headers"
-        export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
-        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
+        export SDK_HOME="$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64"
+        export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.framework/Headers"
+        export CGO_LDFLAGS="-F$SDK_HOME -framework MicrosoftCognitiveServicesSpeech"
+        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$SDK_HOME"
         go build -v ./...
     - name: Test
       env:
@@ -114,7 +115,8 @@ jobs:
         SPEECH_SUBSCRIPTION_KEY: ${{ secrets.SR_SUBSCRIPTION_KEY }}
         SPEECH_SUBSCRIPTION_REGION: ${{ secrets.SR_SUBSCRIPTION_REGION }}
       run: |
-        export CGO_CFLAGS="-I$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.framework/Headers"
-        export CGO_LDFLAGS="-F$HOME/speechsdk -framework MicrosoftCognitiveServicesSpeech"
-        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$HOME/speechsdk/"
+        export SDK_HOME="$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64"
+        export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.framework/Headers"
+        export CGO_LDFLAGS="-F$SDK_HOME -framework MicrosoftCognitiveServicesSpeech"
+        export DYLD_FRAMEWORK_PATH="$DYLD_FRAMEWORK_PATH:$SDK_HOME"
         go test -v ./...
