@@ -110,7 +110,6 @@ func IndependentIdentification(subscription string, region string, file string) 
 
 	EnrollProfile(client, profile, audioConfig)
 
-	/* Test identification */
 	profiles := []*speaker.VoiceProfile{profile}
 	model, err := speaker.NewSpeakerIdentificationModelFromProfiles(profiles)
 	if err != nil {
