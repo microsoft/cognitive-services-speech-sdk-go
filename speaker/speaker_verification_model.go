@@ -17,8 +17,8 @@ type SpeakerVerificationModel struct {
 	handle     C.SPXHANDLE
 }
 
-// NewSpeakerVerificationModelFromHandle creates a SpeakerVerificationModel instance from a valid handle. This is for internal use only.
-func NewSpeakerVerificationModelFromHandle(handle common.SPXHandle) (*SpeakerVerificationModel, error) {
+// newSpeakerVerificationModelFromHandle creates a SpeakerVerificationModel instance from a valid handle. This is for internal use only.
+func newSpeakerVerificationModelFromHandle(handle common.SPXHandle) (*SpeakerVerificationModel, error) {
 	model := new(SpeakerVerificationModel)
 	model.handle = uintptr2handle(handle)
 	return model, nil
@@ -33,7 +33,7 @@ func NewSpeakerVerificationModelFromProfile(profile *VoiceProfile) (*SpeakerVeri
 		return nil, common.NewCarbonError(ret)
 	}
 	
-	return NewSpeakerVerificationModelFromHandle(handle2uintptr(handle))
+	return newSpeakerVerificationModelFromHandle(handle2uintptr(handle))
 }
 
 // Close disposes the associated resources.
