@@ -40,8 +40,8 @@ func (result VoiceProfileResult) Close() {
 	C.recognizer_result_handle_release(result.handle)
 }
 
-// NewVoiceProfileResultFromHandle creates a VoiceProfileResult from a handle (for internal use)
-func NewVoiceProfileResultFromHandle (handle common.SPXHandle) (*VoiceProfileResult, error) {
+// newVoiceProfileResultFromHandle creates a VoiceProfileResult from a handle (for internal use)
+func newVoiceProfileResultFromHandle (handle common.SPXHandle) (*VoiceProfileResult, error) {
 	result := new(VoiceProfileResult)
 	result.handle = uintptr2handle(handle)
 	buffer := C.malloc(C.sizeof_char * 1024)

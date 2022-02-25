@@ -81,7 +81,7 @@ func (client VoiceProfileClient) CreateProfileAsync(profileType common.VoiceProf
 		if ret != C.SPX_NOERROR {
 			outcome <- CreateProfileOutcome{profile: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
-			newProfile, err := NewVoiceProfileFromHandle(handle2uintptr(profileHandle))
+			newProfile, err := newVoiceProfileFromHandle(handle2uintptr(profileHandle))
 			if err != nil {
 				outcome <- CreateProfileOutcome{profile: nil, OperationOutcome: common.OperationOutcome{err}}
 			} else {
@@ -102,7 +102,7 @@ func (client VoiceProfileClient) DeleteProfileAsync(profile *VoiceProfile) <-cha
 		if ret != C.SPX_NOERROR {
 			outcome <- VoiceProfileOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
-			result, err := NewVoiceProfileResultFromHandle(handle2uintptr(handle))
+			result, err := newVoiceProfileResultFromHandle(handle2uintptr(handle))
 			outcome <- VoiceProfileOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
 		}
 	}()
@@ -119,7 +119,7 @@ func (client VoiceProfileClient) ResetProfileAsync(profile *VoiceProfile) <-chan
 		if ret != C.SPX_NOERROR {
 			outcome <- VoiceProfileOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
-			result, err := NewVoiceProfileResultFromHandle(handle2uintptr(handle))
+			result, err := newVoiceProfileResultFromHandle(handle2uintptr(handle))
 			outcome <- VoiceProfileOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
 		}
 	}()
@@ -137,7 +137,7 @@ func (client VoiceProfileClient) GetActivationPhrasesAsync(profileType common.Vo
 		if ret != C.SPX_NOERROR {
 			outcome <- VoiceProfilePhraseOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
-			newResult, err := NewVoiceProfilePhraseResultFromHandle(handle2uintptr(handle))
+			newResult, err := newVoiceProfilePhraseResultFromHandle(handle2uintptr(handle))
 			if err != nil {
 				outcome <- VoiceProfilePhraseOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
 			} else {
@@ -164,7 +164,7 @@ func (client VoiceProfileClient) EnrollProfileAsync(profile *VoiceProfile, audio
 		if ret != C.SPX_NOERROR {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
-			newResult, err := NewVoiceProfileEnrollmentResultFromHandle(handle2uintptr(handle))
+			newResult, err := newVoiceProfileEnrollmentResultFromHandle(handle2uintptr(handle))
 			if err != nil {
 				outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
 			} else {
@@ -194,7 +194,7 @@ func (client VoiceProfileClient) RetrieveEnrollmentResultAsync(profile *VoicePro
 		if ret != C.SPX_NOERROR {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
-			newResult, err := NewVoiceProfileEnrollmentResultFromHandle(handle2uintptr(handle))
+			newResult, err := newVoiceProfileEnrollmentResultFromHandle(handle2uintptr(handle))
 			if err != nil {
 				outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
 			} else {

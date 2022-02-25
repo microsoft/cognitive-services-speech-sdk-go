@@ -18,8 +18,8 @@ type VoiceProfile struct {
 	handle     C.SPXHANDLE
 }
 
-// NewVoiceProfileFromHandle creates a VoiceProfile instance from a valid handle. This is for internal use only.
-func NewVoiceProfileFromHandle(handle common.SPXHandle) (*VoiceProfile, error) {
+// newVoiceProfileFromHandle creates a VoiceProfile instance from a valid handle. This is for internal use only.
+func newVoiceProfileFromHandle(handle common.SPXHandle) (*VoiceProfile, error) {
 	profile := new(VoiceProfile)
 	profile.handle = uintptr2handle(handle)
 	return profile, nil
@@ -35,7 +35,7 @@ func NewVoiceProfileFromIdAndType(id string, profileType common.VoiceProfileType
 		return nil, common.NewCarbonError(ret)
 	}
 	
-	return NewVoiceProfileFromHandle(handle2uintptr(handle))
+	return newVoiceProfileFromHandle(handle2uintptr(handle))
 }
 
 // Return the id of the given voice profile 
