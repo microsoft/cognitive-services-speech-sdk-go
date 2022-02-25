@@ -39,6 +39,7 @@ func main() {
 		"speech_synthesizer:SynthesisToSpeaker":             synthesizer.SynthesisToSpeaker,
 		"speech_synthesizer:SynthesisToAudioDataStream":     synthesizer.SynthesisToAudioDataStream,
 		"speaker_recognizer:IndependentIdentification":      speaker_recognition.IndependentIdentification,
+		"speaker_recognizer:IndependentVerification":        speaker_recognition.IndependentVerification,
 	}
 	args := os.Args[1:]
 	if len(args) != 4 {

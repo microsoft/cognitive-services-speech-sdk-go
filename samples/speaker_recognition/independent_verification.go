@@ -79,7 +79,7 @@ func DeleteProfile(client *speaker.VoiceProfileClient, profile *speaker.VoicePro
 	}
 }
 
-func IndependentIdentification(subscription string, region string, file string) {
+func IndependentVerification(subscription string, region string, file string) {
 	config, err := speech.NewSpeechConfigFromSubscription(subscription, region)
 	if err != nil {
 		fmt.Println("Got an error: ", err)
@@ -99,7 +99,7 @@ func IndependentIdentification(subscription string, region string, file string) 
 	}
 	defer audioConfig.Close()
 	<-time.After(10 * time.Second)
-	expectedType := common.VoiceProfileType(1)
+	expectedType := common.VoiceProfileType(3)
 	
 	profile := GetNewVoiceProfileFromClient(client, expectedType)
 	if profile == nil {
@@ -110,43 +110,41 @@ func IndependentIdentification(subscription string, region string, file string) 
 
 	EnrollProfile(client, profile, audioConfig)
 
-	/* Test identification */
-	profiles := []*speaker.VoiceProfile{profile}
-	model, err := speaker.NewSpeakerIdentificationModelFromProfiles(profiles)
+	model, err := speaker.NewSpeakerVerificationModelFromProfile(profile)
 	if err != nil {
-		fmt.Println("Error creating Identification model: ", err)
+		fmt.Println("Error creating Verification model: ", err)
 	}
 	if model == nil {
-		fmt.Println("Error creating Identification model: nil model")
+		fmt.Println("Error creating Verification model: nil model")
 		return
 	}
-	identifyAudioConfig, err := audio.NewAudioConfigFromWavFileInput(file)
+	verifyAudioConfig, err := audio.NewAudioConfigFromWavFileInput(file)
 	if err != nil {
 		fmt.Println("Got an error: ", err)
 		return
 	}
-	defer identifyAudioConfig.Close()
-	speakerRecognizer, err := speaker.NewSpeakerRecognizerFromConfig(config, identifyAudioConfig)
+	defer verifyAudioConfig.Close()
+	speakerRecognizer, err := speaker.NewSpeakerRecognizerFromConfig(config, verifyAudioConfig)
 	if err != nil {
 		fmt.Println("Got an error: ", err)
 		return nil
 	}
-	identifyFuture := speakerRecognizer.IdentifyOnceAsync(model)
-	identifyOutcome := <-identifyFuture
-	if identifyOutcome.Failed() {
-		fmt.Println("Got an error identifying profile: ", identifyOutcome.Error.Error())
+	verifyFuture := speakerRecognizer.VerifyOnceAsync(model)
+	verifyOutcome := <-verifyFuture
+	if verifyOutcome.Failed() {
+		fmt.Println("Got an error verifying profile: ", verifyOutcome.Error.Error())
 		return
 	}
-	identifyResult := identifyOutcome.Result
-	if identifyResult.Reason != common.RecognizedSpeakers {
-		fmt.Println("Got an unexpected result identifying profile: ", identifyResult)
+	verifyResult := verifyOutcome.Result
+	if verifyResult.Reason != common.RecognizedSpeaker {
+		fmt.Println("Got an unexpected result verifying profile: ", verifyResult)
 	}
 	expectedID, _ := profile.Id()
-	if identifyResult.ProfileID != expectedID {
-		fmt.Println("Got an unexpected profile id identifying profile: ", identifyResult.ProfileID)
+	if verifyResult.ProfileID != expectedID {
+		fmt.Println("Got an unexpected profile id verifying profile: ", verifyResult.ProfileID)
 	}
-	if identifyResult.Score < 1.0 {
-		fmt.Println("Got an unexpected score identifying profile: ", identifyResult.Score)
+	if verifyResult.Score < 1.0 {
+		fmt.Println("Got an unexpected score verifying profile: ", verifyResult.Score)
 	}
 
 	DeleteProfile(client, profile)
