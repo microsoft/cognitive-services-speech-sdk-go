@@ -14,7 +14,6 @@ import (
 )
 
 func GetNewVoiceProfileFromClient(client *speaker.VoiceProfileClient, expectedType common.VoiceProfileType) *speaker.VoiceProfile {
-	/* Test profile creation */
 	future := client.CreateProfileAsync(expectedType, "en-US")
 	outcome := <-future
 	if outcome.Failed() {
