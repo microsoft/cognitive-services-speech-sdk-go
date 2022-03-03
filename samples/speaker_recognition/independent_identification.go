@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speaker"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/helpers"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
 )
 
@@ -20,8 +20,8 @@ func GetNewVoiceProfileFromClient(client *speaker.VoiceProfileClient, expectedTy
 		fmt.Println("Got an error creating profile: ", outcome.Error.Error())
 		return nil
 	}
-	profile := outcome.profile
-	id, err := profile.Id()
+	profile := outcome.Profile
+	_, err := profile.Id()
 	if err != nil {
 		fmt.Println("Unexpected error creating profile id: ", err)
 		return nil
@@ -38,9 +38,9 @@ func GetNewVoiceProfileFromClient(client *speaker.VoiceProfileClient, expectedTy
 	return profile
 }
 
-func EnrollProfile(client *speaker.VoiceProfileClient, profile *speaker.VoiceProfile, audioConfig audio.AudioConfig) {
+func EnrollProfile(client *speaker.VoiceProfileClient, profile *speaker.VoiceProfile, audioConfig *audio.AudioConfig) {
 	enrollmentReason, currentReason := common.EnrollingVoiceProfile, common.EnrollingVoiceProfile
-	var currentResult *VoiceProfileEnrollmentResult
+	var currentResult *speaker.VoiceProfileEnrollmentResult
 	expectedEnrollmentCount := 1
 	for currentReason == enrollmentReason {
 		enrollFuture := client.EnrollProfileAsync(profile, audioConfig)
@@ -58,10 +58,6 @@ func EnrollProfile(client *speaker.VoiceProfileClient, profile *speaker.VoicePro
 	}
 	if currentReason != common.EnrolledVoiceProfile {
 		fmt.Println("Unexpected result enrolling profile: ", currentResult)
-	}
-	expectedEnrollmentsLength := big.NewInt(0)
-	if currentResult.RemainingEnrollmentsLength.Int64() != expectedEnrollmentsLength.Int64() {
-		fmt.Println("Unexpected remaining enrollment length for profile: ", currentResult.RemainingEnrollmentsLength)
 	}
 }
 
@@ -127,7 +123,7 @@ func IndependentIdentification(subscription string, region string, file string) 
 	speakerRecognizer, err := speaker.NewSpeakerRecognizerFromConfig(config, identifyAudioConfig)
 	if err != nil {
 		fmt.Println("Got an error: ", err)
-		return nil
+		return
 	}
 	identifyFuture := speakerRecognizer.IdentifyOnceAsync(model)
 	identifyOutcome := <-identifyFuture

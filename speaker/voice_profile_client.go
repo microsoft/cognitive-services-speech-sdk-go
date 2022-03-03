@@ -60,13 +60,13 @@ func (client VoiceProfileClient) Close() {
 type CreateProfileOutcome struct {
 	common.OperationOutcome
 
-	profile *VoiceProfile
+	Profile *VoiceProfile
 }
 
 // Close releases the underlying resources
 func (outcome CreateProfileOutcome) Close() {
-	if outcome.profile != nil {
-		outcome.profile.Close()
+	if outcome.Profile != nil {
+		outcome.Profile.Close()
 	}
 }
 
@@ -79,13 +79,13 @@ func (client VoiceProfileClient) CreateProfileAsync(profileType common.VoiceProf
 		defer C.free(unsafe.Pointer(loc))
 		ret := uintptr(C.create_voice_profile(client.handle, (C.int)(profileType), loc, &profileHandle))
 		if ret != C.SPX_NOERROR {
-			outcome <- CreateProfileOutcome{profile: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+			outcome <- CreateProfileOutcome{Profile: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
 			newProfile, err := newVoiceProfileFromHandle(handle2uintptr(profileHandle))
 			if err != nil {
-				outcome <- CreateProfileOutcome{profile: nil, OperationOutcome: common.OperationOutcome{err}}
+				outcome <- CreateProfileOutcome{Profile: nil, OperationOutcome: common.OperationOutcome{err}}
 			} else {
-				outcome <- CreateProfileOutcome{profile: newProfile, OperationOutcome: common.OperationOutcome{nil}}
+				outcome <- CreateProfileOutcome{Profile: newProfile, OperationOutcome: common.OperationOutcome{nil}}
 			}
 		}
 	}()
@@ -208,12 +208,12 @@ func (client VoiceProfileClient) RetrieveEnrollmentResultAsync(profile *VoicePro
 type GetAllProfilesOutcome struct {
 	common.OperationOutcome
 
-	profiles []*VoiceProfile
+	Profiles []*VoiceProfile
 }
 
 // Close releases the underlying resources
 func (outcome GetAllProfilesOutcome) Close() {
-	for _, profile := range outcome.profiles {
+	for _, profile := range outcome.Profiles {
 		if profile != nil {
 			profile.Close()
 		}
@@ -226,7 +226,7 @@ func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoicePro
 	go func() {
 		rawProfileJson := C.get_profiles_json(client.handle, (C.int)(profileType))
 		if rawProfileJson == nil {
-			outcome <- GetAllProfilesOutcome{profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
+			outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
 		} else {
 			goProfilesJson := C.GoString(rawProfileJson)
 			splitProfileIds := strings.Split(goProfilesJson, "|")
@@ -234,11 +234,11 @@ func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoicePro
 			for index, id := range splitProfileIds {
 				profile, err := NewVoiceProfileFromIdAndType(id, profileType)
 				if err != nil {
-					outcome <- GetAllProfilesOutcome{profiles: nil, OperationOutcome: common.OperationOutcome{err}}
+					outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{err}}
 				}
 				profileList[index] = profile
 			}
-			outcome <- GetAllProfilesOutcome{profiles: profileList, OperationOutcome: common.OperationOutcome{nil}}
+			outcome <- GetAllProfilesOutcome{Profiles: profileList, OperationOutcome: common.OperationOutcome{nil}}
 		}
 	}()
 	return outcome
