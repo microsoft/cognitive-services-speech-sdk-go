@@ -5,6 +5,7 @@ package speech
 
 import (
 	"bytes"
+	"math"
 	"os"
 	"strings"
 	"testing"
@@ -81,6 +82,10 @@ func checkBinaryEqual(t *testing.T, result1 *SpeechSynthesisResult, result2 *Spe
 	}
 }
 
+func almostEqual(expected, actual, threshold float64) bool {
+	return math.Abs(expected-actual) <= threshold
+}
+
 func TestSynthesizerEvents(t *testing.T) {
 	synthesizer := createSpeechSynthesizerFromAudioConfig(t, nil)
 	if synthesizer == nil {
@@ -110,6 +115,9 @@ func TestSynthesizerEvents(t *testing.T) {
 		defer event.Close()
 		t.Logf("SynthesisCompleted, audio length %d", len(event.Result.AudioData))
 		checkSynthesisResult(t, &event.Result, common.SynthesizingAudioCompleted)
+		if !almostEqual((float64)(event.Result.AudioDuration/time.Millisecond), (float64)(len(event.Result.AudioData)/32000), 100) {
+			t.Errorf("Synthesis duration incorrect")
+		}
 		synthesisCompletedFuture <- "synthesisCompletedFuture"
 	})
 	resultFuture := synthesizer.SpeakTextAsync("test")
@@ -358,6 +366,9 @@ func TestSynthesizerEvents2(t *testing.T) {
 		t.Logf("word boundary event, audio offset [%d], text offset [%d], word length [%d]", event.AudioOffset, event.TextOffset, event.WordLength)
 		if event.AudioOffset <= 0 {
 			t.Error("word boundary audio offset")
+		}
+		if event.Duration <= 0 {
+			t.Error("word boundary duration")
 		}
 		if event.TextOffset <= 0 {
 			t.Error("word boundary text offset")

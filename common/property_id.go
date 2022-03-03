@@ -178,6 +178,20 @@ const (
 	// partial results by omitting words in the end.
 	SpeechServiceResponseTranslationRequestStablePartialResult PropertyID = 4100
 
+	// SpeechServiceResponseRequestWordBoundary is a boolean value specifying whether to request WordBoundary events.
+	// Added in version 1.21.0.
+	SpeechServiceResponseRequestWordBoundary PropertyID = 4200
+
+	// SpeechServiceResponseRequestPunctuationBoundary is a boolean value specifying whether to request punctuation boundary
+	// in WordBoundary Events. Default is true.
+	// Added in version 1.21.0.
+	SpeechServiceResponseRequestPunctuationBoundary PropertyID = 4201
+
+	// SpeechServiceResponseRequestSentenceBoundary ia a boolean value specifying whether to request sentence boundary
+	// in WordBoundary Events. Default is false.
+	// Added in version 1.21.0.
+	SpeechServiceResponseRequestSentenceBoundary PropertyID = 4202
+
 	// SpeechServiceResponseJSONResult is the Cognitive Services Speech Service response output (in JSON format). This
 	// property is available on recognition result objects only.
 	SpeechServiceResponseJSONResult PropertyID = 5000

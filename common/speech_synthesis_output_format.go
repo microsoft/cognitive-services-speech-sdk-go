@@ -95,4 +95,20 @@ const (
 
 	// Riff8Khz8BitMonoALaw stands for riff-8khz-8bit-mono-alaw
 	Riff8Khz8BitMonoALaw SpeechSynthesisOutputFormat = 29
+
+	// Webm24Khz16Bit24KbpsMonoOpus stands for webm-24khz-16bit-24kbps-mono-opus
+	// Audio compressed by OPUS codec in a WebM container, with bitrate of 24kbps, optimized for IoT scenario.
+	Webm24Khz16Bit24KbpsMonoOpus SpeechSynthesisOutputFormat = 30
+
+	// Audio16Khz16Bit32KbpsMonoOpus stands for audio-16khz-16bit-32kbps-mono-opus
+	// Audio compressed by OPUS codec without container, with bitrate of 32kbps.
+	Audio16Khz16Bit32KbpsMonoOpus SpeechSynthesisOutputFormat = 31
+
+	// Audio24Khz16Bit48KbpsMonoOpus stands for audio-24khz-16bit-48kbps-mono-opus
+	// Audio compressed by OPUS codec without container, with bitrate of 48kbps.
+	Audio24Khz16Bit48KbpsMonoOpus SpeechSynthesisOutputFormat = 32
+
+	// Audio24Khz16Bit24KbpsMonoOpus stands for audio-24khz-16bit-24kbps-mono-opus
+	// Audio compressed by OPUS codec without container, with bitrate of 24kbps.
+	Audio24Khz16Bit24KbpsMonoOpus SpeechSynthesisOutputFormat = 33
 )
