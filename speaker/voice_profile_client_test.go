@@ -76,7 +76,7 @@ func GetNewVoiceProfileFromClient(t *testing.T, client *VoiceProfileClient, expe
 		t.Error("Got an error creating profile: ", outcome.Error.Error())
 		return nil
 	}
-	profile := outcome.profile
+	profile := outcome.Profile
 	id, err := profile.Id()
 	if err != nil {
 		t.Error("Unexpected error creating profile id: ", err)
@@ -360,7 +360,7 @@ func TestGetAllProfiles(t *testing.T) {
 		t.Error("Error getting all profiles: ", outcome.Error.Error())
 		return
 	}
-	profiles := outcome.profiles
+	profiles := outcome.Profiles
 	if len(profiles) < 1 {
 		t.Error("Unexpected error getting profiles, no profiles received")
 	}
