@@ -14,10 +14,16 @@ import "C"
 
 // SpeechSynthesisVisemeEventArgs represents the speech synthesis viseme event arguments.
 type SpeechSynthesisVisemeEventArgs struct {
-	handle      C.SPXHANDLE
+	handle C.SPXHANDLE
+
+	// AudioOffset is the audio offset of the viseme event, in ticks (100 nanoseconds).
 	AudioOffset uint64
-	VisemeID    uint
-	Animation   string
+
+	// VisemeID is the viseme ID.
+	VisemeID uint
+
+	// Animation is the animation.
+	Animation string
 }
 
 // Close releases the underlying resources
