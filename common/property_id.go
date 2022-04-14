@@ -269,8 +269,23 @@ const (
 	// AudioConfigPlaybackBufferLengthInMs indicates the playback buffer length in milliseconds, default is 50 milliseconds.
 	AudioConfigPlaybackBufferLengthInMs PropertyID = 8006
 
+	// AudioProcessingOptions provides advanced configuration for audio input for features like Voice Activity Detection
+	// and is provided in the form of a JSON string.
+	AudioProcessingOptions PropertyID = 8007
+
 	// SpeechLogFilename is the file name to write logs.
 	SpeechLogFilename PropertyID = 9001
+
+	// SegmentationSilenceTimeoutMs specifies a duration of detected silence, measured in milliseconds, after which
+	// speech-to-text will determine a spoken phrase has ended and generate a final Recognized result. Configuring
+	// this timeout may be helpful in situations where spoken input is significantly faster or slower than usual and
+	// default segmentation behavior consistently yields results that are too long or too short. Segmentation timeout
+	// values that are inappropriately high or low can negatively affect speech-to-text accuracy; this property should
+	// be carefully configured and the resulting behavior should be thoroughly validated as intended.
+	//
+	// For more information about timeout configuration that includes discussion of default behaviors, please visit
+	// https://aka.ms/csspeech/timeouts.
+	SegmentationSilenceTimeoutMs PropertyID = 9002
 
 	// ConversationApplicationID is the identifier used to connect to the backend service.
 	ConversationApplicationID PropertyID = 10000
