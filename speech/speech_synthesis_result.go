@@ -4,6 +4,7 @@
 package speech
 
 import (
+	"time"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -30,6 +31,9 @@ type SpeechSynthesisResult struct {
 	// AudioData presents the synthesized audio.
 	AudioData []byte
 
+	// AudioDuration presents the time duration of synthesized audio.
+	AudioDuration time.Duration
+
 	// Collection of additional synthesisResult properties.
 	Properties *common.PropertyCollection
 }
@@ -45,12 +49,14 @@ func NewSpeechSynthesisResultFromHandle(handle common.SPXHandle) (*SpeechSynthes
 
 	result := new(SpeechSynthesisResult)
 	result.handle = uintptr2handle(handle)
-	/* AudioData length */
+	/* AudioData length and duration */
 	var cAudioLength C.uint32_t
-	ret := uintptr(C.synth_result_get_audio_length(result.handle, &cAudioLength))
+	var cAudioDuration C.uint64_t
+	ret := uintptr(C.synth_result_get_audio_length_duration(result.handle, &cAudioLength, &cAudioDuration))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
+	result.AudioDuration = time.Duration(cAudioDuration*100) * time.Nanosecond
 	// using max(1024, cAudioLength) as buffer size
 	if cAudioLength < 1024 {
 		cAudioLength = 1024

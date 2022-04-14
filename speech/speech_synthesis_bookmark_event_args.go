@@ -14,9 +14,13 @@ import "C"
 
 // SpeechSynthesisBookmarkEventArgs represents the speech synthesis bookmark event arguments.
 type SpeechSynthesisBookmarkEventArgs struct {
-	handle      C.SPXHANDLE
+	handle C.SPXHANDLE
+
+	// AudioOffset is the audio offset of the bookmark event, in ticks (100 nanoseconds).
 	AudioOffset uint64
-	Text        string
+
+	// Text is the text of the bookmark.
+	Text string
 }
 
 // Close releases the underlying resources
@@ -36,7 +40,7 @@ func NewSpeechSynthesisBookmarkEventArgsFromHandle(handle common.SPXHandle) (*Sp
 	}
 	event.AudioOffset = uint64(cAudioOffset)
 	/* Text */
-	value := C.synthesizer_bookmark_event_get_text(event.handle)
+	value := C.synthesizer_event_get_text(event.handle)
 	event.Text = C.GoString(value)
 	C.property_bag_free_string(value)
 	return event, nil
