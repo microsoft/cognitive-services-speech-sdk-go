@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  CARBON_VERSION: "1.20.0"
+  CARBON_VERSION: "1.21.0"
 
 jobs:
   linux:
