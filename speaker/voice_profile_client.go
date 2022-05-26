@@ -31,7 +31,7 @@ import (
 //     }
 //     if (b != NULL)
 //     {
-//	       property_bag_free_string(b);
+//         property_bag_free_string(b);
 //     }
 //     return hr;
 // }
