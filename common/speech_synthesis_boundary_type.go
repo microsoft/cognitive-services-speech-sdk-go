@@ -8,11 +8,11 @@ type SpeechSynthesisBoundaryType int
 
 const (
 	// WordBoundary indicates word boundary.
-	WordBoundary SpeechSynthesisBoundaryType = 1
+	WordBoundary SpeechSynthesisBoundaryType = 0
 
 	// PunctuationBoundary indicates punctuation boundary.
-	PunctuationBoundary SpeechSynthesisBoundaryType = 2
+	PunctuationBoundary SpeechSynthesisBoundaryType = 1
 
 	// SentenceBoundary indicates sentence boundary.
-	SentenceBoundary SpeechSynthesisBoundaryType = 3
+	SentenceBoundary SpeechSynthesisBoundaryType = 2
 )

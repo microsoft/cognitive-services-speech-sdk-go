@@ -56,7 +56,7 @@ func NewSpeechSynthesisResultFromHandle(handle common.SPXHandle) (*SpeechSynthes
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.AudioDuration = time.Duration(cAudioDuration*100) * time.Nanosecond
+	result.AudioDuration = time.Duration(cAudioDuration) * time.Millisecond
 	// using max(1024, cAudioLength) as buffer size
 	if cAudioLength < 1024 {
 		cAudioLength = 1024
