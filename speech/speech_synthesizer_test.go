@@ -115,7 +115,7 @@ func TestSynthesizerEvents(t *testing.T) {
 		defer event.Close()
 		t.Logf("SynthesisCompleted, audio length %d", len(event.Result.AudioData))
 		checkSynthesisResult(t, &event.Result, common.SynthesizingAudioCompleted)
-		if !almostEqual((float64)(event.Result.AudioDuration/time.Millisecond), (float64)(len(event.Result.AudioData)/32000), 100) {
+		if !almostEqual((float64)(event.Result.AudioDuration/time.Millisecond), (float64)(len(event.Result.AudioData)/32), 100) {
 			t.Errorf("Synthesis duration incorrect")
 		}
 		synthesisCompletedFuture <- "synthesisCompletedFuture"
