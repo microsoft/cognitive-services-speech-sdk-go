@@ -18,7 +18,7 @@ steps:
         dep ensure
     fi
   displayName: 'Get dependencies'
-- script:
+- script: |
     mkdir $HOME/carbon
     pushd $HOME/carbon
     wget https://csspeechstorage.blob.core.windows.net/drop/$(CARBON_VERSION)/SpeechSDK-Linux-$(CARBON_VERSION).tar.gz
@@ -37,5 +37,5 @@ steps:
     export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
     export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
-    go build -v ./...      
+    go build -v ./...
   displayName: 'Build'
