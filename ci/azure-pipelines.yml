@@ -18,6 +18,11 @@ steps:
         dep ensure
     fi
   displayName: 'Get dependencies'
+- task: ComponentGovernanceComponentDetection@0
+  inputs:
+  scanType: 'Register'
+  verbosity: 'Verbose'
+  alertWarningLevel: 'High'
 - script: |
     mkdir $HOME/carbon
     pushd $HOME/carbon
