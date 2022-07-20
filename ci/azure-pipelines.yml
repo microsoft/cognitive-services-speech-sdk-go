@@ -23,6 +23,7 @@ steps:
     scanType: 'Register'
     verbosity: 'Verbose'
     alertWarningLevel: 'High'
+    sourceScanPath: $(Build.SourcesDirectory)
 - script: |
     mkdir $HOME/carbon
     pushd $HOME/carbon
