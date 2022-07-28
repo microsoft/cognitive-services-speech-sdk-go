@@ -4,7 +4,7 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 variables:
-  CARBON_VERSION: '1.22.0'
+  CARBON_VERSION: '1.23.0'
 
 steps:
 - task: GoTool@0
