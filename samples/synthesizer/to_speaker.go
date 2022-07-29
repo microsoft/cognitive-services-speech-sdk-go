@@ -86,11 +86,11 @@ func SynthesisToSpeaker(subscription string, region string, file string) {
 			fmt.Printf("Speech synthesized to speaker for text [%s].\n", text)
 		} else {
 			cancellation, _ := speech.NewCancellationDetailsFromSpeechSynthesisResult(outcome.Result)
-			fmt.Printf("CANCELED: Reason=%d.\n", cancellation.Reason)
+			fmt.Printf("CANCELED: Reason=%s.\n", cancellation.Reason.String())
 
 			if cancellation.Reason == common.Error {
-				fmt.Printf("CANCELED: ErrorCode=%d\nCANCELED: ErrorDetails=[%s]\nCANCELED: Did you update the subscription info?\n",
-					cancellation.ErrorCode,
+				fmt.Printf("CANCELED: ErrorCode=%s\nCANCELED: ErrorDetails=[%s]\nCANCELED: Did you update the subscription info?\n",
+					cancellation.ErrorCode.String(),
 					cancellation.ErrorDetails)
 			}
 		}
