@@ -42,4 +42,4 @@ const (
 	RuntimeError CancellationErrorCode = 9
 )
 
-//go:generate stringer -type=CancellationErrorCode
+//go:generate stringer -type=CancellationErrorCode -output=cancellation_error_code_string.go
