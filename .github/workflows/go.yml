@@ -68,6 +68,10 @@ jobs:
         export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
         export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
         go test -v ./...
+    - name: Run Gosec Security Scanner
+      uses: securego/gosec@master
+      with:
+        args: ./...
     - name: 'Upload Test Logs'
       uses: actions/upload-artifact@v2
       if: always()
