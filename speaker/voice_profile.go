@@ -15,7 +15,7 @@ import "C"
 
 // VoiceProfile is the class that defines voice profiles used in speaker recognition scenarios.
 type VoiceProfile struct {
-	handle     C.SPXHANDLE
+	handle C.SPXHANDLE
 }
 
 // newVoiceProfileFromHandle creates a VoiceProfile instance from a valid handle. This is for internal use only.
@@ -26,19 +26,21 @@ func newVoiceProfileFromHandle(handle common.SPXHandle) (*VoiceProfile, error) {
 }
 
 // NewVoiceProfileFromIdAndType creates an instance of the voice profile with specified id and type.
+//nolint:revive
 func NewVoiceProfileFromIdAndType(id string, profileType common.VoiceProfileType) (*VoiceProfile, error) {
 	var handle C.SPXHANDLE
-	profileId := C.CString(id)
-	defer C.free(unsafe.Pointer(profileId))
-	ret := uintptr(C.create_voice_profile_from_id_and_type(&handle, profileId, (C.int)(profileType)))
+	profileID := C.CString(id)
+	defer C.free(unsafe.Pointer(profileID))
+	ret := uintptr(C.create_voice_profile_from_id_and_type(&handle, profileID, (C.int)(profileType)))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	
+
 	return newVoiceProfileFromHandle(handle2uintptr(handle))
 }
 
-// Return the id of the given voice profile 
+// Return the id of the given voice profile
+//nolint:revive
 func (profile *VoiceProfile) Id() (string, error) {
 	var sz C.uint32_t
 	ret := uintptr(C.voice_profile_get_id(profile.handle, nil, &sz))
@@ -55,7 +57,7 @@ func (profile *VoiceProfile) Id() (string, error) {
 	return id, nil
 }
 
-// Return the type of the given voice profile 
+// Return the type of the given voice profile
 func (profile *VoiceProfile) Type() (common.VoiceProfileType, error) {
 	var profileType C.int
 	ret := uintptr(C.voice_profile_get_type(profile.handle, &profileType))

@@ -39,7 +39,7 @@ type SpeechSynthesisResult struct {
 }
 
 // Close releases the underlying resources
-func (result SpeechSynthesisResult) Close() {
+func (result *SpeechSynthesisResult) Close() {
 	result.Properties.Close()
 	if result.handle != C.SPXHANDLE_INVALID {
 		C.synthesizer_result_handle_release(result.handle)
