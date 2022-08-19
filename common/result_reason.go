@@ -70,3 +70,5 @@ const (
 	// VoicesListRetrieved indicates the voices list has been retrieved successfully.
 	VoicesListRetrieved ResultReason = 23
 )
+
+//go:generate stringer -type=ResultReason -output=result_reason_string.go

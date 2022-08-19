@@ -17,3 +17,5 @@ const (
 	// Added in version 1.17.0
 	CancelledByUser CancellationReason = 3
 )
+
+//go:generate stringer -type=CancellationReason -output=cancellation_reason_string.go
