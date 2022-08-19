@@ -41,7 +41,10 @@ type SpeechSynthesisResult struct {
 // Close releases the underlying resources
 func (result SpeechSynthesisResult) Close() {
 	result.Properties.Close()
-	C.synthesizer_result_handle_release(result.handle)
+	if result.handle != C.SPXHANDLE_INVALID {
+		C.synthesizer_result_handle_release(result.handle)
+		result.handle = C.SPXHANDLE_INVALID
+	}
 }
 
 // NewSpeechSynthesisResultFromHandle creates a SpeechSynthesisResult from a handle (for internal use)

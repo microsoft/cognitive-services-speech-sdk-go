@@ -111,4 +111,20 @@ const (
 	// Audio24Khz16Bit24KbpsMonoOpus stands for audio-24khz-16bit-24kbps-mono-opus
 	// Audio compressed by OPUS codec without container, with bitrate of 24kbps.
 	Audio24Khz16Bit24KbpsMonoOpus SpeechSynthesisOutputFormat = 33
+
+	// Raw22050Hz16BitMonoPcm stands for raw-22050hz-16bit-mono-pcm
+	// Raw PCM audio at 22050Hz sampling rate and 16-bit depth.
+	Raw22050Hz16BitMonoPcm SpeechSynthesisOutputFormat = 34
+
+	// Riff22050Hz16BitMonoPcm stands for riff-22050hz-16bit-mono-pcm
+	// PCM audio at 22050Hz sampling rate and 16-bit depth, with RIFF header.
+	Riff22050Hz16BitMonoPcm SpeechSynthesisOutputFormat = 35
+
+	// Raw44100Hz16BitMonoPcm stands for raw-44100hz-16bit-mono-pcm
+	// Raw PCM audio at 44100Hz sampling rate and 16-bit depth.
+	Raw44100Hz16BitMonoPcm SpeechSynthesisOutputFormat = 36
+
+	// Riff44100Hz16BitMonoPcm stands for riff-44100hz-16bit-mono-pcm
+	// PCM audio at 44100Hz sampling rate and 16-bit depth, with RIFF header.
+	Riff44100Hz16BitMonoPcm SpeechSynthesisOutputFormat = 37
 )
