@@ -45,6 +45,7 @@ func NewSourceLanguageConfigFromLanguage(language string) (*SourceLanguageConfig
 }
 
 // NewSourceLanguageConfigFromLanguageAndEndpointId creates an instance of the SourceLanguageConfig with source language and custom endpoint id. A custom endpoint id corresponds to custom models.
+//nolint:revive
 func NewSourceLanguageConfigFromLanguageAndEndpointId(language string, endpointID string) (*SourceLanguageConfig, error) {
 	var handle C.SPXHANDLE
 	languageCStr := C.CString(language)

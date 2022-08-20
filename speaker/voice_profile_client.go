@@ -204,13 +204,13 @@ func (client VoiceProfileClient) RetrieveEnrollmentResultAsync(profile *VoicePro
 		if err != nil {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
 		}
-		cId := C.CString(id)
-		defer C.free(unsafe.Pointer(cId))
+		cID := C.CString(id)
+		defer C.free(unsafe.Pointer(cID))
 		profileType, err := profile.Type()
 		if err != nil {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
 		}
-		ret := uintptr(C.retrieve_enrollment_result(client.handle, cId, (C.int)(profileType), &handle))
+		ret := uintptr(C.retrieve_enrollment_result(client.handle, cID, (C.int)(profileType), &handle))
 		if ret != C.SPX_NOERROR {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
@@ -249,14 +249,14 @@ func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoicePro
 		if ret != C.SPX_NOERROR {
 			outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
 		}
-		rawProfileJson := C.malloc(C.sizeof_char * (size))
-		defer C.free(unsafe.Pointer(rawProfileJson))
-		ret = uintptr(C.get_profiles_json_proxy(client.handle, (C.int)(profileType), (*C.char)(rawProfileJson), &size))
+		rawProfileJSON := C.malloc(C.sizeof_char * (size))
+		defer C.free(unsafe.Pointer(rawProfileJSON))
+		ret = uintptr(C.get_profiles_json_proxy(client.handle, (C.int)(profileType), (*C.char)(rawProfileJSON), &size))
 		if ret != C.SPX_NOERROR {
 			outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
 		} else {
-			goProfilesJson := C.GoString((*C.char)(rawProfileJson))
-			splitProfileIds := strings.Split(goProfilesJson, "|")
+			goProfilesJSON := C.GoString((*C.char)(rawProfileJSON))
+			splitProfileIds := strings.Split(goProfilesJSON, "|")
 			profileList := make([]*VoiceProfile, len(splitProfileIds))
 			for index, id := range splitProfileIds {
 				profile, err := NewVoiceProfileFromIdAndType(id, profileType)
