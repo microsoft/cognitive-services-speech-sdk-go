@@ -95,7 +95,7 @@ func getErrorCode(errorHandle SPXHandle) int {
 }
 
 func getErrorMessage(errorHandle SPXHandle) string {
-	var message string = ""
+	message := ""
 	ret := C.error_get_message(uintptr2handle(errorHandle))
 	if ret != nil {
 		message = C.GoString(ret)
