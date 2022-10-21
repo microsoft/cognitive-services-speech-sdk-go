@@ -13,9 +13,29 @@ import (
 )
 
 // #include <stdlib.h>
+// #include <string.h>
 // #include <speechapi_c_common.h>
 // #include <speechapi_c_factory.h>
+// #include <speechapi_c_property_bag.h>
 // #include <speechapi_c_speaker_recognition.h>
+//
+// SPXHR get_profiles_json_proxy(SPXVOICEPROFILECLIENTHANDLE hVoiceProfileClient, int type, char* buffer, size_t* pcch)
+// {
+//     char* b = NULL;
+//     size_t s = 0;
+//     SPXHR hr = get_profiles_json(hVoiceProfileClient, type, &b, &s);
+//     *pcch = s;
+//     if ((buffer != NULL) && (b != NULL))
+//     {
+//         memcpy(buffer, b, s);
+//     }
+//     if (b != NULL)
+//     {
+//         property_bag_free_string(b);
+//     }
+//     return hr;
+// }
+//
 import "C"
 
 // VoiceProfileClient connects to a speaker recognition backend.
@@ -184,13 +204,13 @@ func (client VoiceProfileClient) RetrieveEnrollmentResultAsync(profile *VoicePro
 		if err != nil {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
 		}
-		cId := C.CString(id)
-		defer C.free(unsafe.Pointer(cId))
+		cID := C.CString(id)
+		defer C.free(unsafe.Pointer(cID))
 		profileType, err := profile.Type()
 		if err != nil {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{err}}
 		}
-		ret := uintptr(C.retrieve_enrollment_result(client.handle, cId, (C.int)(profileType), &handle))
+		ret := uintptr(C.retrieve_enrollment_result(client.handle, cID, (C.int)(profileType), &handle))
 		if ret != C.SPX_NOERROR {
 			outcome <- VoiceProfileEnrollmentOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
 		} else {
@@ -224,12 +244,19 @@ func (outcome GetAllProfilesOutcome) Close() {
 func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoiceProfileType) chan GetAllProfilesOutcome {
 	outcome := make(chan GetAllProfilesOutcome)
 	go func() {
-		rawProfileJson := C.get_profiles_json(client.handle, (C.int)(profileType))
-		if rawProfileJson == nil {
+		var size C.size_t
+		ret := uintptr(C.get_profiles_json_proxy(client.handle, (C.int)(profileType), nil, &size))
+		if ret != C.SPX_NOERROR {
+			outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
+		}
+		rawProfileJSON := C.malloc(C.sizeof_char * (size))
+		defer C.free(unsafe.Pointer(rawProfileJSON))
+		ret = uintptr(C.get_profiles_json_proxy(client.handle, (C.int)(profileType), (*C.char)(rawProfileJSON), &size))
+		if ret != C.SPX_NOERROR {
 			outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
 		} else {
-			goProfilesJson := C.GoString(rawProfileJson)
-			splitProfileIds := strings.Split(goProfilesJson, "|")
+			goProfilesJSON := C.GoString((*C.char)(rawProfileJSON))
+			splitProfileIds := strings.Split(goProfilesJSON, "|")
 			profileList := make([]*VoiceProfile, len(splitProfileIds))
 			for index, id := range splitProfileIds {
 				profile, err := NewVoiceProfileFromIdAndType(id, profileType)

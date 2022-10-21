@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  CARBON_VERSION: "1.21.0"
+  CARBON_VERSION: "1.24.0"
 
 jobs:
   linux:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04]
-        go: [1.13, 1.15, 1.16]
+        go: [1.13, 1.17, 1.18]
     steps:
     - name: Set up Go ${{ matrix.go }}
       uses: actions/setup-go@v2

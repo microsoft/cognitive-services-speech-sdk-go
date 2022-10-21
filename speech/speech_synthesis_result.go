@@ -39,9 +39,12 @@ type SpeechSynthesisResult struct {
 }
 
 // Close releases the underlying resources
-func (result SpeechSynthesisResult) Close() {
+func (result *SpeechSynthesisResult) Close() {
 	result.Properties.Close()
-	C.synthesizer_result_handle_release(result.handle)
+	if result.handle != C.SPXHANDLE_INVALID {
+		C.synthesizer_result_handle_release(result.handle)
+		result.handle = C.SPXHANDLE_INVALID
+	}
 }
 
 // NewSpeechSynthesisResultFromHandle creates a SpeechSynthesisResult from a handle (for internal use)
@@ -56,7 +59,7 @@ func NewSpeechSynthesisResultFromHandle(handle common.SPXHandle) (*SpeechSynthes
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.AudioDuration = time.Duration(cAudioDuration*100) * time.Nanosecond
+	result.AudioDuration = time.Duration(cAudioDuration) * time.Millisecond
 	// using max(1024, cAudioLength) as buffer size
 	if cAudioLength < 1024 {
 		cAudioLength = 1024

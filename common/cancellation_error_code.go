@@ -41,3 +41,5 @@ const (
 	// RuntimeError indicates an unexpected runtime error.
 	RuntimeError CancellationErrorCode = 9
 )
+
+//go:generate stringer -type=CancellationErrorCode -output=cancellation_error_code_string.go

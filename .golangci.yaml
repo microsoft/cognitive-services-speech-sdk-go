@@ -12,4 +12,5 @@ issues:
       text: "OperationOutcome"
     - linters:
         - golint
+        - revive
       text: "type name will be used"

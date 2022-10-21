@@ -22,3 +22,5 @@ const (
 	// StreamStatusCanceled indicates the audio data stream was canceled.
 	StreamStatusCanceled StreamStatus = 4
 )
+
+//go:generate stringer -type=StreamStatus -trimprefix=StreamStatus -output=stream_status_string.go
