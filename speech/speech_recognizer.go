@@ -15,6 +15,7 @@ import (
 // #include <speechapi_c_recognizer.h>
 // #include <speechapi_c_factory.h>
 // #include <speechapi_c_grammar.h>
+//
 // /* Proxy functions forward declarations */
 // void cgo_recognizer_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_recognizer_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
@@ -383,42 +384,70 @@ func (recognizer SpeechRecognizer) Close() {
 	}
 }
 
-type GrammarPhrase struct {
-	hgrammar C.SPXGRAMMARHANDLE
-	hphrase  C.SPXPHRASEHANDLE
+type grammarPhrase struct {
+	handle C.SPXHANDLE
 }
 
-// Creates a phrase list grammar for the specified recognizer.
-func NewPhraseListGrammarFromRecognizer(recognizer *SpeechRecognizer) (GrammarPhrase, error) {
-	var hreco = (C.SPXRECOHANDLE)(unsafe.Pointer(recognizer.handle))
-	var gh GrammarPhrase
-	gh.hgrammar = C.SPXHANDLE_INVALID
+func grammarPhraseFromText(text string) (*grammarPhrase, error) {
+	var handle C.SPXHANDLE
+	txt := C.CString(text)
+	defer C.free(unsafe.Pointer(txt))
+	ret := uintptr(C.grammar_phrase_create_from_text(&handle, txt))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	phrase := new(grammarPhrase)
+	phrase.handle = handle
+	return phrase, nil
+}
+
+func (grammar *grammarPhrase) Close() {
+	C.grammar_phrase_handle_release(grammar.handle)
+}
+
+type PhraseListGrammar struct {
+	handle C.SPXHANDLE
+}
+
+// NewPhraseListGrammarFromRecognizer Creates a phrase list grammar for the specified recognizer.
+func NewPhraseListGrammarFromRecognizer(recognizer *SpeechRecognizer) (*PhraseListGrammar, error) {
+	var handle C.SPXHANDLE
 	name := C.CString("")
 	defer C.free(unsafe.Pointer(name))
-	ret := uintptr(C.phrase_list_grammar_from_recognizer_by_name(&gh.hgrammar, hreco, name))
+	ret := uintptr(C.phrase_list_grammar_from_recognizer_by_name(&handle, recognizer.handle, name))
 	if ret != C.SPX_NOERROR {
-		return gh, common.NewCarbonError(ret)
+		return nil, common.NewCarbonError(ret)
 	}
-	return gh, nil
+	grammar := new(PhraseListGrammar)
+	grammar.handle = handle
+	return grammar, nil
 }
 
-// Adds a simple phrase that may be spoken by the user.
-func (gh GrammarPhrase) AddPhrase(text string) error {
-	phrase := C.CString(text)
-	defer C.free(unsafe.Pointer(phrase))
-	ret1 := uintptr(C.grammar_phrase_create_from_text(&gh.hphrase, phrase))
-	if ret1 != C.SPX_NOERROR {
-		return common.NewCarbonError(ret1)
+// Close releases the associated resources.
+func (grammar *PhraseListGrammar) Close() {
+	C.grammar_handle_release(grammar.handle)
+}
+
+// AddPhrase adds a simple phrase that may be spoken by the user.
+func (grammar *PhraseListGrammar) AddPhrase(text string) error {
+	phrase, err := grammarPhraseFromText(text)
+	if err != nil {
+		return err
 	}
-	ret2 := uintptr(C.phrase_list_grammar_add_phrase(gh.hgrammar, gh.hphrase))
-	if ret2 != C.SPX_NOERROR {
-		return common.NewCarbonError(ret2)
+	defer phrase.Close()
+
+	ret := uintptr(C.phrase_list_grammar_add_phrase(grammar.handle, phrase.handle))
+	if ret != C.SPX_NOERROR {
+		return common.NewCarbonError(ret)
 	}
 	return nil
 }
 
 // Clears all phrases from the phrase list grammar.
-func (gh GrammarPhrase) Clear() {
-	C.grammar_phrase_handle_release(gh.hphrase)
-	C.phrase_list_grammar_clear(gh.hgrammar)
+func (grammar *PhraseListGrammar) Clear() error {
+	ret := uintptr(C.phrase_list_grammar_clear(grammar.handle))
+	if ret != C.SPX_NOERROR {
+		return common.NewCarbonError(ret)
+	}
+	return nil
 }
