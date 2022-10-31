@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"io"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -233,4 +234,43 @@ func TestContinuousRecognition(t *testing.T) {
 	if err != nil {
 		t.Error("Got error: ", err)
 	}
+}
+
+func testPhraseList(t *testing.T, with_grammar bool) {
+	recognizer := createSpeechRecognizerFromFileInput(t, "../test_files/peloozoid.wav")
+	if recognizer == nil {
+		return
+	}
+	defer recognizer.Close()
+	phraseListGrammar, err := NewPhraseListGrammarFromRecognizer(recognizer)
+	if err != nil {
+		t.Error("Grammar creation failed")
+	}
+	defer phraseListGrammar.Close()
+	if with_grammar {
+		phraseListGrammar.AddPhrase("peloozoid")
+	}
+	var result *SpeechRecognitionResult
+	select {
+	case outcome := <-recognizer.RecognizeOnceAsync():
+		if outcome.Error != nil {
+			t.Error("Received an error")
+		}
+		result = outcome.Result
+	case <-time.After(5 * time.Second):
+		t.Error("Timeout waiting for result.")
+	}
+	defer result.Close()
+	if strings.Contains(result.Text, "peloozoid") != with_grammar {
+		t.Log(result.Text)
+		t.Error("Result doesn't match expectation")
+	}
+}
+
+func TestPhraseListGrammarWithoutGrammar(t *testing.T) {
+	testPhraseList(t, false)
+}
+
+func TestPhraseListGrammarWithGrammar(t *testing.T) {
+	testPhraseList(t, true)
 }

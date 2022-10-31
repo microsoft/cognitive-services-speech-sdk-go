@@ -14,6 +14,7 @@ import (
 // #include <stdlib.h>
 // #include <speechapi_c_recognizer.h>
 // #include <speechapi_c_factory.h>
+// #include <speechapi_c_grammar.h>
 //
 // /* Proxy functions forward declarations */
 // void cgo_recognizer_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
@@ -381,4 +382,72 @@ func (recognizer SpeechRecognizer) Close() {
 		C.recognizer_handle_release(recognizer.handle)
 		recognizer.handle = C.SPXHANDLE_INVALID
 	}
+}
+
+type grammarPhrase struct {
+	handle C.SPXHANDLE
+}
+
+func grammarPhraseFromText(text string) (*grammarPhrase, error) {
+	var handle C.SPXHANDLE
+	txt := C.CString(text)
+	defer C.free(unsafe.Pointer(txt))
+	ret := uintptr(C.grammar_phrase_create_from_text(&handle, txt))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	phrase := new(grammarPhrase)
+	phrase.handle = handle
+	return phrase, nil
+}
+
+func (grammar *grammarPhrase) Close() {
+	C.grammar_phrase_handle_release(grammar.handle)
+}
+
+type PhraseListGrammar struct {
+	handle C.SPXHANDLE
+}
+
+// NewPhraseListGrammarFromRecognizer Creates a phrase list grammar for the specified recognizer.
+func NewPhraseListGrammarFromRecognizer(recognizer *SpeechRecognizer) (*PhraseListGrammar, error) {
+	var handle C.SPXHANDLE
+	name := C.CString("")
+	defer C.free(unsafe.Pointer(name))
+	ret := uintptr(C.phrase_list_grammar_from_recognizer_by_name(&handle, recognizer.handle, name))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	grammar := new(PhraseListGrammar)
+	grammar.handle = handle
+	return grammar, nil
+}
+
+// Close releases the associated resources.
+func (grammar *PhraseListGrammar) Close() {
+	C.grammar_handle_release(grammar.handle)
+}
+
+// AddPhrase adds a simple phrase that may be spoken by the user.
+func (grammar *PhraseListGrammar) AddPhrase(text string) error {
+	phrase, err := grammarPhraseFromText(text)
+	if err != nil {
+		return err
+	}
+	defer phrase.Close()
+
+	ret := uintptr(C.phrase_list_grammar_add_phrase(grammar.handle, phrase.handle))
+	if ret != C.SPX_NOERROR {
+		return common.NewCarbonError(ret)
+	}
+	return nil
+}
+
+// Clears all phrases from the phrase list grammar.
+func (grammar *PhraseListGrammar) Clear() error {
+	ret := uintptr(C.phrase_list_grammar_clear(grammar.handle))
+	if ret != C.SPX_NOERROR {
+		return common.NewCarbonError(ret)
+	}
+	return nil
 }
