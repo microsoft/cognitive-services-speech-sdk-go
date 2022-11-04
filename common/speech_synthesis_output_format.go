@@ -127,4 +127,8 @@ const (
 	// Riff44100Hz16BitMonoPcm stands for riff-44100hz-16bit-mono-pcm
 	// PCM audio at 44100Hz sampling rate and 16-bit depth, with RIFF header.
 	Riff44100Hz16BitMonoPcm SpeechSynthesisOutputFormat = 37
+
+	// AmrWb16000Hz stands for amr-wb-16000hz
+    // AMR-WB audio at 16kHz sampling rate.
+	AmrWb16000Hz = 38
 )
