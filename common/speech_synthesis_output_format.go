@@ -129,6 +129,6 @@ const (
 	Riff44100Hz16BitMonoPcm SpeechSynthesisOutputFormat = 37
 
 	// AmrWb16000Hz stands for amr-wb-16000hz
-    // AMR-WB audio at 16kHz sampling rate.
+	// AMR-WB audio at 16kHz sampling rate.
 	AmrWb16000Hz = 38
 )
