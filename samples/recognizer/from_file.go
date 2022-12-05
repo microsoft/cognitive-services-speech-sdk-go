@@ -125,3 +125,61 @@ func RecognizeOnceFromCompressedFile(subscription string, region string, file st
 	fmt.Println("Got a recognition!")
 	fmt.Println(outcome.Result.Text)
 }
+
+func RecognizeOnceFromALAWFile(subscription string, region string, file string) {
+	var waveFormat audio.AudioStreamWaveFormat
+	waveFormat = audio.WAVE_ALAW
+	format, err := audio.GetWaveFormat(8000, 16, 1, waveFormat)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer format.Close()
+	stream, err := audio.CreatePushAudioInputStreamFromFormat(format)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer stream.Close()
+	audioConfig, err := audio.NewAudioConfigFromStreamInput(stream)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer audioConfig.Close()
+	config, err := speech.NewSpeechConfigFromSubscription(subscription, region)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer config.Close()
+	speechRecognizer, err := speech.NewSpeechRecognizerFromConfig(config, audioConfig)
+	if err != nil {
+		fmt.Println("Got an error: ", err)
+		return
+	}
+	defer speechRecognizer.Close()
+	speechRecognizer.SessionStarted(func(event speech.SessionEventArgs) {
+		defer event.Close()
+		fmt.Println("Session Started (ID=", event.SessionID, ")")
+	})
+	speechRecognizer.SessionStopped(func(event speech.SessionEventArgs) {
+		defer event.Close()
+		fmt.Println("Session Stopped (ID=", event.SessionID, ")")
+	})
+	helpers.PumpFileIntoStream(file, stream)
+	task := speechRecognizer.RecognizeOnceAsync()
+	var outcome speech.SpeechRecognitionOutcome
+	select {
+	case outcome = <-task:
+	case <-time.After(40 * time.Second):
+		fmt.Println("Timed out")
+		return
+	}
+	defer outcome.Close()
+	if outcome.Error != nil {
+		fmt.Println("Got an error: ", outcome.Error)
+	}
+	fmt.Println("Got a recognition!")
+	fmt.Println(outcome.Result.Text)
+}
