@@ -31,3 +31,18 @@ const (
 	// ANY Stream ContainerFormat definition when the actual stream format is not known.
 	ANY AudioStreamContainerFormat = 0x108
 )
+
+// AudioStreamWaveFormat represents the format specified inside WAV container which are sent directly as encoded to the speech service.
+type AudioStreamWaveFormat int //nolint:revive
+
+const (
+	// AudioStreamWaveFormat definition for PCM (pulse-code modulated) data in integer format.
+	WavePCM AudioStreamWaveFormat = 0x0001
+
+	// AudioStreamWaveFormat definition A-law-encoded format.
+	WaveALAW AudioStreamWaveFormat = 0x0006
+
+	// AudioStreamWaveFormat definition for Mu-law-encoded format.
+	WaveMULAW AudioStreamWaveFormat = 0x0007
+
+)

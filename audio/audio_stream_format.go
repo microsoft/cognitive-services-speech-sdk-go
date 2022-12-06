@@ -32,6 +32,23 @@ func GetDefaultInputFormat() (*AudioStreamFormat, error) {
 	return format, nil
 }
 
+// GetWaveFormat creates an audio stream format object with the specified waveformat characteristics.
+func GetWaveFormat(samplesPerSecond uint32, bitsPerSample uint8, channels uint8, waveFormat AudioStreamWaveFormat) (*AudioStreamFormat, error) {
+	var handle C.SPXHANDLE
+	ret := uintptr(C.audio_stream_format_create_from_waveformat(
+		&handle,
+		(C.uint32_t)(samplesPerSecond),
+		(C.uint8_t)(bitsPerSample),
+		(C.uint8_t)(channels),
+		(C.Audio_Stream_Wave_Format)(waveFormat)))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	format := new(AudioStreamFormat)
+	format.handle = handle
+	return format, nil
+}
+
 // GetWaveFormatPCM creates an audio stream format object with the specified PCM waveformat characteristics.
 // Note: Currently, only WAV / PCM with 16-bit samples, 16 kHz sample rate, and a single channel (Mono) is supported. When
 // used with Conversation Transcription, eight channels are supported.

@@ -31,6 +31,7 @@ func main() {
 	samples := functionMap{
 		"speech_recognizer:RecognizeOnceFromWavFile":        recognizer.RecognizeOnceFromWavFile,
 		"speech_recognizer:RecognizeOnceFromCompressedFile": recognizer.RecognizeOnceFromCompressedFile,
+		"speech_recognizer:RecognizeOnceFromALAWFile":       recognizer.RecognizeOnceFromALAWFile,
 		"speech_recognizer:ContinuousFromMicrophone":        recognizer.ContinuousFromMicrophone,
 		"speech_recognizer:RecognizeContinuousUsingWrapper": recognizer.RecognizeContinuousUsingWrapper,
 		"dialog_service_connector:ListenOnce":               dialog_service_connector.ListenOnce,
