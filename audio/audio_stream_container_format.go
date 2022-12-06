@@ -37,12 +37,12 @@ type AudioStreamWaveFormat int //nolint:revive
 
 const (
 	// AudioStreamWaveFormat definition for PCM (pulse-code modulated) data in integer format.
-	WAVE_PCM AudioStreamWaveFormat = 0x0001
+	WavePCM AudioStreamWaveFormat = 0x0001
 
 	// AudioStreamWaveFormat definition A-law-encoded format.
-	WAVE_ALAW AudioStreamWaveFormat = 0x0006
+	WaveALAW AudioStreamWaveFormat = 0x0006
 
 	// AudioStreamWaveFormat definition for Mu-law-encoded format.
-	WAVE_MULAW AudioStreamWaveFormat = 0x0007
+	WaveMULAW AudioStreamWaveFormat = 0x0007
 
 )

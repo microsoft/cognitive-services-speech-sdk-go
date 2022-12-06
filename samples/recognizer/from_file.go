@@ -128,7 +128,7 @@ func RecognizeOnceFromCompressedFile(subscription string, region string, file st
 
 func RecognizeOnceFromALAWFile(subscription string, region string, file string) {
 	var waveFormat audio.AudioStreamWaveFormat
-	waveFormat = audio.WAVE_ALAW
+	waveFormat = audio.WaveALAW
 	format, err := audio.GetWaveFormat(8000, 16, 1, waveFormat)
 	if err != nil {
 		fmt.Println("Got an error: ", err)
