@@ -40,7 +40,7 @@ func NewSpeechSynthesisBookmarkEventArgsFromHandle(handle common.SPXHandle) (*Sp
 	}
 	event.AudioOffset = uint64(cAudioOffset)
 	/* Text */
-	value := C.synthesizer_event_get_text(event.handle)
+	value := C.synthesizer_bookmark_event_get_text(event.handle)
 	event.Text = C.GoString(value)
 	C.property_bag_free_string(value)
 	return event, nil
