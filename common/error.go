@@ -68,15 +68,15 @@ var errorString = map[int]string{
 }
 
 func NewCarbonError(errorHandle uintptr) CarbonError {
-	var error CarbonError
-	error.Code = getErrorCode(SPXHandle(errorHandle))
-	error.Message = getErrorMessage(SPXHandle(errorHandle))
+	var carbonError CarbonError
+	carbonError.Code = getErrorCode(SPXHandle(errorHandle))
+	carbonError.Message = getErrorMessage(SPXHandle(errorHandle))
 	// When the message is empty, construct the error message using the errorHandle value directly.
-	if error.Message == "" {
-		codeAsHexString := fmt.Sprintf("0x%0x", error.Code)
-		error.Message = "Exception with an error code: " + codeAsHexString + " (" + errorString[error.Code] + ")"
+	if carbonError.Message == "" {
+		codeAsHexString := fmt.Sprintf("0x%0x", carbonError.Code)
+		carbonError.Message = "Exception with an error code: " + codeAsHexString + " (" + errorString[carbonError.Code] + ")"
 	}
-	return error
+	return carbonError
 }
 
 func (e CarbonError) Error() string {
