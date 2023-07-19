@@ -226,6 +226,24 @@ const (
 	// Added in version 1.17.0.
 	SpeechServiceResponseSynthesisUnderrunTimeMs PropertyID = 5012
 
+	// SpeechServiceResponseSynthesisConnectionLatencyMs is the speech synthesis connection latency in milliseconds.
+	// Read-only, available on final speech synthesis results.
+	// This measures the latency between when the synthesis is started to be processed, and the moment the HTTP/WebSocket connection is established.
+	// Added in version 1.31.0
+	SpeechServiceResponseSynthesisConnectionLatencyMs PropertyID = 5013
+
+	// SpeechServiceResponseSynthesisNetworkLatencyMs is the speech synthesis network latency in milliseconds.
+	// Read-only, available on final speech synthesis results.
+	// This measures the network round trip time.
+	// Added in version 1.31.0
+	SpeechServiceResponseSynthesisNetworkLatencyMs PropertyID = 5014
+
+	// SpeechServiceResponseSynthesisServiceLatencyMs is the speech synthesis service latency in milliseconds.
+	// Read-only, available on final speech synthesis results.
+	// This measures the service processing time to synthesize the first byte of audio.
+	// Added in version 1.31.0
+	SpeechServiceResponseSynthesisServiceLatencyMs PropertyID = 5015
+
 	// SpeechServiceResponseSynthesisBackend indicates which backend the synthesis is finished by.
 	// Read-only, available on speech synthesis results, except for the result in SynthesisStarted event
 	// Added in version 1.17.0.
