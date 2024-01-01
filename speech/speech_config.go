@@ -12,6 +12,7 @@ import (
 
 // #include <stdlib.h>
 // #include <speechapi_c_speech_config.h>
+// #include <speechapi_c_embedded_speech_config.h>
 import "C"
 
 // SpeechConfig is the class that defines configurations for speech / intent recognition, or speech synthesis.
@@ -42,6 +43,22 @@ func NewSpeechConfigFromHandle(handle common.SPXHandle) (*SpeechConfig, error) {
 		return nil, err
 	}
 	return config, nil
+}
+
+// Creates an instance of the embedded speech config with a specified offline model path
+// for speech recognition and/or synthesis.
+func NewEmbeddedSpeechConfigFromPath(modelPath string) (*SpeechConfig, error) {
+	var handle C.SPXHANDLE
+	mp := C.CString(modelPath)
+	ret1 := uintptr(C.embedded_speech_config_create(&handle))
+	if ret1 != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret1)
+	}
+	ret2 := uintptr(C.embedded_speech_config_add_path(handle, mp))
+	if ret2 != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret2)
+	}
+	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
 // NewSpeechConfigFromSubscription creates an instance of the speech config with specified subscription key and region.
@@ -199,6 +216,15 @@ func (config *SpeechConfig) SpeechRecognitionLanguage() string {
 // SetSpeechRecognitionLanguage sets the input language to the speech recognizer.
 func (config *SpeechConfig) SetSpeechRecognitionLanguage(language string) error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, language)
+}
+
+// Sets the model for speech recognition.
+func (config *SpeechConfig) SetSpeechRecognitionModel(modelName string, modelKey string) error {
+	res := config.SetProperty(common.SpeechServiceConnectionRecoModelName, modelName)
+	if res != nil {
+		return res
+	}
+	return config.SetProperty(common.SpeechServiceConnectionRecoModelKey, modelKey)
 }
 
 // OutputFormat is result output format.

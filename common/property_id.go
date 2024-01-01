@@ -109,6 +109,12 @@ const (
 	// to the service as URL query parameters.
 	SpeechServiceConnectionUserDefinedQueryParameters PropertyID = 3003
 
+	// The embedded speech recognition model name.
+	SpeechServiceConnectionRecoModelName PropertyID = 3005
+
+	// The embedded speech recognition model decryption key.
+	SpeechServiceConnectionRecoModelKey PropertyID = 3006
+	
 	// SpeechServiceConnectionSynthLanguage is the spoken language to be synthesized (e.g. en-US)
 	SpeechServiceConnectionSynthLanguage PropertyID = 3100
 
