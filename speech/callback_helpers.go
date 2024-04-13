@@ -193,6 +193,10 @@ var synthesisStartedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandler
 func registerSynthesisStartedCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
+	if handler == nil {
+		delete(synthesisStartedCallbacks, handle)
+		return
+	}
 	synthesisStartedCallbacks[handle] = handler
 }
 
@@ -243,6 +247,10 @@ var synthesisCompletedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandl
 func registerSynthesisCompletedCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
+	if handler == nil {
+		delete(synthesisCompletedCallbacks, handle)
+		return
+	}
 	synthesisCompletedCallbacks[handle] = handler
 }
 
@@ -268,6 +276,10 @@ var synthesisCanceledCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandle
 func registerSynthesisCanceledCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
+	if handler == nil {
+		delete(synthesisCanceledCallbacks, handle)
+		return
+	}
 	synthesisCanceledCallbacks[handle] = handler
 }
 
@@ -293,6 +305,10 @@ var synthesisWordBoundaryCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisWordBou
 func registerSynthesisWordBoundaryCallback(handler SpeechSynthesisWordBoundaryEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
+	if handler == nil {
+		delete(synthesisWordBoundaryCallbacks, handle)
+		return
+	}
 	synthesisWordBoundaryCallbacks[handle] = handler
 }
 
@@ -318,6 +334,10 @@ var synthesisVisemeReceivedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisVisem
 func registerSynthesisVisemeReceivedCallback(handler SpeechSynthesisVisemeEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
+	if handler == nil {
+		delete(synthesisVisemeReceivedCallbacks, handle)
+		return
+	}
 	synthesisVisemeReceivedCallbacks[handle] = handler
 }
 
@@ -343,6 +363,10 @@ var synthesisBookmarkReachedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisBook
 func registerSynthesisBookmarkReachedCallback(handler SpeechSynthesisBookmarkEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
+	if handler == nil {
+		delete(synthesisBookmarkReachedCallbacks, handle)
+		return
+	}
 	synthesisBookmarkReachedCallbacks[handle] = handler
 }
 
