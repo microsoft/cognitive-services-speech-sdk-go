@@ -335,4 +335,87 @@ const (
 	// DataBufferUserID is the user id associated to data buffer written by client when using Pull/Push audio
 	// input streams.
 	DataBufferUserID PropertyID = 11002
+
+	// PronunciationAssessmentReferenceText <summary>
+	// The reference text of the audio for pronunciation evaluation.
+	// For this and the following pronunciation assessment parameters, see the table
+	// [Pronunciation assessment parameters](/azure/cognitive-services/speech-service/rest-speech-to-text-short#pronunciation-assessment-parameters).
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::Create"/> or <see cref="PronunciationAssessmentConfig::SetReferenceText"/>.
+	// Added in version 1.14.0
+	// </summary>
+	PronunciationAssessmentReferenceText PropertyID = 12001
+
+	// PronunciationAssessment_GradingSystem <summary>
+	// The point system for pronunciation score calibration (FivePoint or HundredMark).
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::Create"/>.
+	// Added in version 1.14.0
+	// </summary>
+	PronunciationAssessmentGradingSystem PropertyID = 12002
+
+	// PronunciationAssessment_Granularity <summary>
+	// The pronunciation evaluation granularity (Phoneme, Word, or FullText).
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::Create"/>.
+	// Added in version 1.14.0
+	// </summary>
+	PronunciationAssessmentGranularity PropertyID = 12003
+
+	// PronunciationAssessment_EnableMiscue <summary>
+	// Defines if enable miscue calculation.
+	// With this enabled, the pronounced words will be compared to the reference text,
+	// and will be marked with omission/insertion based on the comparison. The default setting is False.
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::Create"/>.
+	// Added in version 1.14.0
+	// </summary>
+	PronunciationAssessmentEnableMiscue PropertyID = 12005
+
+	// PronunciationAssessmentPhonemeAlphabet <summary>
+	// The pronunciation evaluation phoneme alphabet. The valid values are "SAPI" (default) and "IPA"
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::SetPhonemeAlphabet"/>.
+	// Added in version 1.20.0
+	// </summary>
+	PronunciationAssessmentPhonemeAlphabet PropertyID = 12006
+
+	// PronunciationAssessment_NBestPhonemeCount <summary>
+	// The pronunciation evaluation nbest phoneme count.
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::SetNBestPhonemeCount"/>.
+	// Added in version 1.20.0
+	// </summary>
+	PronunciationAssessmentNBestPhonemeCount PropertyID = 12007
+
+	// PronunciationAssessment_EnableProsodyAssessment <summary>
+	// Whether to enable prosody assessment.
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::EnableProsodyAssessment"/>.
+	// Added in version 1.33.0
+	// </summary>
+	PronunciationAssessmentEnableProsodyAssessment PropertyID = 12008
+
+	// PronunciationAssessment_Json <summary>
+	// The json string of pronunciation assessment parameters
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::Create"/>.
+	// Added in version 1.14.0
+	// </summary>
+	PronunciationAssessmentJson PropertyID = 12009
+
+	// PronunciationAssessment_Params <summary>
+	// Pronunciation assessment parameters.
+	// This property is intended to be read-only. The SDK is using it internally.
+	// Added in version 1.14.0
+	// </summary>
+	PronunciationAssessmentParams PropertyID = 12010
+
+	// PronunciationAssessmentContentTopic <summary>
+	// The content topic of the pronunciation assessment.
+	// Under normal circumstances, you shouldn't have to use this property directly.
+	// Instead, use <see cref="PronunciationAssessmentConfig::EnableContentAssessmentWithTopic"/>.
+	// Added in version 1.33.0
+	// </summary>
+	PronunciationAssessmentContentTopic PropertyID = 12020
 )
