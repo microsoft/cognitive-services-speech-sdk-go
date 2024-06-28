@@ -137,6 +137,9 @@ const (
 	// or not.
 	SpeechServiceConnectionEnableAudioLogging PropertyID = 3202
 
+	// SpeechServiceConnectionLanguageIdMode is the language id mode. 支持的值为启动时 LID AtStart 或连续 LID Continuous。
+	SpeechServiceConnectionLanguageIdMode PropertyID = 3205
+
 	// SpeechServiceConnectionAutoDetectSourceLanguages is the auto detect source languages.
 	SpeechServiceConnectionAutoDetectSourceLanguages PropertyID = 3300
 
