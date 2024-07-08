@@ -78,14 +78,14 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.Duration = time.Nanosecond * time.Duration(100*cDuration)
+	result.Duration = time.Nanosecond * time.Duration(cDuration)
 	/* Offset */
 	var cOffset C.uint64_t
 	ret = uintptr(C.result_get_offset(result.handle, &cOffset))
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.Offset = time.Nanosecond * time.Duration(100*cOffset)
+	result.Offset = time.Nanosecond * time.Duration(cOffset)
 	/* Properties */
 	var propBagHandle C.SPXHANDLE
 	ret = uintptr(C.result_get_property_bag(uintptr2handle(handle), &propBagHandle))
