@@ -1,7 +1,8 @@
 
+resources:
 - repo: self
   clean: true
-  
+    
 trigger:  
   branches:  
     include:  
