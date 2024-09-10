@@ -1,10 +1,24 @@
-trigger:
-- master
+
+resources:
+- repo: self
+  clean: true
+    
+trigger:  
+  branches:  
+    include:  
+      - master  
+  
+schedules:  
+  - cron: "0 18 * * 6"  
+    displayName: "Saturday Evening Schedule"  
+    branches:  
+      include:  
+        - master  
 
 pool:
   vmImage: ubuntu-latest
 variables:
-  CARBON_VERSION: "1.33.0"
+  CARBON_VERSION: "1.40.0"
 
 steps:
 - task: GoTool@0

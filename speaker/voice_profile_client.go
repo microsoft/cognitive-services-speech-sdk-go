@@ -256,9 +256,9 @@ func (client VoiceProfileClient) GetAllProfilesAsync(profileType common.VoicePro
 			outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))}}
 		} else {
 			goProfilesJSON := C.GoString((*C.char)(rawProfileJSON))
-			splitProfileIds := strings.Split(goProfilesJSON, "|")
-			profileList := make([]*VoiceProfile, len(splitProfileIds))
-			for index, id := range splitProfileIds {
+			splitProfileIDs := strings.Split(goProfilesJSON, "|")
+			profileList := make([]*VoiceProfile, len(splitProfileIDs))
+			for index, id := range splitProfileIDs {
 				profile, err := NewVoiceProfileFromIdAndType(id, profileType)
 				if err != nil {
 					outcome <- GetAllProfilesOutcome{Profiles: nil, OperationOutcome: common.OperationOutcome{err}}
