@@ -25,7 +25,7 @@ jobs:
           ln -s SpeechSDK-Linux-$CARBON_VERSION current
           popd
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v5
         env:
           CGO_CFLAGS: "-I/tmp/carbon/current/include/c_api"
           CGO_LDFLAGS: "-L/tmp/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
