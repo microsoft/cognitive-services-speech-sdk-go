@@ -70,6 +70,11 @@ const (
 	// The SDK is using it internally.
 	SpeechServiceConnectionURL PropertyID = 1104
 
+	
+    // Specifies the list of hosts for which proxies should not be used. This setting overrides all other configurations.
+    // Hostnames are separated by commas and are matched in a case-insensitive manner. Wildcards are not supported.
+	SpeechServiceConnectionProxyHostBypass PropertyID = 1105
+
 	// SpeechServiceConnectionTranslationToLanguages is the list of comma separated languages used as target translation
 	// languages. Under normal circumstances, you shouldn't have to use this property directly.
 	// Instead use SpeechTranslationConfig.AddTargetLanguage and SpeechTranslationConfig.GetTargetLanguages.
