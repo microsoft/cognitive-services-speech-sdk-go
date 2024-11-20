@@ -362,3 +362,28 @@ func synthesizerFireEventBookmarkReached(handle C.SPXRECOHANDLE, eventHandle C.S
 	}
 	handler(*event)
 }
+
+var translationSynthesisCallbacks = make(map[C.SPXHANDLE]TranslationSynthesisEventHandler)
+
+func registerTranslationSynthesizingCallback(handler TranslationSynthesisEventHandler, handle C.SPXHANDLE) {
+	mu.Lock()
+	defer mu.Unlock()
+	translationSynthesisCallbacks[handle] = handler
+}
+
+func getTranslationSynthesizingCallback(handle C.SPXHANDLE) TranslationSynthesisEventHandler {
+	mu.Lock()
+	defer mu.Unlock()
+	return translationSynthesisCallbacks[handle]
+}
+
+//export translatorFireEventSynthesizing
+func translatorFireEventSynthesizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
+	handler := getTranslationSynthesizingCallback(handle)
+	event, err := NewTranslationSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
+	if err != nil || handler == nil {
+		C.recognizer_event_handle_release(handle)
+		return
+	}
+	handler(*event)
+}

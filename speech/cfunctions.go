@@ -105,4 +105,10 @@ package speech
 //     synthesizerFireEventBookmarkReached(handle, event);
 // }
 //
+// extern void translatorFireEventSynthesizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_translator_synthesizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     translatorFireEventSynthesizing(handle, event);
+// }
 import "C"
