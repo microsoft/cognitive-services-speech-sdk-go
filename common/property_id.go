@@ -141,6 +141,10 @@ const (
 	// or not.
 	SpeechServiceConnectionEnableAudioLogging PropertyID = 3202
 
+	// SpeechServiceConnectionLanguageIdMode is the language identifier mode.
+	// Allowed values are "AtStart" (the default value), "Continuous".
+	SpeechServiceConnectionLanguageIdMode = 3205
+
 	// SpeechServiceConnectionAutoDetectSourceLanguages is the auto detect source languages.
 	SpeechServiceConnectionAutoDetectSourceLanguages PropertyID = 3300
 
