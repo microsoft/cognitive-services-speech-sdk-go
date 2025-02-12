@@ -4,13 +4,12 @@
 package speech
 
 import (
-	"bufio"
-	"io"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 func createTranslationRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *TranslationRecognizer {
@@ -20,6 +19,8 @@ func createTranslationRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.
 		return nil
 	}
 	defer config.Close()
+
+	config.SetProxy("localhost", 8888)
 
 	// Add target languages for translation
 	err = config.AddTargetLanguage("es") // Spanish
@@ -265,44 +266,5 @@ func TestTranslationSynthesis(t *testing.T) {
 		t.Log("Received synthesis event.")
 	case <-time.After(5 * time.Second):
 		t.Error("Didn't receive synthesis event.")
-	}
-}
-
-func pumpFileIntoStream(t *testing.T, filename string, stream *audio.PushAudioInputStream) {
-	file, err := os.Open(filename)
-	if err != nil {
-		t.Error("Error opening file: ", err)
-		return
-	}
-	defer file.Close()
-	reader := bufio.NewReader(file)
-	buffer := make([]byte, 1000)
-	for {
-		n, err := reader.Read(buffer)
-		if err == io.EOF {
-			t.Log("Done reading file.")
-			break
-		}
-		if err != nil {
-			t.Error("Error reading file: ", err)
-			break
-		}
-		err = stream.Write(buffer[0:n])
-		if err != nil {
-			t.Error("Error writing to the stream")
-		}
-	}
-}
-
-func pumpSilenceIntoStream(t *testing.T, stream *audio.PushAudioInputStream) {
-	buffer := make([]byte, 1000)
-	for i := range buffer {
-		buffer[i] = 0
-	}
-	for i := 0; i < 16; i++ {
-		err := stream.Write(buffer)
-		if err != nil {
-			t.Error("Error writing to the stream")
-		}
 	}
 }

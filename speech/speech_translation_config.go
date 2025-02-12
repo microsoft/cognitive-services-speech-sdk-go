@@ -5,6 +5,7 @@ package speech
 
 import (
 	"strings"
+	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
@@ -34,11 +35,23 @@ func NewSpeechTranslationConfigFromSubscription(subscription string, region stri
 	}
 
 	config := new(SpeechTranslationConfig)
-	config.handle = handle
+	speechConfig, err := NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+
+	config.SpeechConfig = *speechConfig
+
 	return config, nil
 }
 
 // NewSpeechTranslationConfigFromAuthorizationToken creates a speech translation config instance with specified authorization token and region.
+// Note: The caller needs to ensure that the authorization token is valid. Before the authorization token expires, the
+// caller needs to refresh it by calling this setter with a new valid token.
+// As configuration values are copied when creating a new recognizer, the new token value will not apply to recognizers
+// that have already been created.
+// For recognizers that have been created before, you need to set authorization token of the corresponding recognizer
+// to refresh the token. Otherwise, the recognizers will encounter errors during recognition.
 func NewSpeechTranslationConfigFromAuthorizationToken(authToken string, region string) (*SpeechTranslationConfig, error) {
 	var handle C.SPXHANDLE
 	authTokenCStr := C.CString(authToken)
@@ -52,12 +65,26 @@ func NewSpeechTranslationConfigFromAuthorizationToken(authToken string, region s
 	}
 
 	config := new(SpeechTranslationConfig)
-	config.handle = handle
+	speechConfig, err := NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+
+	config.SpeechConfig = *speechConfig
+
 	return config, nil
 }
 
-// NewSpeechTranslationConfigFromEndpoint creates a speech translation config instance with specified endpoint and subscription.
-func NewSpeechTranslationConfigFromEndpoint(endpoint string, subscription string) (*SpeechTranslationConfig, error) {
+// NewSpeechTranslationConfigFromEndpointWithSubscription creates a speech translation config instance with specified endpoint and subscription.
+// This method is intended only for users who use a non-standard service endpoint.
+// Note: The query parameters specified in the endpoint URI are not changed, even if they are set by any other APIs.
+// For example, if the recognition language is defined in URI as query parameter "language=de-DE", and also set by
+// SetSpeechRecognitionLanguage("en-US"), the language setting in URI takes precedence, and the effective language
+// is "de-DE".
+// / Only the parameters that are not specified in the endpoint URI can be set by other APIs.
+// / Note: To use an authorization token with endoint, use FromEndpoint,
+// / and then call SetAuthorizationToken() on the created SpeechConfig instance.
+func NewSpeechTranslationConfigFromEndpointWithSubscription(endpoint string, subscription string) (*SpeechTranslationConfig, error) {
 	var handle C.SPXHANDLE
 	endpointCStr := C.CString(endpoint)
 	defer C.free(unsafe.Pointer(endpointCStr))
@@ -70,12 +97,51 @@ func NewSpeechTranslationConfigFromEndpoint(endpoint string, subscription string
 	}
 
 	config := new(SpeechTranslationConfig)
-	config.handle = handle
+	speechConfig, err := NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+
+	config.SpeechConfig = *speechConfig
+
 	return config, nil
 }
 
-// NewSpeechTranslationConfigFromHost creates a speech translation config instance with specified host and subscription.
-func NewSpeechTranslationConfigFromHost(host string, subscription string) (*SpeechTranslationConfig, error) {
+// NewSpeechTranslationConfigFromEndpoint creates a speech translation config instance with specified endpoint and subscription.
+// This method is intended only for users who use a non-standard service endpoint.
+// Note: The query parameters specified in the endpoint URI are not changed, even if they are set by any other APIs.
+// For example, if the recognition language is defined in URI as query parameter "language=de-DE", and also set by
+// SetSpeechRecognitionLanguage("en-US"), the language setting in URI takes precedence, and the effective language
+// is "de-DE".
+// / Only the parameters that are not specified in the endpoint URI can be set by other APIs.
+func NewSpeechTranslationConfigFromEndpoint(endpoint string) (*SpeechTranslationConfig, error) {
+	var handle C.SPXHANDLE
+	endpointCStr := C.CString(endpoint)
+	defer C.free(unsafe.Pointer(endpointCStr))
+
+	ret := uintptr(C.speech_translation_config_from_endpoint(&handle, endpointCStr, nil))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+
+	config := new(SpeechTranslationConfig)
+	speechConfig, err := NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+
+	config.SpeechConfig = *speechConfig
+
+	return config, nil
+}
+
+// NewSpeechTranslationConfigFromHostWithSubscription creates a speech translation config instance with specified host and subscription.
+// This method is intended only for users who use a non-default service host. Standard resource path will be assumed.
+// For services with a non-standard resource path or no path at all, use FromEndpoint instead.
+// Note: Query parameters are not allowed in the host URI and must be set by other APIs.
+// Note: To use an authorization token with host, use NewSpeechConfigFromHost,
+// and then call SetAuthorizationToken() on the created SpeechConfig instance.
+func NewSpeechTranslationConfigFromHostWithSubscription(host string, subscription string) (*SpeechTranslationConfig, error) {
 	var handle C.SPXHANDLE
 	hostCStr := C.CString(host)
 	defer C.free(unsafe.Pointer(hostCStr))
@@ -88,7 +154,42 @@ func NewSpeechTranslationConfigFromHost(host string, subscription string) (*Spee
 	}
 
 	config := new(SpeechTranslationConfig)
-	config.handle = handle
+	speechConfig, err := NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+
+	config.SpeechConfig = *speechConfig
+
+	return config, nil
+}
+
+// NewSpeechTranslationConfigFromHost creates a speech translation config instance with specified host and subscription.
+// This method is intended only for users who use a non-default service host. Standard resource path will be assumed.
+// For services with a non-standard resource path or no path at all, use FromEndpoint instead.
+// Note: Query parameters are not allowed in the host URI and must be set by other APIs.
+// Note: If the host requires a subscription key for authentication, use NewSpeechConfigFromHostWithSubscription to pass
+// the subscription key as parameter.
+// To use an authorization token with FromHost, use this method to create a SpeechConfig instance, and then
+// call SetAuthorizationToken() on the created SpeechConfig instance.
+func NewSpeechTranslationConfigFromHost(host string) (*SpeechTranslationConfig, error) {
+	var handle C.SPXHANDLE
+	hostCStr := C.CString(host)
+	defer C.free(unsafe.Pointer(hostCStr))
+
+	ret := uintptr(C.speech_translation_config_from_host(&handle, hostCStr, nil))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+
+	config := new(SpeechTranslationConfig)
+	speechConfig, err := NewSpeechConfigFromHandle(handle2uintptr(handle))
+	if err != nil {
+		return nil, err
+	}
+
+	config.SpeechConfig = *speechConfig
+
 	return config, nil
 }
 
@@ -118,7 +219,7 @@ func (config *SpeechTranslationConfig) RemoveTargetLanguage(language string) err
 
 // GetTargetLanguages gets target languages for translation.
 func (config *SpeechTranslationConfig) GetTargetLanguages() []string {
-	languages := config.GetProperty(common.SpeechServiceConnectionTranslationToLanguages, "")
+	languages := config.properties.GetProperty(common.SpeechServiceConnectionTranslationToLanguages, "")
 	if languages == "" {
 		return []string{}
 	}
@@ -145,5 +246,5 @@ func (config *SpeechTranslationConfig) SetVoiceName(voice string) {
 
 // GetVoiceName gets output voice name.
 func (config *SpeechTranslationConfig) GetVoiceName() string {
-	return config.GetProperty(common.SpeechServiceConnectionTranslationVoice, "")
+	return config.GetProperty(common.SpeechServiceConnectionTranslationVoice)
 }

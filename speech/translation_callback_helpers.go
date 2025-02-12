@@ -5,7 +5,6 @@ package speech
 
 import (
 	"sync"
-	"unsafe"
 )
 
 // #include <stdlib.h>
@@ -15,93 +14,77 @@ import (
 import "C"
 
 var (
-	translationRecognizingCallbacks = make(map[uintptr]TranslationRecognitionEventHandler)
-	translationRecognizedCallbacks  = make(map[uintptr]TranslationRecognitionEventHandler)
-	translationCanceledCallbacks    = make(map[uintptr]TranslationRecognitionCanceledEventHandler)
-	translationSynthesisCallbacks   = make(map[uintptr]TranslationSynthesisEventHandler)
+	translationRecognizingCallbacks = make(map[C.SPXHANDLE]TranslationRecognitionEventHandler)
+	translationRecognizedCallbacks  = make(map[C.SPXHANDLE]TranslationRecognitionEventHandler)
+	translationCanceledCallbacks    = make(map[C.SPXHANDLE]TranslationRecognitionCanceledEventHandler)
+	translationSynthesisCallbacks   = make(map[C.SPXHANDLE]TranslationSynthesisEventHandler)
 	translationCallbacksLock        sync.Mutex
 )
 
 func registerTranslationRecognizingCallback(callback TranslationRecognitionEventHandler, handle C.SPXHANDLE) {
 	translationCallbacksLock.Lock()
 	defer translationCallbacksLock.Unlock()
-	if callback == nil {
-		delete(translationRecognizingCallbacks, uintptr(handle))
-	} else {
-		translationRecognizingCallbacks[uintptr(handle)] = callback
-	}
+	translationRecognizingCallbacks[handle] = callback
 }
 
 func registerTranslationRecognizedCallback(callback TranslationRecognitionEventHandler, handle C.SPXHANDLE) {
 	translationCallbacksLock.Lock()
 	defer translationCallbacksLock.Unlock()
-	if callback == nil {
-		delete(translationRecognizedCallbacks, uintptr(handle))
-	} else {
-		translationRecognizedCallbacks[uintptr(handle)] = callback
-	}
+	translationRecognizedCallbacks[handle] = callback
 }
 
 func registerTranslationCanceledCallback(callback TranslationRecognitionCanceledEventHandler, handle C.SPXHANDLE) {
 	translationCallbacksLock.Lock()
 	defer translationCallbacksLock.Unlock()
-	if callback == nil {
-		delete(translationCanceledCallbacks, uintptr(handle))
-	} else {
-		translationCanceledCallbacks[uintptr(handle)] = callback
-	}
+	translationCanceledCallbacks[handle] = callback
 }
 
 func registerTranslationSynthesisCallback(callback TranslationSynthesisEventHandler, handle C.SPXHANDLE) {
 	translationCallbacksLock.Lock()
 	defer translationCallbacksLock.Unlock()
-	if callback == nil {
-		delete(translationSynthesisCallbacks, uintptr(handle))
-	} else {
-		translationSynthesisCallbacks[uintptr(handle)] = callback
-	}
+	translationSynthesisCallbacks[handle] = callback
 }
 
 //export cgoTranslationRecognizing
-func cgoTranslationRecognizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE, context unsafe.Pointer) {
+func cgoTranslationRecognizing(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	translationCallbacksLock.Lock()
-	callback := translationRecognizingCallbacks[uintptr(handle)]
+	callback := translationRecognizingCallbacks[handle]
 	translationCallbacksLock.Unlock()
 	if callback != nil {
-		eventArgs, _ := NewTranslationRecognitionEventArgsFromHandle(uintptr(eventHandle))
+		eventArgs, _ := NewTranslationRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
 		callback(*eventArgs)
 	}
 }
 
 //export cgoTranslationRecognized
-func cgoTranslationRecognized(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE, context unsafe.Pointer) {
+func cgoTranslationRecognized(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	translationCallbacksLock.Lock()
-	callback := translationRecognizedCallbacks[uintptr(handle)]
+	callback := translationRecognizedCallbacks[handle]
 	translationCallbacksLock.Unlock()
 	if callback != nil {
-		eventArgs, _ := NewTranslationRecognitionEventArgsFromHandle(uintptr(eventHandle))
+		eventArgs, _ := NewTranslationRecognitionEventArgsFromHandle(handle2uintptr(eventHandle))
 		callback(*eventArgs)
 	}
 }
 
 //export cgoTranslationCanceled
-func cgoTranslationCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE, context unsafe.Pointer) {
+func cgoTranslationCanceled(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	translationCallbacksLock.Lock()
-	callback := translationCanceledCallbacks[uintptr(handle)]
+	callback := translationCanceledCallbacks[handle]
 	translationCallbacksLock.Unlock()
 	if callback != nil {
-		eventArgs, _ := NewTranslationRecognitionCanceledEventArgsFromHandle(uintptr(eventHandle))
+		eventArgs, _ := NewTranslationRecognitionCanceledEventArgsFromHandle(handle2uintptr(eventHandle))
 		callback(*eventArgs)
 	}
 }
 
 //export cgoTranslationSynthesis
-func cgoTranslationSynthesis(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE, context unsafe.Pointer) {
+func cgoTranslationSynthesis(handle C.SPXRECOHANDLE, eventHandle C.SPXEVENTHANDLE) {
 	translationCallbacksLock.Lock()
-	callback := translationSynthesisCallbacks[uintptr(handle)]
+	callback := translationSynthesisCallbacks[handle]
 	translationCallbacksLock.Unlock()
 	if callback != nil {
-		eventArgs, _ := NewTranslationSynthesisEventArgsFromHandle(uintptr(eventHandle))
+		eventArgs, _ := NewTranslationSynthesisEventArgsFromHandle(handle2uintptr(eventHandle))
 		callback(*eventArgs)
 	}
 }
