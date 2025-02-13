@@ -105,4 +105,31 @@ package speech
 //     synthesizerFireEventBookmarkReached(handle, event);
 // }
 //
+// extern void cgoTranslationRecognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_translation_recognizer_recognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     cgoTranslationRecognized(handle, event);
+// }
+//
+// extern void cgoTranslationRecognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_translation_recognizer_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     cgoTranslationRecognizing(handle, event);
+// }
+//
+// extern void cgoTranslationSynthesis(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_translation_synthesis(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     cgoTranslationSynthesis(handle, event);
+// }
+//
+// extern void cgoTranslationCanceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_translation_recognizer_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     cgoTranslationCanceled(handle, event);
+// }
 import "C"

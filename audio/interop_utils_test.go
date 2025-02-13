@@ -4,8 +4,9 @@
 package audio
 
 import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"testing"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 func TestHandleConversion(t *testing.T) {
