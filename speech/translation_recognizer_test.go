@@ -5,12 +5,35 @@ package speech
 
 import (
 	"os"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/diagnostics"
 )
+
+func setup(t *testing.T) (teardown func()) {
+	logLineAtStart := diagnostics.GetMemoryLogLineNumNewest()
+	diagnostics.StartMemoryLogging()
+
+	return func() {
+		diagnostics.StopMemoryLogging()
+
+		if t.Failed() {
+			logLineAtEnd := diagnostics.GetMemoryLogLineNumNewest()
+
+			var logLines strings.Builder
+
+			for i := logLineAtStart; i < logLineAtEnd; i++ {
+				logLines.WriteString(diagnostics.GetMemoryLogLine(i))
+			}
+
+			t.Log(logLines.String())
+		}
+	}
+}
 
 func createTranslationRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *TranslationRecognizer {
 	config, err := NewSpeechTranslationConfigFromSubscription(subscription, region)
@@ -20,7 +43,11 @@ func createTranslationRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.
 	}
 	defer config.Close()
 
-	config.SetProxy("localhost", 8888)
+	err = config.SetSpeechRecognitionLanguage("en-us")
+	if err != nil {
+		t.Error("Got an error setting source language: ", err)
+		return nil
+	}
 
 	// Add target languages for translation
 	err = config.AddTargetLanguage("es") // Spanish
@@ -57,14 +84,20 @@ func createTranslationRecognizerFromFileInput(t *testing.T, file string) *Transl
 }
 
 func TestTranslationSessionEvents(t *testing.T) {
+	teardown := setup(t)
+	defer teardown()
+
 	recognizer := createTranslationRecognizerFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
 	if recognizer == nil {
 		t.Error("Recognizer creation failed")
 		return
 	}
 	defer recognizer.Close()
-	sessionStartedFuture := make(chan bool)
-	sessionStoppedFuture := make(chan bool)
+	sessionStartedFuture := make(chan bool, 1)
+	sessionStoppedFuture := make(chan bool, 1)
+	speechStartFuture := make(chan bool, 1)
+	speechEndFuture := make(chan bool, 1)
+
 	recognizer.SessionStarted(func(event SessionEventArgs) {
 		defer event.Close()
 		t.Log("SessionStarted")
@@ -75,11 +108,32 @@ func TestTranslationSessionEvents(t *testing.T) {
 		t.Log("SessionStopped")
 		sessionStoppedFuture <- true
 	})
+	recognizer.SpeechStartDetected(func(event RecognitionEventArgs) {
+		defer event.Close()
+		t.Log("SpeechStart")
+		speechStartFuture <- true
+	})
+	recognizer.SpeechEndDetected(func(event RecognitionEventArgs) {
+		defer event.Close()
+		t.Log("SpeechEnd")
+		speechEndFuture <- true
+	})
+
 	recognizer.RecognizeOnceAsync()
 	select {
 	case <-sessionStartedFuture:
 	case <-time.After(5 * time.Second):
 		t.Error("Timeout waiting for SessionStarted event.")
+	}
+	select {
+	case <-speechStartFuture:
+	case <-time.After(5 * time.Second):
+		t.Error("Timeout waiting for SpeechStart event.")
+	}
+	select {
+	case <-speechEndFuture:
+	case <-time.After(5 * time.Second):
+		t.Error("Timeout waiting for SpeechEnd event.")
 	}
 	select {
 	case <-sessionStoppedFuture:
@@ -89,7 +143,10 @@ func TestTranslationSessionEvents(t *testing.T) {
 }
 
 func TestTranslationRecognizeOnce(t *testing.T) {
-	recognizer := createTranslationRecognizerFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
+	teardown := setup(t)
+	defer teardown()
+
+	recognizer := createTranslationRecognizerFromFileInput(t, "../test_files/myVoiceIsMyPassportVerifyMe01.wav")
 	if recognizer == nil {
 		return
 	}
@@ -147,6 +204,17 @@ func TestTranslationRecognizeOnce(t *testing.T) {
 }
 
 func TestTranslationContinuousRecognition(t *testing.T) {
+	ImplTranslationContinuousRecognition(t, false)
+}
+
+func TestTranslationContinuousRecognitionEos(t *testing.T) {
+	ImplTranslationContinuousRecognition(t, true)
+}
+
+func ImplTranslationContinuousRecognition(t *testing.T, runToEnd bool) {
+	teardown := setup(t)
+	defer teardown()
+
 	format, err := audio.GetDefaultInputFormat()
 	if err != nil {
 		t.Error("Got an error ", err.Error())
@@ -168,8 +236,10 @@ func TestTranslationContinuousRecognition(t *testing.T) {
 	}
 	defer recognizer.Close()
 	firstResult := true
-	recognizedFuture := make(chan string)
-	recognizingFuture := make(chan string)
+	recognizedFuture := make(chan string, 10)
+	recognizingFuture := make(chan string, 10)
+	canceledFuture := make(chan bool)
+
 	recognizedHandler := func(event TranslationRecognitionEventArgs) {
 		defer event.Close()
 		firstResult = true
@@ -192,6 +262,16 @@ func TestTranslationContinuousRecognition(t *testing.T) {
 	}
 	recognizer.Recognized(recognizedHandler)
 	recognizer.Recognizing(recognizingHandle)
+	recognizer.Canceled(func(event TranslationRecognitionCanceledEventArgs) {
+		t.Log("Canceled event fired")
+		if event.Reason == common.EndOfStream {
+			canceledFuture <- true
+			return
+		}
+
+		t.Error("Canceled was not due to EOS " + event.ErrorDetails)
+	})
+
 	err = <-recognizer.StartContinuousRecognitionAsync()
 	if err != nil {
 		t.Error("Got error: ", err)
@@ -224,13 +304,25 @@ func TestTranslationContinuousRecognition(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Error("Didn't receive second Recognized event.")
 	}
-	err = <-recognizer.StopContinuousRecognitionAsync()
-	if err != nil {
-		t.Error("Got error: ", err)
+	if !runToEnd {
+		err = <-recognizer.StopContinuousRecognitionAsync()
+		if err != nil {
+			t.Error("Got error: ", err)
+		}
+	} else {
+		select {
+		case <-canceledFuture:
+			t.Log("Cancled EOS")
+		case <-time.After(5 * time.Second):
+			t.Error("Didn't receive Canceled event.")
+		}
 	}
 }
 
 func TestTranslationSynthesis(t *testing.T) {
+	teardown := setup(t)
+	defer teardown()
+
 	recognizer := createTranslationRecognizerFromFileInput(t, "../test_files/turn_on_the_lamp.wav")
 	if recognizer == nil {
 		return
@@ -241,15 +333,21 @@ func TestTranslationSynthesis(t *testing.T) {
 	config := recognizer.Properties
 	config.SetProperty(common.SpeechServiceConnectionTranslationVoice, "es-ES-ElviraNeural")
 
-	synthesisFuture := make(chan bool)
+	synthesisFuture := make(chan bool, 2)
+	synthesisCompleteFuture := make(chan bool, 2)
+
 	synthesisHandler := func(event TranslationSynthesisEventArgs) {
 		defer event.Close()
 		audioData := event.Result.GetAudioData()
-		if len(audioData) > 0 {
-			t.Log("Received synthesized audio data of length: ", len(audioData))
+		if len(audioData) > 0 && event.Result.Reason == common.SynthesizingAudio {
+			t.Log(time.Now().String()+"Received synthesized audio data of length: ", len(audioData))
 			synthesisFuture <- true
+		} else if event.Result.Reason == common.SynthesizingAudioCompleted {
+			t.Log("Synthesis is complete")
+			synthesisCompleteFuture <- true
 		}
 	}
+
 	recognizer.Synthesizing(synthesisHandler)
 
 	select {
@@ -257,13 +355,21 @@ func TestTranslationSynthesis(t *testing.T) {
 		if outcome.Error != nil {
 			t.Error("Got an error: ", outcome.Error)
 		}
-	case <-time.After(5 * time.Second):
+		t.Log(time.Now().String() + "Got result")
+	case <-time.After(9 * time.Second):
 		t.Error("Recognition result didn't resolve.")
 	}
 
 	select {
 	case <-synthesisFuture:
 		t.Log("Received synthesis event.")
+	case <-time.After(5 * time.Second):
+		t.Error("Didn't receive synthesis event.")
+	}
+
+	select {
+	case <-synthesisCompleteFuture:
+		t.Log("Received synthesis complete event.")
 	case <-time.After(5 * time.Second):
 		t.Error("Didn't receive synthesis event.")
 	}

@@ -21,9 +21,9 @@ import (
 // void cgo_recognizer_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_recognizer_speech_start_detected(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_recognizer_speech_end_detected(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
-// void cgo_recognizer_recognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
-// void cgo_recognizer_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
-// void cgo_recognizer_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_translation_recognizer_recognized(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_translation_recognizer_recognizing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
+// void cgo_translation_recognizer_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_translation_synthesis(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 //
 import "C"
@@ -234,7 +234,7 @@ func (recognizer TranslationRecognizer) Recognizing(handler TranslationRecogniti
 	if handler != nil {
 		C.recognizer_recognizing_set_callback(
 			recognizer.handle,
-			(C.PSESSION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_recognizer_recognizing)),
+			(C.PSESSION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_translation_recognizer_recognizing)),
 			nil)
 	} else {
 		C.recognizer_recognizing_set_callback(recognizer.handle, nil, nil)
@@ -248,7 +248,7 @@ func (recognizer TranslationRecognizer) Recognized(handler TranslationRecognitio
 	if handler != nil {
 		C.recognizer_recognized_set_callback(
 			recognizer.handle,
-			(C.PSESSION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_recognizer_recognized)),
+			(C.PSESSION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_translation_recognizer_recognized)),
 			nil)
 	} else {
 		C.recognizer_recognized_set_callback(recognizer.handle, nil, nil)
@@ -263,7 +263,7 @@ func (recognizer TranslationRecognizer) Canceled(handler TranslationRecognitionC
 	if handler != nil {
 		C.recognizer_canceled_set_callback(
 			recognizer.handle,
-			(C.PSESSION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_recognizer_canceled)),
+			(C.PSESSION_CALLBACK_FUNC)(unsafe.Pointer(C.cgo_translation_recognizer_canceled)),
 			nil)
 	} else {
 		C.recognizer_canceled_set_callback(recognizer.handle, nil, nil)
