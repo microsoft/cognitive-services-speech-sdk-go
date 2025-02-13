@@ -228,11 +228,11 @@ func (config *SpeechTranslationConfig) GetTargetLanguages() []string {
 
 // SetCustomModelCategoryId sets a Category Id that will be passed to service.
 // Category Id is used to find the custom model.
-func (config *SpeechTranslationConfig) SetCustomModelCategoryId(categoryId string) error {
-	categoryIdCStr := C.CString(categoryId)
-	defer C.free(unsafe.Pointer(categoryIdCStr))
+func (config *SpeechTranslationConfig) SetCustomModelCategoryID(categoryID string) error {
+	categoryIDCStr := C.CString(categoryID)
+	defer C.free(unsafe.Pointer(categoryIDCStr))
 
-	ret := uintptr(C.speech_translation_config_set_custom_model_category_id(config.handle, categoryIdCStr))
+	ret := uintptr(C.speech_translation_config_set_custom_model_category_id(config.handle, categoryIDCStr))
 	if ret != C.SPX_NOERROR {
 		return common.NewCarbonError(ret)
 	}
@@ -240,8 +240,8 @@ func (config *SpeechTranslationConfig) SetCustomModelCategoryId(categoryId strin
 }
 
 // SetVoiceName sets output voice name.
-func (config *SpeechTranslationConfig) SetVoiceName(voice string) {
-	config.SetProperty(common.SpeechServiceConnectionTranslationVoice, voice)
+func (config *SpeechTranslationConfig) SetVoiceName(voice string) error {
+	return config.SetProperty(common.SpeechServiceConnectionTranslationVoice, voice)
 }
 
 // GetVoiceName gets output voice name.

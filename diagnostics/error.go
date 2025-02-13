@@ -6,10 +6,6 @@ import "C"
 
 import "fmt"
 
-const (
-	AZAC_OK = 0
-)
-
 type diagnosticsError struct {
 	operation string
 	code      uintptr
