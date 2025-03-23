@@ -11,8 +11,8 @@ import (
 import "C"
 
 type CarbonError struct {
-	Code    int
-	Message string
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 var errorString = map[int]string{
