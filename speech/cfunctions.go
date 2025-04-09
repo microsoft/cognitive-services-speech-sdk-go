@@ -132,4 +132,45 @@ package speech
 // {
 //     cgoTranslationCanceled(handle, event);
 // }
+//
+// extern void conversationTranscriberFireEventTranscribing(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_conversation_transcriber_transcribing(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     conversationTranscriberFireEventTranscribing(handle, event);
+// }
+//
+// extern void conversationTranscriberFireEventTranscribed(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_conversation_transcriber_transcribed(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     conversationTranscriberFireEventTranscribed(handle, event);
+// }
+//
+// extern void conversationTranscriberFireEventCanceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event);
+//
+// void cgo_conversation_transcriber_canceled(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     conversationTranscriberFireEventCanceled(handle, event);
+// }
+//
+// void cgo_conversation_transcriber_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     recognizerFireEventSessionStarted(handle, event);
+// }
+//
+// void cgo_conversation_transcriber_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     recognizerFireEventSessionStopped(handle, event);
+// }
+//
+// void cgo_conversation_transcriber_speech_start_detected(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     recognizerFireEventSpeechStartDetected(handle, event);
+// }
+//
+// void cgo_conversation_transcriber_speech_end_detected(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context)
+// {
+//     recognizerFireEventSpeechEndDetected(handle, event);
+// }
 import "C"
