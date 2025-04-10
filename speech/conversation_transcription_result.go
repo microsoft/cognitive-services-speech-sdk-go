@@ -19,7 +19,7 @@ import "C"
 // ConversationTranscriptionResult contains detailed information about result of a conversation transcription operation.
 type ConversationTranscriptionResult struct {
 	SpeechRecognitionResult // Embedded for common fields
-	SpeakerId              string
+	SpeakerID              string
 }
 
 // NewConversationTranscriptionResultFromHandle creates a ConversationTranscriptionResult from a handle (for internal use)
@@ -42,7 +42,7 @@ func NewConversationTranscriptionResultFromHandle(handle common.SPXHandle) (*Con
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.SpeakerId = C.GoString((*C.char)(buffer))
+	result.SpeakerID = C.GoString((*C.char)(buffer))
 
 	return result, nil
 }

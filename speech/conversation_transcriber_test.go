@@ -226,14 +226,14 @@ func TestConversationTranscriberSingleSpeaker(t *testing.T) {
 	transcribedHandler := func(event ConversationTranscriptionEventArgs) {
 		defer event.Close()
 		t.Log("Transcribed text: ", event.Result.Text)
-		t.Log("Speaker ID: ", event.Result.SpeakerId)
+		t.Log("Speaker ID: ", event.Result.SpeakerID)
 		transcribedFuture <- true
 	}
 	
 	transcribingHandler := func(event ConversationTranscriptionEventArgs) {
 		defer event.Close()
 		t.Log("Transcribing text: ", event.Result.Text)
-		t.Log("Speaker ID: ", event.Result.SpeakerId)
+		t.Log("Speaker ID: ", event.Result.SpeakerID)
 		select {
 		case transcribingFuture <- true:
 		default:
@@ -323,11 +323,11 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 		defer event.Close()
 		firstResult = true
 		t.Log("Transcribed: ", event.Result.Text)
-		t.Log("Speaker ID: ", event.Result.SpeakerId)
+		t.Log("Speaker ID: ", event.Result.SpeakerID)
 		
 		// Send speaker ID to the channel if it's not empty
-		if event.Result.SpeakerId != "" && event.Result.SpeakerId != "Unknown" {
-			speakerIDsChan <- event.Result.SpeakerId
+		if event.Result.SpeakerID != "" && event.Result.SpeakerID != "Unknown" {
+			speakerIDsChan <- event.Result.SpeakerID
 		}
 		
 		transcribedFuture <- "Transcribed"
@@ -336,11 +336,11 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 	transcribingHandler := func(event ConversationTranscriptionEventArgs) {
 		defer event.Close()
 		t.Log("Transcribing: ", event.Result.Text)
-		t.Log("Speaker ID: ", event.Result.SpeakerId)
+		t.Log("Speaker ID: ", event.Result.SpeakerID)
 		
 		// Send speaker ID to the channel if it's not empty
-		if event.Result.SpeakerId != "" && event.Result.SpeakerId != "Unknown" {
-			speakerIDsChan <- event.Result.SpeakerId
+		if event.Result.SpeakerID != "" && event.Result.SpeakerID != "Unknown" {
+			speakerIDsChan <- event.Result.SpeakerID
 		}
 		
 		if firstResult {
