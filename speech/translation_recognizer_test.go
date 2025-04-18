@@ -238,7 +238,7 @@ func ImplTranslationContinuousRecognition(t *testing.T, runToEnd bool) {
 	firstResult := true
 	recognizedFuture := make(chan string, 10)
 	recognizingFuture := make(chan string, 10)
-	canceledFuture := make(chan bool)
+	canceledFuture := make(chan bool, 1)
 
 	recognizedHandler := func(event TranslationRecognitionEventArgs) {
 		defer event.Close()
