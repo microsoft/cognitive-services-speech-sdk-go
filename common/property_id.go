@@ -134,7 +134,8 @@ const (
 	// service.
 	SpeechServiceConnectionInitialSilenceTimeoutMs PropertyID = 3200
 
-	// SpeechServiceConnectionEndSilenceTimeoutMs is the end silence timeout value (in milliseconds) used by the service.
+	// This property is deprecated.
+	// For current information about silence timeouts, please visit https://aka.ms/csspeech/timeouts.
 	SpeechServiceConnectionEndSilenceTimeoutMs PropertyID = 3201
 
 	// SpeechServiceConnectionEnableAudioLogging is a boolean value specifying whether audio logging is enabled in the service
