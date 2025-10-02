@@ -11,7 +11,6 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/dialog_service_connector"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/recognizer"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/synthesizer"
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/speaker_recognition"
 )
 
 type functionMap = map[string]func(string, string, string)
@@ -39,8 +38,6 @@ func main() {
 		"dialog_service_connector:ListenOnceFromStream":     dialog_service_connector.ListenOnceFromStream,
 		"speech_synthesizer:SynthesisToSpeaker":             synthesizer.SynthesisToSpeaker,
 		"speech_synthesizer:SynthesisToAudioDataStream":     synthesizer.SynthesisToAudioDataStream,
-		"speaker_recognizer:IndependentIdentification":      speaker_recognition.IndependentIdentification,
-		"speaker_recognizer:IndependentVerification":        speaker_recognition.IndependentVerification,
 	}
 	args := os.Args[1:]
 	if len(args) != 4 {

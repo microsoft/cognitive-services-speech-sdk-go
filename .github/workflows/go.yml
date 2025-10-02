@@ -61,8 +61,6 @@ jobs:
         DIALOG_SUBSCRIPTION_REGION: ${{ secrets.DIALOG_SUBSCRIPTION_REGION }}
         SPEECH_SUBSCRIPTION_KEY: ${{ secrets.SR_SUBSCRIPTION_KEY }}
         SPEECH_SUBSCRIPTION_REGION: ${{ secrets.SR_SUBSCRIPTION_REGION }}
-        SPEAKER_RECOGNITION_SUBSCRIPTION_KEY: ${{ secrets.SPEAKER_SUBSCRIPTION_KEY }}
-        SPEAKER_RECOGNITION_SUBSCRIPTION_REGION: ${{ secrets.SPEAKER_SUBSCRIPTION_REGION }}
       run: |
         export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
         export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
@@ -116,8 +114,6 @@ jobs:
         DIALOG_SUBSCRIPTION_REGION: ${{ secrets.DIALOG_SUBSCRIPTION_REGION }}
         SPEECH_SUBSCRIPTION_KEY: ${{ secrets.SR_SUBSCRIPTION_KEY }}
         SPEECH_SUBSCRIPTION_REGION: ${{ secrets.SR_SUBSCRIPTION_REGION }}
-        SPEAKER_RECOGNITION_SUBSCRIPTION_KEY: ${{ secrets.SPEAKER_SUBSCRIPTION_KEY }}
-        SPEAKER_RECOGNITION_SUBSCRIPTION_REGION: ${{ secrets.SPEAKER_SUBSCRIPTION_REGION }}
       run: |
         export SDK_HOME="$HOME/speechsdk/MicrosoftCognitiveServicesSpeech.xcframework/macos-arm64_x86_64"
         export CGO_CFLAGS="-I$SDK_HOME/MicrosoftCognitiveServicesSpeech.framework/Headers"

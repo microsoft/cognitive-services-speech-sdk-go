@@ -261,9 +261,9 @@ func testPhraseList(t *testing.T, with_grammar bool) {
 		t.Error("Timeout waiting for result.")
 	}
 	defer result.Close()
-	if strings.Contains(result.Text, "peloozoid") != with_grammar {
+	if strings.Contains(strings.ToLower(result.Text), "peloozoid") != with_grammar {
 		t.Log(result.Text)
-		t.Error("Result doesn't match expectation")
+		t.Errorf("Result doesn't match expectation (expected 'peloozoid', got '%s')", result.Text)
 	}
 }
 

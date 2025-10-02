@@ -21,30 +21,24 @@ func _() {
 	_ = x[RecognizingKeyword-10]
 	_ = x[RecognizedKeyword-11]
 	_ = x[SynthesizingAudioStarted-12]
-	_ = x[EnrollingVoiceProfile-17]
-	_ = x[EnrolledVoiceProfile-18]
-	_ = x[RecognizedSpeakers-19]
-	_ = x[RecognizedSpeaker-20]
-	_ = x[ResetVoiceProfile-21]
-	_ = x[DeletedVoiceProfile-22]
-	_ = x[VoicesListRetrieved-23]
+	_ = x[VoicesListRetrieved-17]
 }
 
 const (
 	_ResultReason_name_0 = "NoMatchCanceledRecognizingSpeechRecognizedSpeechRecognizingIntentRecognizedIntentTranslatingSpeechTranslatedSpeechSynthesizingAudioSynthesizingAudioCompletedRecognizingKeywordRecognizedKeywordSynthesizingAudioStarted"
-	_ResultReason_name_1 = "EnrollingVoiceProfileEnrolledVoiceProfileRecognizedSpeakersRecognizedSpeakerResetVoiceProfileDeletedVoiceProfileVoicesListRetrieved"
+	_ResultReason_name_1 = "VoicesListRetrieved"
 )
 
 var (
 	_ResultReason_index_0 = [...]uint8{0, 7, 15, 32, 48, 65, 81, 98, 114, 131, 157, 175, 192, 216}
-	_ResultReason_index_1 = [...]uint8{0, 21, 41, 59, 76, 93, 112, 131}
+	_ResultReason_index_1 = [...]uint8{0, 19}
 )
 
 func (i ResultReason) String() string {
 	switch {
 	case 0 <= i && i <= 12:
 		return _ResultReason_name_0[_ResultReason_index_0[i]:_ResultReason_index_0[i+1]]
-	case 17 <= i && i <= 23:
+	case 17 == i:
 		i -= 17
 		return _ResultReason_name_1[_ResultReason_index_1[i]:_ResultReason_index_1[i+1]]
 	default:

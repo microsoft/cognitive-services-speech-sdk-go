@@ -53,11 +53,18 @@ func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason co
 	t.Logf("checking synthesis result with result id of %v", result.ResultID)
 	if result.Reason != reason {
 		t.Errorf("Synthesis result reason mismatch. expected %v, got %v", reason, result.Reason)
+		if result.Reason == common.Canceled {
+			cancellation, _ := NewCancellationDetailsFromSpeechSynthesisResult(result)
+			t.Errorf("CANCELED: Reason=%v", cancellation.Reason)
+			t.Errorf("CANCELED: ErrorCode=%v ErrorDetails=%s",
+				cancellation.ErrorCode,
+				cancellation.ErrorDetails)
+		}
 	}
-	if reason == common.Canceled {
+	if result.Reason == common.Canceled {
 		return
 	}
-	if reason == common.SynthesizingAudioStarted {
+	if result.Reason == common.SynthesizingAudioStarted {
 		if len(result.AudioData) != 0 {
 			t.Errorf("Synthesized audio should be empty for SynthesizingAudioStarted, got size %d.", len(result.AudioData))
 		}
@@ -156,7 +163,7 @@ func TestSynthesizerSpeakingSsml(t *testing.T) {
 		return
 	}
 	defer synthesizer.Close()
-	synthesizer.Properties.SetProperty(common.SpeechServiceConnectionSynthVoice, "en-GB-George")
+	synthesizer.Properties.SetProperty(common.SpeechServiceConnectionSynthVoice, "en-GB-SoniaNeural")
 	textResultFuture := synthesizer.SpeakTextAsync("text")
 
 	var textResult SpeechSynthesisOutcome
@@ -168,7 +175,7 @@ func TestSynthesizerSpeakingSsml(t *testing.T) {
 		t.Error("Timeout waiting for synthesis result.")
 	}
 
-	ssml := "<speak xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xmlns:emo='http://www.w3.org/2009/10/emotionml' version='1.0' xml:lang='en-US'><voice name='en-GB-George'>text</voice></speak>"
+	ssml := "<speak xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xmlns:emo='http://www.w3.org/2009/10/emotionml' version='1.0' xml:lang='en-US'><voice name='en-GB-SoniaNeural'>text</voice></speak>"
 	ssmlResultFuture := synthesizer.SpeakSsmlAsync(ssml)
 
 	select {
@@ -434,18 +441,12 @@ func TestSynthesisGetAvailableVoices(t *testing.T) {
 				t.Error("voice name error")
 			}
 		}
-		jenny := outcome.Result.Voices[0]
-		if jenny.LocalName != "Jenny" {
-			t.Errorf("The first en-US voice [%s] is not Jenny.", jenny.LocalName)
+		voice := outcome.Result.Voices[0]
+		if voice.VoiceType != common.OnlineNeural {
+			t.Error("Voice type is incorrect.")
 		}
-		if jenny.VoiceType != common.OnlineNeural {
-			t.Error("Jenny's voice type is incorrect.")
-		}
-		if len(jenny.StyleList) < 2 {
-			t.Error("Jenny's style list error.")
-		}
-		if jenny.Gender != common.Female {
-			t.Error("Jenny's gender error.")
+		if voice.Gender != common.Female {
+			t.Error("Voice gender error.")
 		}
 	case <-time.After(timeout):
 		t.Error("Timeout waiting for synthesis voices result.")

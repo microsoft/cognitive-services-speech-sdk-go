@@ -326,6 +326,7 @@ func pumpFileIntoStream(t *testing.T, filename string, stream *audio.PushAudioIn
 			t.Error("Error writing to the stream")
 		}
 	}
+	stream.Write(buffer[0:0]) // Force a final result at the end.
 }
 
 func TestFromPushInputStream(t *testing.T) {
