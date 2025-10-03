@@ -49,8 +49,26 @@ const (
 	// SynthesizingAudioStarted indicates the speech synthesis is now started
 	SynthesizingAudioStarted ResultReason = 12
 
+	// This result reason is deprecated and not used anymore.
+	EnrollingVoiceProfile ResultReason = 17
+
+	// This result reason is deprecated and not used anymore.
+	EnrolledVoiceProfile ResultReason = 18
+
+	// This result reason is deprecated and not used anymore.
+	RecognizedSpeakers ResultReason = 19
+
+	// This result reason is deprecated and not used anymore.
+	RecognizedSpeaker ResultReason = 20
+
+	// This result reason is deprecated and not used anymore.
+	ResetVoiceProfile ResultReason = 21
+
+	// This result reason is deprecated and not used anymore.
+	DeletedVoiceProfile ResultReason = 22
+
 	// VoicesListRetrieved indicates the voices list has been retrieved successfully.
-	VoicesListRetrieved ResultReason = 17
+	VoicesListRetrieved ResultReason = 23
 )
 
 //go:generate stringer -type=ResultReason -output=result_reason_string.go
