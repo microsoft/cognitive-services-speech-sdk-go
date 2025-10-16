@@ -14,7 +14,7 @@ import (
 // #include <speechapi_c_speech_config.h>
 import "C"
 
-// SpeechConfig is the class that defines configurations for speech / intent recognition, or speech synthesis.
+// SpeechConfig is the class that defines configurations for speech recognition or speech synthesis.
 type SpeechConfig struct {
 	handle     C.SPXHANDLE
 	properties *common.PropertyCollection
@@ -162,13 +162,13 @@ func NewSpeechConfigFromHost(host string) (*SpeechConfig, error) {
 	return NewSpeechConfigFromHandle(handle2uintptr(handle))
 }
 
-// SubscriptionKey is the subscription key that is used to create Speech Recognizer or Intent Recognizer or Translation
+// SubscriptionKey is the subscription key that is used to create Speech Recognizer or Translation
 // Recognizer or Speech Synthesizer
 func (config *SpeechConfig) SubscriptionKey() string {
 	return config.GetProperty(common.SpeechServiceConnectionKey)
 }
 
-// Region is the region key that used to create Speech Recognizer or Intent Recognizer or Translation Recognizer or
+// Region is the region key that used to create Speech Recognizer or Translation Recognizer or
 // Speech Synthesizer.
 func (config *SpeechConfig) Region() string {
 	return config.GetProperty(common.SpeechServiceConnectionRegion)

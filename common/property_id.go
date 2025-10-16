@@ -8,8 +8,7 @@ package common
 type PropertyID int
 
 const (
-	// SpeechServiceConnectionKey is the Cognitive Services Speech Service subscription key. If you are using an
-	// intent recognizer, you need to specify the LUIS endpoint key for your particular LUIS app. Under normal
+	// SpeechServiceConnectionKey is the Cognitive Services Speech Service subscription key. Under normal
 	// circumstances, you shouldn't have to use this property directly.
 	// Instead, use NewSpeechConfigFromSubscription.
 	SpeechServiceConnectionKey PropertyID = 1000
@@ -87,11 +86,6 @@ const (
 
 	// SpeechServiceConnectionTranslationFeatures is the translation features. For internal use.
 	SpeechServiceConnectionTranslationFeatures PropertyID = 2002
-
-	// SpeechServiceConnectionIntentRegion is the Language Understanding Service region. Under normal circumstances, you
-	// shouldn't have to use this property directly.
-	// Instead use LanguageUnderstandingModel.
-	SpeechServiceConnectionIntentRegion PropertyID = 2003
 
 	// SpeechServiceConnectionRecoMode is the Cognitive Services Speech Service recognition mode. Can be "INTERACTIVE",
 	// "CONVERSATION" or "DICTATION".
@@ -207,7 +201,7 @@ const (
 	SpeechServiceResponseJSONErrorDetails PropertyID = 5001
 
 	// SpeechServiceResponseRecognitionLatencyMs is the recognition latency in milliseconds. Read-only, available on final
-	// speech/translation/intent results. This measures the latency between when an audio input is received by the SDK, and
+	// speech/translation results. This measures the latency between when an audio input is received by the SDK, and
 	// the moment the final result is received from the service. The SDK computes the time difference between the last audio
 	// fragment from the audio input that is contributing to the final result, and the time the final result is received from
 	// the speech service.
@@ -262,10 +256,6 @@ const (
 
 	// CancellationDetailsReasonDetailedText is the cancellation detailed text. Currently unused.
 	CancellationDetailsReasonDetailedText PropertyID = 6002
-
-	// LanguageUnderstandingServiceResponseJSONResult is the Language Understanding Service response output (in JSON format).
-	// Available via IntentRecognitionResult.Properties.
-	LanguageUnderstandingServiceResponseJSONResult PropertyID = 7000
 
 	// AudioConfigDeviceNameForCapture is the device name for audio capture. Under normal circumstances, you shouldn't have
 	// to use this property directly.

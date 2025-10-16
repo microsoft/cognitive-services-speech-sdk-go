@@ -20,11 +20,10 @@ const (
 	// Speech Recognition is now complete for this phrase.
 	RecognizedSpeech ResultReason = 3
 
-	// RecognizingIntent indicates the intent result contains hypothesis text and intent.
+	// This result reason is deprecated and not used anymore.
 	RecognizingIntent ResultReason = 4
 
-	// RecognizedIntent indicates the intent result contains final text and intent.
-	// Speech Recognition and Intent determination are now complete for this phrase.
+	// This result reason is deprecated and not used anymore.
 	RecognizedIntent ResultReason = 5
 
 	// TranslatingSpeech indicates the translation result contains hypothesis text and its translation(s).
