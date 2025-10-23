@@ -89,7 +89,7 @@ func NewSpeechSynthesizerFomAutoDetectSourceLangConfig(config *SpeechConfig, lan
 
 // SpeakTextAsync executes the speech synthesis on plain text, asynchronously.
 func (synthesizer SpeechSynthesizer) SpeakTextAsync(text string) chan SpeechSynthesisOutcome {
-	outcome := make(chan SpeechSynthesisOutcome)
+	outcome := make(chan SpeechSynthesisOutcome, 1)
 	go func() {
 		var handle C.SPXRESULTHANDLE
 		cText := C.CString(text)
@@ -108,7 +108,7 @@ func (synthesizer SpeechSynthesizer) SpeakTextAsync(text string) chan SpeechSynt
 
 // SpeakSsmlAsync executes the speech synthesis on SSML, asynchronously.
 func (synthesizer SpeechSynthesizer) SpeakSsmlAsync(ssml string) chan SpeechSynthesisOutcome {
-	outcome := make(chan SpeechSynthesisOutcome)
+	outcome := make(chan SpeechSynthesisOutcome, 1)
 	go func() {
 		var handle C.SPXRESULTHANDLE
 		cText := C.CString(ssml)
@@ -128,7 +128,7 @@ func (synthesizer SpeechSynthesizer) SpeakSsmlAsync(ssml string) chan SpeechSynt
 // StartSpeakingTextAsync starts the speech synthesis on plain text, asynchronously.
 // It returns when the synthesis request is started to process (the result reason is SynthesizingAudioStarted).
 func (synthesizer SpeechSynthesizer) StartSpeakingTextAsync(text string) chan SpeechSynthesisOutcome {
-	outcome := make(chan SpeechSynthesisOutcome)
+	outcome := make(chan SpeechSynthesisOutcome, 1)
 	go func() {
 		var handle C.SPXRESULTHANDLE
 		cText := C.CString(text)
@@ -148,7 +148,7 @@ func (synthesizer SpeechSynthesizer) StartSpeakingTextAsync(text string) chan Sp
 // StartSpeakingSsmlAsync starts the speech synthesis on SSML, asynchronously.
 // It returns when the synthesis request is started to process (the result reason is SynthesizingAudioStarted).
 func (synthesizer SpeechSynthesizer) StartSpeakingSsmlAsync(ssml string) chan SpeechSynthesisOutcome {
-	outcome := make(chan SpeechSynthesisOutcome)
+	outcome := make(chan SpeechSynthesisOutcome, 1)
 	go func() {
 		var handle C.SPXRESULTHANDLE
 		cText := C.CString(ssml)
@@ -168,7 +168,7 @@ func (synthesizer SpeechSynthesizer) StartSpeakingSsmlAsync(ssml string) chan Sp
 // StopSpeakingAsync stops the speech synthesis, asynchronously.
 // It stops audio speech synthesis and discards any unread data in audio.PullAudioOutputStream.
 func (synthesizer SpeechSynthesizer) StopSpeakingAsync() chan error {
-	outcome := make(chan error)
+	outcome := make(chan error, 1)
 	go func() {
 		ret := uintptr(C.synthesizer_stop_speaking(synthesizer.handle))
 		if ret != C.SPX_NOERROR {
@@ -183,7 +183,7 @@ func (synthesizer SpeechSynthesizer) StopSpeakingAsync() chan error {
 // GetVoicesAsync gets the available voices, asynchronously.
 // The parameter locale specifies the locale of voices, in BCP-47 format; or leave it empty to get all available voices.
 func (synthesizer SpeechSynthesizer) GetVoicesAsync(locale string) chan SpeechSynthesisVoicesOutcome {
-	outcome := make(chan SpeechSynthesisVoicesOutcome)
+	outcome := make(chan SpeechSynthesisVoicesOutcome, 1)
 	go func() {
 		var handle C.SPXRESULTHANDLE
 		cLocale := C.CString(locale)

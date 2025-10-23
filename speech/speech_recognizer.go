@@ -137,7 +137,7 @@ func NewSpeechRecognizerFromSourceLanguage(config *SpeechConfig, sourceLanguage 
 // shot recognition like command or query.
 // For long-running multi-utterance recognition, use StartContinuousRecognitionAsync() instead.
 func (recognizer SpeechRecognizer) RecognizeOnceAsync() chan SpeechRecognitionOutcome {
-	outcome := make(chan SpeechRecognitionOutcome)
+	outcome := make(chan SpeechRecognitionOutcome, 1)
 	go func() {
 		var handle C.SPXRESULTHANDLE
 		ret := uintptr(C.recognizer_recognize_once(recognizer.handle, &handle))
@@ -162,7 +162,7 @@ func releaseAsyncHandleIfValid(handle *C.SPXASYNCHANDLE) uintptr {
 
 // StartContinuousRecognitionAsync asynchronously initiates continuous speech recognition operation.
 func (recognizer SpeechRecognizer) StartContinuousRecognitionAsync() chan error {
-	outcome := make(chan error)
+	outcome := make(chan error, 1)
 	go func() {
 		// Close any unfinished previous attempt
 		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStartContinuous)
@@ -184,7 +184,7 @@ func (recognizer SpeechRecognizer) StartContinuousRecognitionAsync() chan error 
 
 // StopContinuousRecognitionAsync asynchronously terminates ongoing continuous speech recognition operation.
 func (recognizer SpeechRecognizer) StopContinuousRecognitionAsync() chan error {
-	outcome := make(chan error)
+	outcome := make(chan error, 1)
 	go func() {
 		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStopContinuous)
 		if ret == C.SPX_NOERROR {
@@ -205,7 +205,7 @@ func (recognizer SpeechRecognizer) StopContinuousRecognitionAsync() chan error {
 
 // StartKeywordRecognitionAsync asynchronously initiates keyword recognition operation.
 func (recognizer SpeechRecognizer) StartKeywordRecognitionAsync(model KeywordRecognitionModel) chan error {
-	outcome := make(chan error)
+	outcome := make(chan error, 1)
 	modelHandle := uintptr2handle(model.GetHandle())
 	go func() {
 		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStartKeyword)
@@ -227,7 +227,7 @@ func (recognizer SpeechRecognizer) StartKeywordRecognitionAsync(model KeywordRec
 
 // StopKeywordRecognitionAsync asynchronously terminates keyword recognition operation.
 func (recognizer SpeechRecognizer) StopKeywordRecognitionAsync() chan error {
-	outcome := make(chan error)
+	outcome := make(chan error, 1)
 	go func() {
 		ret := releaseAsyncHandleIfValid(&recognizer.handleAsyncStopKeyword)
 		if ret == C.SPX_NOERROR {
