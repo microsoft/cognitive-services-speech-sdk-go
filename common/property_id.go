@@ -142,6 +142,12 @@ const (
 	// SpeechServiceConnectionAutoDetectSourceLanguageResult is the auto detect source language result.
 	SpeechServiceConnectionAutoDetectSourceLanguageResult PropertyID = 3301
 
+	// SpeechServiceConnectionLanguageIdMode is the speech service connection language identifier mode.
+	// Can be "AtStart" (the default), or "Continuous". See Language Identification documentation
+	// at https://aka.ms/speech/lid for more details.
+	// Added in version 1.25.0
+	SpeechServiceConnectionLanguageIdMode PropertyID = 3205
+
 	// SpeechServiceResponseRequestDetailedResultTrueFalse the requested Cognitive Services Speech Service response output
 	// format (simple or detailed). Under normal circumstances, you shouldn't have to use this property directly.
 	// Instead use SpeechConfig.SetOutputFormat.
