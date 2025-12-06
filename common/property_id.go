@@ -139,7 +139,7 @@ const (
 	// SpeechServiceConnectionLanguageIdMode is the speech service connection language identifier mode.
 	// Can be "AtStart" (the default), or "Continuous". See Language Identification documentation
 	// at https://aka.ms/speech/lid for more details.
-	SpeechServiceConnectionLanguageIdMode PropertyID = 3205
+	SpeechServiceConnectionLanguageIDMode PropertyID = 3205
 
 	// SpeechServiceConnectionAutoDetectSourceLanguages is the auto detect source languages.
 	SpeechServiceConnectionAutoDetectSourceLanguages PropertyID = 3300
