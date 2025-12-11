@@ -33,6 +33,8 @@ func main() {
 		"speech_recognizer:RecognizeOnceFromALAWFile":       recognizer.RecognizeOnceFromALAWFile,
 		"speech_recognizer:ContinuousFromMicrophone":        recognizer.ContinuousFromMicrophone,
 		"speech_recognizer:RecognizeContinuousUsingWrapper": recognizer.RecognizeContinuousUsingWrapper,
+		"speech_recognizer:LanguageDetectionRecognizeOnce":  recognizer.LanguageDetectionRecognizeOnce,
+		"speech_recognizer:LanguageDetectionContinuousLID":  recognizer.LanguageDetectionContinuousLID,
 		"dialog_service_connector:ListenOnce":               dialog_service_connector.ListenOnce,
 		"dialog_service_connector:KWS":                      dialog_service_connector.KWS,
 		"dialog_service_connector:ListenOnceFromStream":     dialog_service_connector.ListenOnceFromStream,

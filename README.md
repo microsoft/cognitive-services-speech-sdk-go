@@ -12,6 +12,75 @@ Get started with [text-to-speech sample for Go](https://docs.microsoft.com/azure
 
 This project requires Go 1.13
 
+# Features
+
+## Language Detection
+
+The Speech SDK supports automatic language detection for speech recognition. You can specify a list of candidate languages, and the SDK will detect which language is being spoken.
+
+### Basic Usage
+
+```go
+import (
+    "fmt"
+    "github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+    "github.com/Microsoft/cognitive-services-speech-sdk-go/common"
+    "github.com/Microsoft/cognitive-services-speech-sdk-go/speech"
+)
+
+// Create speech config
+config, _ := speech.NewSpeechConfigFromSubscription("YourKey", "YourRegion")
+defer config.Close()
+
+// Create auto-detect config with candidate languages
+autoDetectConfig, _ := speech.NewAutoDetectSourceLanguageConfigFromLanguages(
+    []string{"en-US", "de-DE", "es-MX"})
+defer autoDetectConfig.Close()
+
+// Create recognizer with auto-detect
+recognizer, _ := speech.NewSpeechRecognizerFomAutoDetectSourceLangConfig(
+    config, autoDetectConfig, nil)
+defer recognizer.Close()
+
+// Recognize
+result, _ := recognizer.RecognizeOnce()
+defer result.Close()
+
+// Get detected language using the helper class
+autoDetectResult := speech.NewAutoDetectSourceLanguageResultFromSpeechRecognitionResult(result)
+fmt.Printf("Detected: %s\n", autoDetectResult.Language)
+fmt.Printf("Text: %s\n", result.Text)
+```
+
+### Language Detection Modes
+
+- **At-Start** (default): Detects language at the beginning of audio (up to 10 candidate languages)
+- **Continuous**: Detects language changes throughout audio (up to 4 candidate languages)
+
+```go
+// Enable Continuous mode for code-switching scenarios
+config.SetProperty(common.SpeechServiceConnectionLanguageIDMode, "Continuous")
+
+autoDetectConfig, _ := speech.NewAutoDetectSourceLanguageConfigFromLanguages(
+    []string{"en-US", "de-DE", "es-MX", "ja-JP"})  // Up to 4 for Continuous mode
+
+recognizer, _ := speech.NewSpeechRecognizerFomAutoDetectSourceLangConfig(
+    config, autoDetectConfig, nil)
+
+// In your event handler:
+recognizer.Recognized(func(event speech.SpeechRecognitionEventArgs) {
+    autoDetectResult := speech.NewAutoDetectSourceLanguageResultFromSpeechRecognitionResult(&event.Result)
+    fmt.Printf("Language: %s, Text: %s\n", autoDetectResult.Language, event.Result.Text)
+})
+```
+
+### Examples
+
+- [Recognize Once with Language Detection](samples/recognizer/language_detection_recognize_once.go)
+- [Continuous Recognition with Continuous LID](samples/recognizer/language_detection_continuous_lid.go)
+
+For more details, see [Language Detection Quick Reference](LANGUAGE_DETECTION_QUICK_REFERENCE.md).
+
 # Reference
 
 Reference documentation for these packages is available at http://aka.ms/csspeech/goref
