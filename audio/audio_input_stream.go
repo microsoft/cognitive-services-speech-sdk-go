@@ -65,6 +65,7 @@ func CreatePushAudioInputStream() (*PushAudioInputStream, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer format.Close()
 	return CreatePushAudioInputStreamFromFormat(format)
 }
 
@@ -222,5 +223,6 @@ func CreatePullStream(callback PullAudioInputStreamCallback) (*PullAudioInputStr
 	if err != nil {
 		return nil, err
 	}
+	defer format.Close()
 	return CreatePullStreamFromFormat(callback, format)
 }
