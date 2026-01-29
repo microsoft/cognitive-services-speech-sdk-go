@@ -65,6 +65,7 @@ func CreatePushAudioInputStream() (*PushAudioInputStream, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer format.Close()
 	return CreatePushAudioInputStreamFromFormat(format)
 }
 
