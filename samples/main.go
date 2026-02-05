@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/conversation_transcriber"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/dialog_service_connector"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/recognizer"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/synthesizer"
@@ -33,6 +34,8 @@ func main() {
 		"speech_recognizer:RecognizeOnceFromALAWFile":       recognizer.RecognizeOnceFromALAWFile,
 		"speech_recognizer:ContinuousFromMicrophone":        recognizer.ContinuousFromMicrophone,
 		"speech_recognizer:RecognizeContinuousUsingWrapper": recognizer.RecognizeContinuousUsingWrapper,
+		"conversation_transcriber:ContinuousFromMicrophone": conversation_transcriber.ContinuousFromMicrophone,
+		"conversation_transcriber:TranscribeFromFile":       conversation_transcriber.TranscribeFromFile,
 		"dialog_service_connector:ListenOnce":               dialog_service_connector.ListenOnce,
 		"dialog_service_connector:KWS":                      dialog_service_connector.KWS,
 		"dialog_service_connector:ListenOnceFromStream":     dialog_service_connector.ListenOnceFromStream,
