@@ -64,15 +64,81 @@ Legacy `diagnostics` package stays available with `Deprecated:` markers guiding 
 - Native event callbacks arrive on SDK worker threads.
 - `EventLogger` protects state with a mutex; callback handlers should be fast and non-blocking.
 
+## Quick Start
+
+```go
+import "github.com/Microsoft/cognitive-services-speech-sdk-go/diagnostics/logging"
+
+// File logging
+logging.FileLogger.Start("/tmp/speech.log")
+defer logging.FileLogger.Stop()
+
+// Memory logging with dump
+logging.MemoryLogger.Start()
+defer logging.MemoryLogger.Stop()
+logging.TraceInfo("recognized: %s", result.Text)
+lines := logging.MemoryLogger.DumpToSlice()
+
+// Event-based logging
+logging.EventLogger.SetCallback(func(msg string) {
+    fmt.Println(msg)
+})
+defer logging.EventLogger.SetCallback(nil)
+
+// Console logging
+logging.ConsoleLogger.Start()
+defer logging.ConsoleLogger.Stop()
+
+// Set log level
+logging.FileLogger.SetLevel(logging.Error)
+```
+
 ## Testing
 
-`logging/logging_test.go` contains pure unit tests and integration tests gated by `SPEECH_SDK_AVAILABLE=1`. Integration tests verify start/stop, filters, levels, file append, trace no-crash, and event callback lifecycle.
+49 tests total (3 in `diagnostics_test.go`, 46 in `logging/logging_test.go`).
+
+Integration tests are gated by `SPEECH_SDK_AVAILABLE=1`; pure unit tests (e.g. `TestLevelString`, `TestLoggingError`) run unconditionally.
+
+| Area | Tests |
+|------|-------|
+| **MemoryLogger** | Start/Stop idempotent, DumpToFile, DumpToSlice content verification, DumpToStderr, DumpToWriter (content, error path, bytes.Buffer), DumpOnExit (valid path, stderr-only, bad directory), SetFilters (multi), SetLevel (all levels), RoundTrip, nil writer, empty/whitespace/bad-dir path validation |
+| **EventLogger** | Callback registration, callback receives trace, callback replacement, unregister without register, SetFilters (multi), SetLevel (all levels) |
+| **FileLogger** | Start/Stop, append mode, overwrite mode, double stop, SetFilters, SetLevel (all levels), empty/whitespace/bad-dir path validation |
+| **ConsoleLogger** | Start/Stop, stderr mode, SetFilters, SetLevel |
+| **Trace** | All four levels, WithCaller variants (all levels), format args |
+| **Level** | String() for all values + unknown |
+| **Error** | Error message format |
+
+## File Inventory
+
+| File | Purpose |
+|------|---------|
+| `logging/doc.go` | Package documentation |
+| `logging/level.go` | Level type and constants |
+| `logging/error.go` | Error wrapper |
+| `logging/cfunctions.go` | CGo trampoline for event callbacks |
+| `logging/file_logger.go` | FileLogger singleton |
+| `logging/memory_logger.go` | MemoryLogger singleton |
+| `logging/event_logger.go` | EventLogger singleton |
+| `logging/console_logger.go` | ConsoleLogger singleton |
+| `logging/spx_trace.go` | Trace helpers |
+| `logging/logging_test.go` | All logging tests (46) |
+| `diagnostics.go` | Legacy deprecated API |
+| `diagnostics_test.go` | Legacy tests (3) |
+| `error.go` | Legacy error wrapper |
 
 ## Local Validation
 
 Requirements: Go toolchain, CGo-compatible C compiler, Speech SDK headers and native library.
 
 Key environment variables: `CGO_ENABLED=1`, `CGO_CFLAGS` (header path), `CGO_LDFLAGS` (lib path), `SPEECH_SDK_AVAILABLE=1`.
+
+Run tests via CMake:
+
+```bash
+cmake --build build --target go-tests --config Release
+cmake --build build --target go-tests-race --config Release
+```
 
 ## Extension Guidelines
 
