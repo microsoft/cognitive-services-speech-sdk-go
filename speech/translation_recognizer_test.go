@@ -307,18 +307,8 @@ func ImplTranslationContinuousRecognition(t *testing.T, runToEnd bool) {
 		t.Error("Didn't receive second Recognized event.")
 	}
 	// Check Recognizing events (best-effort, non-fatal)
-	recognizingCount := 0
-	for {
-		select {
-		case <-recognizingFuture:
-			recognizingCount++
-		default:
-			goto doneChecking
-		}
-	}
-doneChecking:
-	if recognizingCount > 0 {
-		t.Logf("Received %d Recognizing event(s).", recognizingCount)
+	if n := len(recognizingFuture); n > 0 {
+		t.Logf("Received %d Recognizing event(s).", n)
 	} else {
 		t.Log("No Recognizing events received (service may skip hypotheses under load).")
 	}
