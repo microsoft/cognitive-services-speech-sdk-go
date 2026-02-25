@@ -80,33 +80,8 @@ The public API had a typo — `Fom` instead of `From` — in two constructor fun
 
 ### Solution
 
-**Corrected functions** (new primary API):
-```go
-// speech/speech_recognizer.go
-func NewSpeechRecognizerFromAutoDetectSourceLangConfig(
-    config *SpeechConfig,
-    langConfig *AutoDetectSourceLanguageConfig,
-    audioConfig *audio.AudioConfig,
-) (*SpeechRecognizer, error)
-
-// speech/speech_synthesizer.go
-func NewSpeechSynthesizerFromAutoDetectSourceLangConfig(
-    config *SpeechConfig,
-    langConfig *AutoDetectSourceLanguageConfig,
-    audioConfig *audio.AudioConfig,
-) (*SpeechSynthesizer, error)
-```
-
-**Deprecated aliases** (backward compatibility):
-```go
-// Deprecated: Use NewSpeechRecognizerFromAutoDetectSourceLangConfig instead.
-func NewSpeechRecognizerFomAutoDetectSourceLangConfig(...) { ... }
-
-// Deprecated: Use NewSpeechSynthesizerFromAutoDetectSourceLangConfig instead.
-func NewSpeechSynthesizerFomAutoDetectSourceLangConfig(...) { ... }
-```
-
-The old misspelled names delegate to the corrected functions, so existing callers are unaffected.
+- **Corrected functions**: `NewSpeechRecognizerFromAutoDetectSourceLangConfig` and `NewSpeechSynthesizerFromAutoDetectSourceLangConfig` (new primary API)
+- **Deprecated aliases**: The old misspelled names (`Fom`) delegate to the corrected functions, so existing callers are unaffected
 
 ### Files Changed
 
@@ -158,20 +133,7 @@ Bash script sourced at test time that:
 4. Validates that required fields are present and non-null
 
 #### `ci/azure-pipelines.yml` (modified)
-Updated test step:
-```yaml
-# Download secrets from Azure Key Vault
-- template: generate-subscription-file.yml
-
-# Run tests with secrets loaded and output redacted
-- script: |
-    export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
-    export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
-    source ci/load-build-secrets.sh
-    go test -v ./speech 2>&1 | global_redact
-  displayName: 'Run Go tests'
-```
+Updated test step that sources secrets, sets CGo flags, and pipes `go test` output through `global_redact`.
 
 #### `.gitignore` (modified)
 Added ignore rules to prevent accidental commit of secrets:
@@ -183,8 +145,10 @@ Added ignore rules to prevent accidental commit of secrets:
 
 Follows the same pattern as the [Carbon pipeline](https://dev.azure.com/speedme/_git/Carbon?path=/ci/pipeline/scripts/load-build-secrets.sh):
 
-- `source ci/load-build-secrets.sh` loads secrets and defines the `global_redact` function in the current shell
+- `set +x` disables trace mode before any secret handling to prevent bash from echoing variable assignments
+- `source ci/load-build-secrets.sh` loads secrets, defines `global_redact`, and redacts both raw and URL-encoded key variants
 - `go test ... 2>&1 | global_redact` pipes all test output through a perl-based streaming filter that replaces subscription keys with `***`
+- Test files redact secrets from memory log dumps at the source via `redactSecrets()` before `t.Log()`
 - Secrets are fetched from Key Vault at runtime, not stored in the repo
 - Service connection: `ADO -> Speech Services - DEV - SDK`
 
@@ -192,9 +156,7 @@ Follows the same pattern as the [Carbon pipeline](https://dev.azure.com/speedme/
 
 ## Full Diff Summary
 
-```
- 25 files changed, 2015 insertions(+), 142 deletions(-)
-```
+- 28 files changed, 2251 insertions(+), 176 deletions(-)
 
 | Category | Files |
 |----------|-------|

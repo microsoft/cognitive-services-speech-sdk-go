@@ -14,6 +14,12 @@
 
 set -euo pipefail
 
+# CRITICAL: Disable trace mode before handling secrets. If the caller
+# had 'set -x' enabled (e.g. for debugging), bash would echo every
+# variable assignment — including the subscription key — to stderr
+# before global_redact is available to filter it.
+set +x
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SECRETS_DIR="${BUILD_SOURCESDIRECTORY:-$REPO_ROOT}/secrets"
@@ -52,6 +58,12 @@ echo "Loaded speech subscription for region: $SPEECH_SUBSCRIPTION_REGION"
 GLOBAL_STRINGS_TO_REDACT=(
   "$SPEECH_SUBSCRIPTION_KEY"
 )
+
+URL_ENCODED_SPEECH_SUBSCRIPTION_KEY=$(jq -nr --arg v "$SPEECH_SUBSCRIPTION_KEY" '$v | @uri')
+if [[ -n "$URL_ENCODED_SPEECH_SUBSCRIPTION_KEY" && "$URL_ENCODED_SPEECH_SUBSCRIPTION_KEY" != "$SPEECH_SUBSCRIPTION_KEY" ]]; then
+  GLOBAL_STRINGS_TO_REDACT+=("$URL_ENCODED_SPEECH_SUBSCRIPTION_KEY")
+fi
+unset URL_ENCODED_SPEECH_SUBSCRIPTION_KEY
 
 redact_input_with() {
   # Redacts known sensitive strings from stdin.
