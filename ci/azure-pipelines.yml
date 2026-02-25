@@ -59,3 +59,18 @@ steps:
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
     go build -v ./...
   displayName: 'Build'
+- script: |
+    export CGO_CFLAGS="-I$HOME/carbon/current/include/c_api"
+    export CGO_LDFLAGS="-L$HOME/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
+
+    if [ -z "$SPEECH_SUBSCRIPTION_KEY" ] || [ -z "$SPEECH_SUBSCRIPTION_REGION" ]; then
+      echo "Missing required secret variables SPEECH_SUBSCRIPTION_KEY and/or SPEECH_SUBSCRIPTION_REGION."
+      exit 1
+    fi
+
+    go test -v ./speech -run 'TestRecognitionWithLanguageAutoDetection|TestSynthesisWithLanguageAutoDetection'
+  displayName: 'Run Go AutoDetect tests'
+  env:
+    SPEECH_SUBSCRIPTION_KEY: $(SPEECH_SUBSCRIPTION_KEY)
+    SPEECH_SUBSCRIPTION_REGION: $(SPEECH_SUBSCRIPTION_REGION)
