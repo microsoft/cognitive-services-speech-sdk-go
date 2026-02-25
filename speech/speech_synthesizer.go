@@ -63,8 +63,8 @@ func NewSpeechSynthesizerFromConfig(config *SpeechConfig, audioConfig *audio.Aud
 	return newSpeechSynthesizerFromHandle(handle)
 }
 
-// NewSpeechSynthesizerFomAutoDetectSourceLangConfig creates a speech synthesizer from a speech config, auto detection source language config and audio config
-func NewSpeechSynthesizerFomAutoDetectSourceLangConfig(config *SpeechConfig, langConfig *AutoDetectSourceLanguageConfig, audioConfig *audio.AudioConfig) (*SpeechSynthesizer, error) {
+// NewSpeechSynthesizerFromAutoDetectSourceLangConfig creates a speech synthesizer from a speech config, auto detection source language config and audio config
+func NewSpeechSynthesizerFromAutoDetectSourceLangConfig(config *SpeechConfig, langConfig *AutoDetectSourceLanguageConfig, audioConfig *audio.AudioConfig) (*SpeechSynthesizer, error) {
 	var handle C.SPXHANDLE
 	if config == nil {
 		return nil, common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))
@@ -85,6 +85,12 @@ func NewSpeechSynthesizerFomAutoDetectSourceLangConfig(config *SpeechConfig, lan
 		return nil, common.NewCarbonError(ret)
 	}
 	return newSpeechSynthesizerFromHandle(handle)
+}
+
+// NewSpeechSynthesizerFomAutoDetectSourceLangConfig is a deprecated alias for NewSpeechSynthesizerFromAutoDetectSourceLangConfig.
+// Deprecated: Use NewSpeechSynthesizerFromAutoDetectSourceLangConfig instead.
+func NewSpeechSynthesizerFomAutoDetectSourceLangConfig(config *SpeechConfig, langConfig *AutoDetectSourceLanguageConfig, audioConfig *audio.AudioConfig) (*SpeechSynthesizer, error) {
+	return NewSpeechSynthesizerFromAutoDetectSourceLangConfig(config, langConfig, audioConfig)
 }
 
 // SpeakTextAsync executes the speech synthesis on plain text, asynchronously.

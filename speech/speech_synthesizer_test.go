@@ -461,7 +461,7 @@ func TestSynthesisWithLanguageAutoDetection(t *testing.T) {
 		t.Error("Got an error: ", err)
 	}
 	defer languageConfig.Close()
-	synthesizer, err := NewSpeechSynthesizerFomAutoDetectSourceLangConfig(config, languageConfig, nil)
+	synthesizer, err := NewSpeechSynthesizerFromAutoDetectSourceLangConfig(config, languageConfig, nil)
 	if err != nil {
 		t.Error("Got an error: ", err)
 	}

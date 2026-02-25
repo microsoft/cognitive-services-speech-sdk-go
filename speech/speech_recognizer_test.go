@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/audio"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 func createSpeechRecognizerFromSubscriptionRegionAndAudioConfig(t *testing.T, subscription string, region string, audioConfig *audio.AudioConfig) *SpeechRecognizer {
@@ -273,4 +274,54 @@ func TestPhraseListGrammarWithoutGrammar(t *testing.T) {
 
 func TestPhraseListGrammarWithGrammar(t *testing.T) {
 	testPhraseList(t, true)
+}
+
+func TestRecognitionWithLanguageAutoDetection(t *testing.T) {
+	subscription := os.Getenv("SPEECH_SUBSCRIPTION_KEY")
+	region := os.Getenv("SPEECH_SUBSCRIPTION_REGION")
+	config, err := NewSpeechConfigFromSubscription(subscription, region)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	defer config.Close()
+	languageConfig, err := NewAutoDetectSourceLanguageConfigFromLanguages([]string{"en-US", "de-DE"})
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	defer languageConfig.Close()
+	audioConfig, err := audio.NewAudioConfigFromWavFileInput("../test_files/turn_on_the_lamp.wav")
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	defer audioConfig.Close()
+	recognizer, err := NewSpeechRecognizerFromAutoDetectSourceLangConfig(config, languageConfig, audioConfig)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	if recognizer == nil {
+		t.Error("Recognizer creation failed")
+		return
+	}
+	defer recognizer.Close()
+	select {
+	case outcome := <-recognizer.RecognizeOnceAsync():
+		if outcome.Error != nil {
+			t.Error("Got an error: ", outcome.Error)
+			return
+		}
+		defer outcome.Result.Close()
+		if outcome.Result.Reason != common.RecognizedSpeech {
+			t.Error("Expected RecognizedSpeech reason, got: ", outcome.Result.Reason)
+		}
+		if outcome.Result.Text == "" {
+			t.Error("Expected non-empty recognition result")
+		}
+		t.Log("Recognized: ", outcome.Result.Text)
+	case <-time.After(5 * time.Second):
+		t.Error("Timeout waiting for recognition result.")
+	}
 }
