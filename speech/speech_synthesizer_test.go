@@ -122,8 +122,8 @@ func TestSynthesizerEvents(t *testing.T) {
 		defer event.Close()
 		t.Logf("SynthesisCompleted, audio length %d", len(event.Result.AudioData))
 		checkSynthesisResult(t, &event.Result, common.SynthesizingAudioCompleted)
-		durationFromProperty := (float64)(event.Result.AudioDuration/time.Millisecond)
-		durationFromAudioBuffer := (float64)(len(event.Result.AudioData)/32)
+		durationFromProperty := (float64)(event.Result.AudioDuration / time.Millisecond)
+		durationFromAudioBuffer := (float64)(len(event.Result.AudioData) / 32)
 		if !almostEqual(durationFromProperty, durationFromAudioBuffer, 150) {
 			t.Errorf("Synthesis duration incorrect (%.2f vs %.2f)", durationFromProperty, durationFromAudioBuffer)
 		}
@@ -461,7 +461,7 @@ func TestSynthesisWithLanguageAutoDetection(t *testing.T) {
 		t.Error("Got an error: ", err)
 	}
 	defer languageConfig.Close()
-	synthesizer, err := NewSpeechSynthesizerFomAutoDetectSourceLangConfig(config, languageConfig, nil)
+	synthesizer, err := NewSpeechSynthesizerFromAutoDetectSourceLangConfig(config, languageConfig, nil)
 	if err != nil {
 		t.Error("Got an error: ", err)
 	}

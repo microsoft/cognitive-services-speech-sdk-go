@@ -29,18 +29,20 @@ func printHelp(executableName string, samples functionMap) {
 
 func main() {
 	samples := functionMap{
-		"speech_recognizer:RecognizeOnceFromWavFile":        recognizer.RecognizeOnceFromWavFile,
-		"speech_recognizer:RecognizeOnceFromCompressedFile": recognizer.RecognizeOnceFromCompressedFile,
-		"speech_recognizer:RecognizeOnceFromALAWFile":       recognizer.RecognizeOnceFromALAWFile,
-		"speech_recognizer:ContinuousFromMicrophone":        recognizer.ContinuousFromMicrophone,
-		"speech_recognizer:RecognizeContinuousUsingWrapper": recognizer.RecognizeContinuousUsingWrapper,
-		"conversation_transcriber:ContinuousFromMicrophone": conversation_transcriber.ContinuousFromMicrophone,
-		"conversation_transcriber:TranscribeFromFile":       conversation_transcriber.TranscribeFromFile,
-		"dialog_service_connector:ListenOnce":               dialog_service_connector.ListenOnce,
-		"dialog_service_connector:KWS":                      dialog_service_connector.KWS,
-		"dialog_service_connector:ListenOnceFromStream":     dialog_service_connector.ListenOnceFromStream,
-		"speech_synthesizer:SynthesisToSpeaker":             synthesizer.SynthesisToSpeaker,
-		"speech_synthesizer:SynthesisToAudioDataStream":     synthesizer.SynthesisToAudioDataStream,
+		"speech_recognizer:RecognizeOnceFromWavFile":                    recognizer.RecognizeOnceFromWavFile,
+		"speech_recognizer:RecognizeOnceFromCompressedFile":             recognizer.RecognizeOnceFromCompressedFile,
+		"speech_recognizer:RecognizeOnceFromALAWFile":                   recognizer.RecognizeOnceFromALAWFile,
+		"speech_recognizer:RecognizeOnceFromAutoDetectSourceLangConfig": recognizer.RecognizeOnceFromAutoDetectSourceLangConfig,
+		"speech_recognizer:ContinuousFromMicrophone":                    recognizer.ContinuousFromMicrophone,
+		"speech_recognizer:RecognizeContinuousUsingWrapper":             recognizer.RecognizeContinuousUsingWrapper,
+		"conversation_transcriber:ContinuousFromMicrophone":             conversation_transcriber.ContinuousFromMicrophone,
+		"conversation_transcriber:TranscribeFromFile":                   conversation_transcriber.TranscribeFromFile,
+		"dialog_service_connector:ListenOnce":                           dialog_service_connector.ListenOnce,
+		"dialog_service_connector:KWS":                                  dialog_service_connector.KWS,
+		"dialog_service_connector:ListenOnceFromStream":                 dialog_service_connector.ListenOnceFromStream,
+		"speech_synthesizer:SynthesisToSpeaker":                         synthesizer.SynthesisToSpeaker,
+		"speech_synthesizer:SynthesisToAudioDataStream":                 synthesizer.SynthesisToAudioDataStream,
+		"speech_synthesizer:SynthesisFromAutoDetectSourceLangConfig":    synthesizer.SynthesisFromAutoDetectSourceLangConfig,
 	}
 	args := os.Args[1:]
 	if len(args) != 4 {
