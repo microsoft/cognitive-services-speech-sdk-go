@@ -95,37 +95,7 @@ logging.FileLogger.SetLevel(logging.Error)
 
 ## Testing
 
-49 tests total (3 in `diagnostics_test.go`, 46 in `logging/logging_test.go`).
-
 Integration tests are gated by `SPEECH_SDK_AVAILABLE=1`; pure unit tests (e.g. `TestLevelString`, `TestLoggingError`) run unconditionally.
-
-| Area | Tests |
-|------|-------|
-| **MemoryLogger** | Start/Stop idempotent, DumpToFile, DumpToSlice content verification, DumpToStderr, DumpToWriter (content, error path, bytes.Buffer), DumpOnExit (valid path, stderr-only, bad directory), SetFilters (multi), SetLevel (all levels), RoundTrip, nil writer, empty/whitespace/bad-dir path validation |
-| **EventLogger** | Callback registration, callback receives trace, callback replacement, unregister without register, SetFilters (multi), SetLevel (all levels) |
-| **FileLogger** | Start/Stop, append mode, overwrite mode, double stop, SetFilters, SetLevel (all levels), empty/whitespace/bad-dir path validation |
-| **ConsoleLogger** | Start/Stop, stderr mode, SetFilters, SetLevel |
-| **Trace** | All four levels, WithCaller variants (all levels), format args |
-| **Level** | String() for all values + unknown |
-| **Error** | Error message format |
-
-## File Inventory
-
-| File | Purpose |
-|------|---------|
-| `logging/doc.go` | Package documentation |
-| `logging/level.go` | Level type and constants |
-| `logging/error.go` | Error wrapper |
-| `logging/cfunctions.go` | CGo trampoline for event callbacks |
-| `logging/file_logger.go` | FileLogger singleton |
-| `logging/memory_logger.go` | MemoryLogger singleton |
-| `logging/event_logger.go` | EventLogger singleton |
-| `logging/console_logger.go` | ConsoleLogger singleton |
-| `logging/spx_trace.go` | Trace helpers |
-| `logging/logging_test.go` | All logging tests (46) |
-| `diagnostics.go` | Legacy deprecated API |
-| `diagnostics_test.go` | Legacy tests (3) |
-| `error.go` | Legacy error wrapper |
 
 ## Local Validation
 
