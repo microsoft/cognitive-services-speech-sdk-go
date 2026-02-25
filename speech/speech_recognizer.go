@@ -73,8 +73,8 @@ func NewSpeechRecognizerFromConfig(config *SpeechConfig, audioConfig *audio.Audi
 	return newSpeechRecognizerFromHandle(handle)
 }
 
-// NewSpeechRecognizerFomAutoDetectSourceLangConfig creates a speech recognizer from a speech config, auto detection source language config and audio config
-func NewSpeechRecognizerFomAutoDetectSourceLangConfig(config *SpeechConfig, langConfig *AutoDetectSourceLanguageConfig, audioConfig *audio.AudioConfig) (*SpeechRecognizer, error) {
+// NewSpeechRecognizerFromAutoDetectSourceLangConfig creates a speech recognizer from a speech config, auto detection source language config and audio config
+func NewSpeechRecognizerFromAutoDetectSourceLangConfig(config *SpeechConfig, langConfig *AutoDetectSourceLanguageConfig, audioConfig *audio.AudioConfig) (*SpeechRecognizer, error) {
 	var handle C.SPXHANDLE
 	if config == nil {
 		return nil, common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))
@@ -95,6 +95,12 @@ func NewSpeechRecognizerFomAutoDetectSourceLangConfig(config *SpeechConfig, lang
 		return nil, common.NewCarbonError(ret)
 	}
 	return newSpeechRecognizerFromHandle(handle)
+}
+
+// NewSpeechRecognizerFomAutoDetectSourceLangConfig is a deprecated alias for NewSpeechRecognizerFromAutoDetectSourceLangConfig.
+// Deprecated: Use NewSpeechRecognizerFromAutoDetectSourceLangConfig instead.
+func NewSpeechRecognizerFomAutoDetectSourceLangConfig(config *SpeechConfig, langConfig *AutoDetectSourceLanguageConfig, audioConfig *audio.AudioConfig) (*SpeechRecognizer, error) {
+	return NewSpeechRecognizerFromAutoDetectSourceLangConfig(config, langConfig, audioConfig)
 }
 
 // NewSpeechRecognizerFromSourceLanguageConfig creates a speech recognizer from a speech config, source language config and audio config
