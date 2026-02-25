@@ -14,6 +14,14 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/diagnostics"
 )
 
+func redactSecrets(s string) string {
+	key := os.Getenv("SPEECH_SUBSCRIPTION_KEY")
+	if key != "" {
+		s = strings.ReplaceAll(s, key, "***")
+	}
+	return s
+}
+
 func setup(t *testing.T) (teardown func()) {
 	logLineAtStart := diagnostics.GetMemoryLogLineNumNewest()
 	diagnostics.StartMemoryLogging()
@@ -30,7 +38,7 @@ func setup(t *testing.T) (teardown func()) {
 				logLines.WriteString(diagnostics.GetMemoryLogLine(i))
 			}
 
-			t.Log(logLines.String())
+			t.Log(redactSecrets(logLines.String()))
 		}
 	}
 }
