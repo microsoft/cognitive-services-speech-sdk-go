@@ -1,57 +1,68 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+
+// Deprecated: Use the diagnostics/logging sub-package instead.
 package diagnostics
 
 // #include <stdlib.h>
 // #include <speechapi_c_diagnostics.h>
 import "C"
-import "unsafe"
+import (
+	"unsafe"
 
-// StartMemoryLogging starts logging to memory
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/diagnostics/logging"
+)
+
+// Deprecated: Use logging.FileLogger.Start() instead.
+func StartFileLogging(filename string, appendMode ...bool) error {
+	return logging.FileLogger.Start(filename, appendMode...)
+}
+
+// Deprecated: Use logging.FileLogger.Stop() instead.
+func StopFileLogging() error {
+	return logging.FileLogger.Stop()
+}
+
+// Deprecated: Use logging.MemoryLogger.Start() instead.
 func StartMemoryLogging() {
-	C.diagnostics_log_memory_start_logging()
+	logging.MemoryLogger.Start()
 }
 
-// StopMemoryLogging stops logging to memory
+// Deprecated: Use logging.MemoryLogger.Stop() instead.
 func StopMemoryLogging() {
-	C.diagnostics_log_memory_stop_logging()
+	logging.MemoryLogger.Stop()
 }
 
-// SetMemoryLogFilters sets filters for memory logging
+// Deprecated: Use logging.MemoryLogger.SetFilters() instead.
 func SetMemoryLogFilters(filters string) {
-	cFilters := C.CString(filters)
-	defer C.free(unsafe.Pointer(cFilters))
-	C.diagnostics_log_memory_set_filters(cFilters)
+	logging.MemoryLogger.SetFilters(filters)
 }
 
-// GetMemoryLogLineNumOldest gets the line number of the oldest memory log entry
+// Deprecated: Use logging.MemoryLogger.DumpToSlice() instead.
 func GetMemoryLogLineNumOldest() uint {
 	return uint(C.diagnostics_log_memory_get_line_num_oldest())
 }
 
-// GetMemoryLogLineNumNewest gets the line number of the newest memory log entry
+// Deprecated: Use logging.MemoryLogger.DumpToSlice() instead.
 func GetMemoryLogLineNumNewest() uint {
 	return uint(C.diagnostics_log_memory_get_line_num_newest())
 }
 
-// GetMemoryLogLine gets a specific line from the memory log
+// Deprecated: Use logging.MemoryLogger.DumpToSlice() instead.
 func GetMemoryLogLine(lineNum uint) string {
 	cLine := C.diagnostics_log_memory_get_line(C.size_t(lineNum))
 	if cLine == nil {
 		return ""
 	}
 	return C.GoString(cLine)
-
 }
 
-// DumpMemoryLogToStderr dumps the memory log to stderr
+// Deprecated: Use logging.MemoryLogger.DumpToStderr() instead.
 func DumpMemoryLogToStderr() error {
-	ret := uintptr(C.diagnostics_log_memory_dump_to_stderr())
-	if ret != 0 {
-		return newDiagnosticsError("dumpMemoryLogToStderr", ret)
-	}
-	return nil
+	return logging.MemoryLogger.DumpToStderr()
 }
 
-// DumpMemoryLog dumps the memory log to a file and/or standard output
+// Deprecated: Use logging.MemoryLogger.Dump() instead.
 func DumpMemoryLog(filename string, linePrefix string, emitToStdOut bool, emitToStdErr bool) error {
 	var cFilename *C.char
 	if filename != "" {
@@ -70,38 +81,22 @@ func DumpMemoryLog(filename string, linePrefix string, emitToStdOut bool, emitTo
 	return nil
 }
 
-// DumpMemoryLogOnExit dumps the memory log when the program exits
+// Deprecated: Use logging.MemoryLogger.DumpOnExit() instead.
 func DumpMemoryLogOnExit(filename string, linePrefix string, emitToStdOut bool, emitToStdErr bool) error {
-	var cFilename *C.char
-	if filename != "" {
-		cFilename = C.CString(filename)
-		defer C.free(unsafe.Pointer(cFilename))
-	}
-	var cLinePrefix *C.char
-	if linePrefix != "" {
-		cLinePrefix = C.CString(linePrefix)
-		defer C.free(unsafe.Pointer(cLinePrefix))
-	}
-	ret := uintptr(C.diagnostics_log_memory_dump_on_exit(cFilename, cLinePrefix, C.bool(emitToStdOut), C.bool(emitToStdErr)))
-	if ret != 0 {
-		return newDiagnosticsError("dumpMemoryLogOnExit", ret)
-	}
-	return nil
+	return logging.MemoryLogger.DumpOnExit(filename, linePrefix, emitToStdOut, emitToStdErr)
 }
 
-// StartConsoleLogging starts logging to the console
-func StartConsoleLogging(logToStderr bool) {
-	C.diagnostics_log_console_start_logging(C.bool(logToStderr))
+// Deprecated: Use logging.ConsoleLogger.Start() instead.
+func StartConsoleLogging(logToStderr ...bool) {
+	logging.ConsoleLogger.Start(logToStderr...)
 }
 
-// StopConsoleLogging stops logging to the console
+// Deprecated: Use logging.ConsoleLogger.Stop() instead.
 func StopConsoleLogging() {
-	C.diagnostics_log_console_stop_logging()
+	logging.ConsoleLogger.Stop()
 }
 
-// SetConsoleLogFilters sets filters for console logging
+// Deprecated: Use logging.ConsoleLogger.SetFilters() instead.
 func SetConsoleLogFilters(filters string) {
-	cFilters := C.CString(filters)
-	defer C.free(unsafe.Pointer(cFilters))
-	C.diagnostics_log_console_set_filters(cFilters)
+	logging.ConsoleLogger.SetFilters(filters)
 }
