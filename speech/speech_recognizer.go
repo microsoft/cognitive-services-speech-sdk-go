@@ -449,6 +449,17 @@ func (grammar *PhraseListGrammar) AddPhrase(text string) error {
 	return nil
 }
 
+// SetWeight sets the weight of the phrase list grammar. The weight is used to bias the speech recognition
+// towards the phrases in the grammar. A higher weight increases the likelihood that phrases in the list
+// will be recognized.
+func (grammar *PhraseListGrammar) SetWeight(weight float64) error {
+	ret := uintptr(C.phrase_list_grammar_set_weight(grammar.handle, C.double(weight)))
+	if ret != C.SPX_NOERROR {
+		return common.NewCarbonError(ret)
+	}
+	return nil
+}
+
 // Clears all phrases from the phrase list grammar.
 func (grammar *PhraseListGrammar) Clear() error {
 	ret := uintptr(C.phrase_list_grammar_clear(grammar.handle))
