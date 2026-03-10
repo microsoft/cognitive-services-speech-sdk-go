@@ -276,6 +276,95 @@ func TestPhraseListGrammarWithGrammar(t *testing.T) {
 	testPhraseList(t, true)
 }
 
+func TestPhraseListGrammarSetWeightValid(t *testing.T) {
+	recognizer := createSpeechRecognizerFromFileInput(t, "../test_files/peloozoid.wav")
+	if recognizer == nil {
+		return
+	}
+	defer recognizer.Close()
+	phraseListGrammar, err := NewPhraseListGrammarFromRecognizer(recognizer)
+	if err != nil {
+		t.Error("Grammar creation failed")
+	}
+	defer phraseListGrammar.Close()
+	phraseListGrammar.AddPhrase("peloozoid")
+
+	err = phraseListGrammar.SetWeight(2.0)
+	if err != nil {
+		t.Errorf("SetWeight(2.0) returned unexpected error: %v", err)
+	}
+
+	var result *SpeechRecognitionResult
+	select {
+	case outcome := <-recognizer.RecognizeOnceAsync():
+		if outcome.Error != nil {
+			t.Error("Received an error")
+		}
+		result = outcome.Result
+	case <-time.After(5 * time.Second):
+		t.Error("Timeout waiting for result.")
+	}
+	defer result.Close()
+	if !strings.Contains(strings.ToLower(result.Text), "peloozoid") {
+		t.Log(result.Text)
+		t.Errorf("Expected 'peloozoid' with weight 2.0, got '%s'", result.Text)
+	}
+}
+
+func TestPhraseListGrammarSetWeightInvalid(t *testing.T) {
+	recognizer := createSpeechRecognizerFromFileInput(t, "../test_files/peloozoid.wav")
+	if recognizer == nil {
+		return
+	}
+	defer recognizer.Close()
+	phraseListGrammar, err := NewPhraseListGrammarFromRecognizer(recognizer)
+	if err != nil {
+		t.Error("Grammar creation failed")
+	}
+	defer phraseListGrammar.Close()
+
+	invalidWeights := []float64{-1.0, 3.0, 100.0}
+	for _, w := range invalidWeights {
+		err = phraseListGrammar.SetWeight(w)
+		if err == nil {
+			t.Errorf("SetWeight(%.1f) should have returned an error", w)
+		}
+	}
+}
+
+func TestPhraseListGrammarClearRemovesPhrases(t *testing.T) {
+	recognizer := createSpeechRecognizerFromFileInput(t, "../test_files/peloozoid.wav")
+	if recognizer == nil {
+		return
+	}
+	defer recognizer.Close()
+	phraseListGrammar, err := NewPhraseListGrammarFromRecognizer(recognizer)
+	if err != nil {
+		t.Error("Grammar creation failed")
+	}
+	defer phraseListGrammar.Close()
+
+	phraseListGrammar.AddPhrase("peloozoid")
+	phraseListGrammar.SetWeight(2.0)
+	phraseListGrammar.Clear()
+
+	var result *SpeechRecognitionResult
+	select {
+	case outcome := <-recognizer.RecognizeOnceAsync():
+		if outcome.Error != nil {
+			t.Error("Received an error")
+		}
+		result = outcome.Result
+	case <-time.After(5 * time.Second):
+		t.Error("Timeout waiting for result.")
+	}
+	defer result.Close()
+	if strings.Contains(strings.ToLower(result.Text), "peloozoid") {
+		t.Log(result.Text)
+		t.Error("Expected 'peloozoid' to NOT be recognized after Clear()")
+	}
+}
+
 func TestRecognitionWithLanguageAutoDetection(t *testing.T) {
 	subscription := os.Getenv("SPEECH_SUBSCRIPTION_KEY")
 	region := os.Getenv("SPEECH_SUBSCRIPTION_REGION")

@@ -16,6 +16,9 @@ import (
 // #include <speechapi_c_factory.h>
 // #include <speechapi_c_grammar.h>
 //
+// /* Forward declaration for phrase list grammar weight support */
+// SPXAPI phrase_list_grammar_set_weight(SPXGRAMMARHANDLE hgrammar, double weight);
+//
 // /* Proxy functions forward declarations */
 // void cgo_recognizer_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_recognizer_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
@@ -443,6 +446,17 @@ func (grammar *PhraseListGrammar) AddPhrase(text string) error {
 	defer phrase.Close()
 
 	ret := uintptr(C.phrase_list_grammar_add_phrase(grammar.handle, phrase.handle))
+	if ret != C.SPX_NOERROR {
+		return common.NewCarbonError(ret)
+	}
+	return nil
+}
+
+// SetWeight sets the weight of the phrase list grammar. The weight is used to bias the speech recognition
+// towards the phrases in the grammar. A higher weight increases the likelihood that phrases in the list
+// will be recognized.
+func (grammar *PhraseListGrammar) SetWeight(weight float64) error {
+	ret := uintptr(C.phrase_list_grammar_set_weight(grammar.handle, C.double(weight)))
 	if ret != C.SPX_NOERROR {
 		return common.NewCarbonError(ret)
 	}

@@ -35,6 +35,7 @@ func main() {
 		"speech_recognizer:RecognizeOnceFromAutoDetectSourceLangConfig": recognizer.RecognizeOnceFromAutoDetectSourceLangConfig,
 		"speech_recognizer:ContinuousFromMicrophone":                    recognizer.ContinuousFromMicrophone,
 		"speech_recognizer:RecognizeContinuousUsingWrapper":             recognizer.RecognizeContinuousUsingWrapper,
+		"speech_recognizer:RecognizeOnceWithPhraseList":                 recognizer.RecognizeOnceWithPhraseList,
 		"conversation_transcriber:ContinuousFromMicrophone":             conversation_transcriber.ContinuousFromMicrophone,
 		"conversation_transcriber:TranscribeFromFile":                   conversation_transcriber.TranscribeFromFile,
 		"dialog_service_connector:ListenOnce":                           dialog_service_connector.ListenOnce,
