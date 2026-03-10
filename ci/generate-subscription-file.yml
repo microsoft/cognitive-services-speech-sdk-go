@@ -1,0 +1,17 @@
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+#
+# This file defines a reusable step that downloads the subscriptions JSON from Azure Key Vault
+# and writes it to a local file for use by load-build-secrets.sh.
+steps:
+- task: AzureKeyVault@2
+  inputs:
+    azureSubscription: 'ADO -> Speech Services - DEV - SDK'
+    keyVaultName: "CarbonSDK-CICD"
+    secretsFilter: 'CarbonSubscriptionsJson'
+- task: file-creator@6
+  inputs:
+    filepath: '$(Build.SourcesDirectory)/secrets/test.subscriptions.regions.json'
+    filecontent: '$(CarbonSubscriptionsJson)'
+    fileoverwrite: true
+  displayName: "Ensure subscriptions .json file"

@@ -30,7 +30,7 @@ func setupConversation(t *testing.T) (teardown func()) {
 				logLines.WriteString(diagnostics.GetMemoryLogLine(i))
 			}
 
-			t.Log(logLines.String())
+			t.Log(redactSecrets(logLines.String()))
 		}
 	}
 }
@@ -222,14 +222,14 @@ func TestConversationTranscriberSingleSpeaker(t *testing.T) {
 
 	transcribingFuture := make(chan bool)
 	transcribedFuture := make(chan bool)
-	
+
 	transcribedHandler := func(event ConversationTranscriptionEventArgs) {
 		defer event.Close()
 		t.Log("Transcribed text: ", event.Result.Text)
 		t.Log("Speaker ID: ", event.Result.SpeakerID)
 		transcribedFuture <- true
 	}
-	
+
 	transcribingHandler := func(event ConversationTranscriptionEventArgs) {
 		defer event.Close()
 		t.Log("Transcribing text: ", event.Result.Text)
@@ -239,16 +239,16 @@ func TestConversationTranscriberSingleSpeaker(t *testing.T) {
 		default:
 		}
 	}
-	
+
 	transcriber.Transcribed(transcribedHandler)
 	transcriber.Transcribing(transcribingHandler)
-	
+
 	// Start transcribing
 	err := <-transcriber.StartTranscribingAsync()
 	if err != nil {
 		t.Error("Got error: ", err)
 	}
-	
+
 	// Wait for transcribing event
 	select {
 	case <-transcribingFuture:
@@ -256,7 +256,7 @@ func TestConversationTranscriberSingleSpeaker(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Error("Timeout waiting for Transcribing event.")
 	}
-	
+
 	// Wait for transcribed event
 	select {
 	case <-transcribedFuture:
@@ -264,7 +264,7 @@ func TestConversationTranscriberSingleSpeaker(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Error("Timeout waiting for Transcribed event.")
 	}
-	
+
 	// Stop transcribing
 	err = <-transcriber.StopTranscribingAsync()
 	if err != nil {
@@ -290,65 +290,65 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 		t.Error("Got an error ", err.Error())
 	}
 	defer format.Close()
-	
+
 	stream, err := audio.CreatePushAudioInputStreamFromFormat(format)
 	if err != nil {
 		t.Error("Got an error ", err.Error())
 	}
 	defer stream.Close()
-	
+
 	audioConfig, err := audio.NewAudioConfigFromStreamInput(stream)
 	if err != nil {
 		t.Error("Got an error ", err.Error())
 	}
 	defer audioConfig.Close()
-	
+
 	transcriber := createConversationTranscriberFromAudioConfig(t, audioConfig)
 	if transcriber == nil {
 		t.Error("Transcriber creation failed")
 		return
 	}
 	defer transcriber.Close()
-	
+
 	firstResult := true
 	transcribedFuture := make(chan string, 10)
 	transcribingFuture := make(chan string, 10)
 	sessionStoppedFuture := make(chan bool, 1)
 	canceledFuture := make(chan bool, 1)
-	
+
 	// Channel to collect speaker IDs
 	speakerIDsChan := make(chan string, 200)
-	
+
 	transcribedHandler := func(event ConversationTranscriptionEventArgs) {
 		defer event.Close()
 		firstResult = true
 		t.Log("Transcribed: ", event.Result.Text)
 		t.Log("Speaker ID: ", event.Result.SpeakerID)
-		
+
 		// Send speaker ID to the channel if it's not empty
 		if event.Result.SpeakerID != "" && event.Result.SpeakerID != "Unknown" {
 			speakerIDsChan <- event.Result.SpeakerID
 		}
-		
+
 		transcribedFuture <- "Transcribed"
 	}
-	
+
 	transcribingHandler := func(event ConversationTranscriptionEventArgs) {
 		defer event.Close()
 		t.Log("Transcribing: ", event.Result.Text)
 		t.Log("Speaker ID: ", event.Result.SpeakerID)
-		
+
 		// Send speaker ID to the channel if it's not empty
 		if event.Result.SpeakerID != "" && event.Result.SpeakerID != "Unknown" {
 			speakerIDsChan <- event.Result.SpeakerID
 		}
-		
+
 		if firstResult {
 			firstResult = false
 			transcribingFuture <- "Transcribing"
 		}
 	}
-	
+
 	transcriber.Transcribed(transcribedHandler)
 	transcriber.Transcribing(transcribingHandler)
 	transcriber.SessionStopped(func(event SessionEventArgs) {
@@ -364,18 +364,18 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 		}
 		t.Error("Canceled was not due to EOS " + event.ErrorDetails)
 	})
-	
+
 	err = <-transcriber.StartTranscribingAsync()
 	if err != nil {
 		t.Error("Got error: ", err)
 	}
-	
+
 	// Pump audio data into the stream
 	pumpFileIntoStream(t, "../test_files/katiesteve_mono.wav", stream)
 	pumpFileIntoStream(t, "../test_files/katiesteve_mono.wav", stream)
 	pumpSilenceIntoStream(t, stream)
 	stream.CloseStream()
-	
+
 	// Wait for first transcribing event
 	select {
 	case <-transcribingFuture:
@@ -383,7 +383,7 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 	case <-time.After(30 * time.Second):
 		t.Error("Didn't receive first Transcribing event.")
 	}
-	
+
 	// Wait for first transcribed event
 	select {
 	case <-transcribedFuture:
@@ -391,7 +391,7 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 	case <-time.After(30 * time.Second):
 		t.Error("Didn't receive first Transcribed event.")
 	}
-	
+
 	// Wait for second transcribing event
 	select {
 	case <-transcribingFuture:
@@ -399,7 +399,7 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 	case <-time.After(30 * time.Second):
 		t.Error("Didn't receive second Transcribing event.")
 	}
-	
+
 	// Wait for second transcribed event
 	select {
 	case <-transcribedFuture:
@@ -407,12 +407,12 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 	case <-time.After(30 * time.Second):
 		t.Error("Didn't receive second Transcribed event.")
 	}
-	
+
 	err = <-transcriber.StopTranscribingAsync()
 	if err != nil {
 		t.Error("Got error: ", err)
 	}
-	
+
 	// Wait for session stopped event
 	select {
 	case <-sessionStoppedFuture:
@@ -420,22 +420,22 @@ func TestConversationTranscriberContinuousRecognition(t *testing.T) {
 	case <-time.After(30 * time.Second):
 		t.Error("Timeout waiting for SessionStopped event.")
 	}
-	
+
 	// Close the speaker ID channel to signal we're done collecting IDs
 	close(speakerIDsChan)
-	
+
 	// Collect unique speaker IDs
 	uniqueSpeakerIDs := make(map[string]bool)
 	for speakerID := range speakerIDsChan {
 		uniqueSpeakerIDs[speakerID] = true
 	}
-	
+
 	// Verify that more than one speaker ID was detected
 	if len(uniqueSpeakerIDs) <= 1 {
-		t.Errorf("Expected more than 1 unique speaker ID, but got %d: %v", 
+		t.Errorf("Expected more than 1 unique speaker ID, but got %d: %v",
 			len(uniqueSpeakerIDs), getKeysFromMap(uniqueSpeakerIDs))
 	} else {
-		t.Logf("Successfully detected %d unique speaker IDs: %v", 
+		t.Logf("Successfully detected %d unique speaker IDs: %v",
 			len(uniqueSpeakerIDs), getKeysFromMap(uniqueSpeakerIDs))
 	}
 }
