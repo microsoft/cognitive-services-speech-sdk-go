@@ -324,3 +324,28 @@ func (synthesizer *SpeechSynthesizer) Close() {
 		synthesizer.handle = C.SPXHANDLE_INVALID
 	}
 }
+
+// SpeakRequestAsync executes the speech synthesis request, asynchronously.
+func (synthesizer SpeechSynthesizer) SpeakRequestAsync(request *SpeechSynthesisRequest) chan SpeechSynthesisOutcome {
+	outcome := make(chan SpeechSynthesisOutcome)
+	go func() {
+		var handle C.SPXRESULTHANDLE
+        var asyncHandle C.SPXASYNCHANDLE
+		ret := uintptr(C.synthesizer_speak_request_async(synthesizer.handle, request.getHandle(), &asyncHandle))
+		if ret != C.SPX_NOERROR {
+			outcome <- SpeechSynthesisOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+		} else {
+            // Wait for completion
+            ret = uintptr(C.synthesizer_speak_async_wait_for(asyncHandle, C.uint32_t(4294967295), &handle))
+            C.synthesizer_async_handle_release(asyncHandle)
+
+            if ret != C.SPX_NOERROR {
+                 outcome <- SpeechSynthesisOutcome{Result: nil, OperationOutcome: common.OperationOutcome{common.NewCarbonError(ret)}}
+            } else {
+			    result, err := NewSpeechSynthesisResultFromHandle(handle2uintptr(handle))
+			    outcome <- SpeechSynthesisOutcome{Result: result, OperationOutcome: common.OperationOutcome{err}}
+            }
+		}
+	}()
+	return outcome
+}
