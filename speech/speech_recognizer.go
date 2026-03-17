@@ -16,9 +16,6 @@ import (
 // #include <speechapi_c_factory.h>
 // #include <speechapi_c_grammar.h>
 //
-// /* Forward declaration for phrase list grammar weight support */
-// SPXAPI phrase_list_grammar_set_weight(SPXGRAMMARHANDLE hgrammar, double weight);
-//
 // /* Proxy functions forward declarations */
 // void cgo_recognizer_session_started(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
 // void cgo_recognizer_session_stopped(SPXRECOHANDLE handle, SPXEVENTHANDLE event, void* context);
