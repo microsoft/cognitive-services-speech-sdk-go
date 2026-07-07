@@ -70,6 +70,28 @@ func NewTranslationRecognizerFromConfig(config *SpeechTranslationConfig, audioCo
 	return newTranslationRecognizerFromHandle(handle)
 }
 
+// NewTranslationRecognizerFromEmbeddedConfig creates a translation recognizer from an embedded (offline)
+// speech config and audio config. The translation model to be used must be set first through
+// EmbeddedSpeechConfig.SetSpeechTranslationModel.
+func NewTranslationRecognizerFromEmbeddedConfig(config *EmbeddedSpeechConfig, audioConfig *audio.AudioConfig) (*TranslationRecognizer, error) {
+	var handle C.SPXHANDLE
+	if config == nil {
+		return nil, common.NewCarbonError(uintptr(C.SPXERR_INVALID_ARG))
+	}
+	configHandle := uintptr2handle(config.GetHandle())
+	var audioHandle C.SPXHANDLE
+	if audioConfig == nil {
+		audioHandle = nil
+	} else {
+		audioHandle = uintptr2handle(audioConfig.GetHandle())
+	}
+	ret := uintptr(C.recognizer_create_translation_recognizer_from_config(&handle, configHandle, audioHandle))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	return newTranslationRecognizerFromHandle(handle)
+}
+
 // NewTranslationRecognizerFromAutoDetectSourceLangConfig creates a translation recognizer from a speech translation config, auto detection source language config and audio config.
 func NewTranslationRecognizerFromAutoDetectSourceLangConfig(config *SpeechTranslationConfig, langConfig *AutoDetectSourceLanguageConfig, audioConfig *audio.AudioConfig) (*TranslationRecognizer, error) {
 	var handle C.SPXHANDLE

@@ -10,6 +10,7 @@ import (
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/conversation_transcriber"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/dialog_service_connector"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/embedded"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/recognizer"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/synthesizer"
 )
@@ -44,6 +45,10 @@ func main() {
 		"speech_synthesizer:SynthesisToSpeaker":                         synthesizer.SynthesisToSpeaker,
 		"speech_synthesizer:SynthesisToAudioDataStream":                 synthesizer.SynthesisToAudioDataStream,
 		"speech_synthesizer:SynthesisFromAutoDetectSourceLangConfig":    synthesizer.SynthesisFromAutoDetectSourceLangConfig,
+		"embedded:RecognizeOnceFromWavFile":                             embedded.RecognizeOnceFromWavFile,
+		"embedded:RecognizeContinuousFromWavFile":                       embedded.RecognizeContinuousFromWavFile,
+		"embedded:SynthesisToWavFile":                                   embedded.SynthesisToWavFile,
+		"embedded:TranslateOnceFromWavFile":                             embedded.TranslateOnceFromWavFile,
 	}
 	args := os.Args[1:]
 	if len(args) != 4 {

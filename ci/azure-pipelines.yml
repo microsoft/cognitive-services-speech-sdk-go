@@ -23,7 +23,7 @@ schedules:
 pool:
   vmImage: ubuntu-latest
 variables:
-  CARBON_VERSION: "1.48.2"
+  CARBON_VERSION: "1.50.0"
 
 steps:
 - task: GoTool@0

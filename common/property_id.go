@@ -87,6 +87,19 @@ const (
 	// SpeechServiceConnectionTranslationFeatures is the translation features. For internal use.
 	SpeechServiceConnectionTranslationFeatures PropertyID = 2002
 
+	// SpeechTranslationModelName is the name of the model to be used for embedded (offline) speech translation.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetSpeechTranslationModel.
+	// Added in version 1.19.0
+	SpeechTranslationModelName PropertyID = 13100
+
+	// SpeechTranslationModelKey is the decryption key of the model to be used for embedded (offline) speech
+	// translation.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetSpeechTranslationModel.
+	// Added in version 1.19.0
+	SpeechTranslationModelKey PropertyID = 13101
+
 	// SpeechServiceConnectionRecoMode is the Cognitive Services Speech Service recognition mode. Can be "INTERACTIVE",
 	// "CONVERSATION" or "DICTATION".
 	// This property is intended to be read-only. The SDK is using it internally.
@@ -107,6 +120,19 @@ const (
 	// to the service as URL query parameters.
 	SpeechServiceConnectionUserDefinedQueryParameters PropertyID = 3003
 
+	// SpeechServiceConnectionRecoModelName is the name of the model to be used for embedded (offline) speech recognition.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetSpeechRecognitionModel.
+	// Added in version 1.19.0
+	SpeechServiceConnectionRecoModelName PropertyID = 3005
+
+	// SpeechServiceConnectionRecoModelKey is the decryption key of the model to be used for embedded (offline) speech
+	// recognition.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetSpeechRecognitionModel.
+	// Added in version 1.19.0
+	SpeechServiceConnectionRecoModelKey PropertyID = 3006
+
 	// SpeechServiceConnectionSynthLanguage is the spoken language to be synthesized (e.g. en-US)
 	SpeechServiceConnectionSynthLanguage PropertyID = 3100
 
@@ -123,6 +149,20 @@ const (
 	// and decode it. You can set this property to "false" to use raw pcm format for transmission on wire.
 	// Added in version 1.17.0
 	SpeechServiceConnectionSynthEnableCompressedAudioTransmission PropertyID = 3103
+
+	// SpeechServiceConnectionSynthOfflineVoice is the name of the offline TTS voice to be used for embedded
+	// (offline) speech synthesis.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetSpeechSynthesisVoice.
+	// Added in version 1.19.0
+	SpeechServiceConnectionSynthOfflineVoice PropertyID = 3113
+
+	// SpeechServiceConnectionSynthModelKey is the decryption key of the voice to be used for embedded (offline)
+	// speech synthesis.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetSpeechSynthesisVoice.
+	// Added in version 1.19.0
+	SpeechServiceConnectionSynthModelKey PropertyID = 3114
 
 	// SpeechServiceConnectionInitialSilenceTimeoutMs is the initial silence timeout value (in milliseconds) used by the
 	// service.
@@ -354,4 +394,16 @@ const (
 	// DataBufferUserID is the user id associated to data buffer written by client when using Pull/Push audio
 	// input streams.
 	DataBufferUserID PropertyID = 11002
+
+	// KeywordRecognitionModelName is the name of the model to be used for keyword recognition.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetKeywordRecognitionModel.
+	// Added in version 1.19.0
+	KeywordRecognitionModelName PropertyID = 13200
+
+	// KeywordRecognitionModelKey is the decryption key of the model to be used for keyword recognition.
+	// Under normal circumstances, you shouldn't use this property directly.
+	// Instead, use EmbeddedSpeechConfig.SetKeywordRecognitionModel.
+	// Added in version 1.19.0
+	KeywordRecognitionModelKey PropertyID = 13201
 )

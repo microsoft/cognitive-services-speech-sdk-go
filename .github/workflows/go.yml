@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  CARBON_VERSION: "1.43.0"
+  CARBON_VERSION: "1.50.0"
 
 jobs:
   linux:
@@ -43,6 +43,13 @@ jobs:
         rm SpeechSDK-Linux-$CARBON_VERSION.tar.gz
         ln -s SpeechSDK-Linux-$CARBON_VERSION current
         popd
+    # Embedded (offline) speech: the embedded_speech_config_* / speech_recognition_model_* C
+    # symbols live in the core library and their headers ship in the standard SDK tarball above,
+    # so the bindings compile and link without any extra steps. Actually running embedded
+    # recognition/synthesis additionally requires the embedded runtime extensions
+    # (libMicrosoft.CognitiveServices.Speech.extension.embedded.sr/.tts + onnxruntime) staged next
+    # to the core library, plus licensed on-device models/voices. Those are a Limited Access
+    # feature and are not exercised by CI.
     - name: Get Carbon Dependencies
       run: |
         sudo apt-get update
