@@ -21,7 +21,7 @@ import (
 //	EMBEDDED_MODELS_DIR=/path/to/models
 //
 // The directory is expected to contain:
-//   - rnnt/Models/FP and rnnt/Models/LP  (speech recognition models)
+//   - rnnt/Models/SR                     (speech recognition model)
 //   - rnnt/Models/ST                     (speech translation models)
 //   - audio/whatstheweatherlike.wav      (English utterance)
 //   - audio/de-de/CallTheFirstOne.wav    (German utterance)
@@ -42,11 +42,7 @@ func embeddedModelsDir(t *testing.T) string {
 
 func TestEmbeddedSpeechRecognitionE2E(t *testing.T) {
 	root := embeddedModelsDir(t)
-	modelsRoot := filepath.Join(root, "rnnt", "Models")
-	config, err := NewEmbeddedSpeechConfigFromPaths([]string{
-		filepath.Join(modelsRoot, "FP"),
-		filepath.Join(modelsRoot, "LP"),
-	})
+	config, err := NewEmbeddedSpeechConfigFromPath(filepath.Join(root, "rnnt", "Models", "SR"))
 	if err != nil {
 		t.Fatal("Unexpected error creating embedded speech config: ", err)
 	}
