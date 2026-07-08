@@ -90,14 +90,12 @@ const (
 	// SpeechTranslationModelName is the name of the model to be used for embedded (offline) speech translation.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetSpeechTranslationModel.
-	// Added in version 1.19.0
 	SpeechTranslationModelName PropertyID = 13100
 
 	// SpeechTranslationModelKey is the decryption key of the model to be used for embedded (offline) speech
 	// translation.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetSpeechTranslationModel.
-	// Added in version 1.19.0
 	SpeechTranslationModelKey PropertyID = 13101
 
 	// SpeechServiceConnectionRecoMode is the Cognitive Services Speech Service recognition mode. Can be "INTERACTIVE",
@@ -123,14 +121,12 @@ const (
 	// SpeechServiceConnectionRecoModelName is the name of the model to be used for embedded (offline) speech recognition.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetSpeechRecognitionModel.
-	// Added in version 1.19.0
 	SpeechServiceConnectionRecoModelName PropertyID = 3005
 
 	// SpeechServiceConnectionRecoModelKey is the decryption key of the model to be used for embedded (offline) speech
 	// recognition.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetSpeechRecognitionModel.
-	// Added in version 1.19.0
 	SpeechServiceConnectionRecoModelKey PropertyID = 3006
 
 	// SpeechServiceConnectionSynthLanguage is the spoken language to be synthesized (e.g. en-US)
@@ -154,14 +150,12 @@ const (
 	// (offline) speech synthesis.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetSpeechSynthesisVoice.
-	// Added in version 1.19.0
 	SpeechServiceConnectionSynthOfflineVoice PropertyID = 3113
 
 	// SpeechServiceConnectionSynthModelKey is the decryption key of the voice to be used for embedded (offline)
 	// speech synthesis.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetSpeechSynthesisVoice.
-	// Added in version 1.19.0
 	SpeechServiceConnectionSynthModelKey PropertyID = 3114
 
 	// SpeechServiceConnectionInitialSilenceTimeoutMs is the initial silence timeout value (in milliseconds) used by the
@@ -398,12 +392,10 @@ const (
 	// KeywordRecognitionModelName is the name of the model to be used for keyword recognition.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetKeywordRecognitionModel.
-	// Added in version 1.19.0
 	KeywordRecognitionModelName PropertyID = 13200
 
 	// KeywordRecognitionModelKey is the decryption key of the model to be used for keyword recognition.
 	// Under normal circumstances, you shouldn't use this property directly.
 	// Instead, use EmbeddedSpeechConfig.SetKeywordRecognitionModel.
-	// Added in version 1.19.0
 	KeywordRecognitionModelKey PropertyID = 13201
 )
