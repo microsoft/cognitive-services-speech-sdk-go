@@ -27,10 +27,11 @@ import (
 // Live Interpreter requires the universal v2 endpoint together with open-range language
 // identification, so the config is created with FromEndpoint (not FromSubscription).
 func LiveInterpreterFromFile(subscription string, region string, file string) {
-	// When you use multilingual translation with language identification you must use the v2 endpoint
-	// and create the SpeechTranslationConfig with FromEndpoint.
-	//   Regional form (used here):  wss://<region>.stt.speech.microsoft.com/speech/universal/v2
-	//   Resource form (from docs):  wss://<YourResourceName>.cognitiveservices.azure.com/stt/speech/universal/v2
+	// Live Interpreter requires the universal v2 endpoint, created with FromEndpoint (the same call
+	// the C# reference uses). This sample builds the regional v2 endpoint from the region argument.
+	// If your Speech resource uses a custom domain (for example a unified Azure AI resource), replace
+	// this line with your resource's endpoint, for example:
+	//   wss://<YourResourceName>.cognitiveservices.azure.com/stt/speech/universal/v2
 	endpoint := fmt.Sprintf("wss://%s.stt.speech.microsoft.com/speech/universal/v2", region)
 
 	config, err := speech.NewSpeechTranslationConfigFromEndpointWithSubscription(endpoint, subscription)
