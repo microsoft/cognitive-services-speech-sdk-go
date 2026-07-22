@@ -13,6 +13,7 @@ import (
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/embedded"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/recognizer"
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/synthesizer"
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/samples/translation"
 )
 
 type functionMap = map[string]func(string, string, string)
@@ -49,6 +50,7 @@ func main() {
 		"embedded:RecognizeContinuousFromWavFile":                       embedded.RecognizeContinuousFromWavFile,
 		"embedded:SynthesisToWavFile":                                   embedded.SynthesisToWavFile,
 		"embedded:TranslateOnceFromWavFile":                             embedded.TranslateOnceFromWavFile,
+		"translation:LiveInterpreterFromFile":                           translation.LiveInterpreterFromFile,
 	}
 	args := os.Args[1:]
 	if len(args) != 4 {
