@@ -4,7 +4,9 @@
 package speech
 
 import (
+	"bytes"
 	"time"
+	"unicode/utf8"
 	"unsafe"
 
 	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
@@ -17,6 +19,35 @@ import (
 // #include <speechapi_c_recognizer.h>
 //
 import "C"
+
+const (
+	initialRecognitionResultTextBufferSize = 1024
+	maxRecognitionResultTextBufferSize     = 16 * 1024 * 1024
+)
+
+type recognitionResultTextGetter func(buffer []byte) uintptr
+
+// readRecognitionResultText grows the buffer when the native API reports that
+// it is too small or returns a string that may have been truncated at the end.
+func readRecognitionResultText(getter recognitionResultTextGetter) (string, uintptr) {
+	for bufferSize := initialRecognitionResultTextBufferSize; bufferSize <= maxRecognitionResultTextBufferSize; bufferSize *= 2 {
+		buffer := make([]byte, bufferSize)
+		ret := getter(buffer)
+		if ret == uintptr(C.SPXERR_BUFFER_TOO_SMALL) {
+			continue
+		}
+		if ret != uintptr(C.SPX_NOERROR) {
+			return "", ret
+		}
+
+		terminator := bytes.IndexByte(buffer, 0)
+		if terminator >= 0 && terminator < len(buffer)-utf8.UTFMax {
+			return string(buffer[:terminator]), ret
+		}
+	}
+
+	return "", uintptr(C.SPXERR_BUFFER_TOO_SMALL)
+}
 
 // SpeechRecognitionResult contains detailed information about result of a recognition operation.
 type SpeechRecognitionResult struct {
@@ -67,11 +98,12 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 	}
 	result.Reason = (common.ResultReason)(cReason)
 	/* Text */
-	ret = uintptr(C.result_get_text(result.handle, (*C.char)(buffer), 1024))
+	result.Text, ret = readRecognitionResultText(func(buffer []byte) uintptr {
+		return uintptr(C.result_get_text(result.handle, (*C.char)(unsafe.Pointer(&buffer[0])), C.uint32_t(len(buffer))))
+	})
 	if ret != C.SPX_NOERROR {
 		return nil, common.NewCarbonError(ret)
 	}
-	result.Text = C.GoString((*C.char)(buffer))
 	/* Duration */
 	var cDuration C.uint64_t
 	ret = uintptr(C.result_get_duration(result.handle, &cDuration))
