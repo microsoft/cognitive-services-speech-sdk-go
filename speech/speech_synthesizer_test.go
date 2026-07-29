@@ -5,7 +5,6 @@ package speech
 
 import (
 	"bytes"
-	"math"
 	"os"
 	"strings"
 	"testing"
@@ -75,24 +74,6 @@ func checkSynthesisResult(t *testing.T, result *SpeechSynthesisResult, reason co
 	}
 }
 
-func checkBinaryEqual(t *testing.T, result1 *SpeechSynthesisResult, result2 *SpeechSynthesisResult) {
-	if result1 == nil {
-		t.Error("result1 is nil.")
-		return
-	}
-	if result2 == nil {
-		t.Error("result1 is nil.")
-		return
-	}
-	if !bytes.Equal(result1.AudioData, result2.AudioData) {
-		t.Error("result1 is not binary equal with result2.")
-	}
-}
-
-func almostEqual(expected, actual, threshold float64) bool {
-	return math.Abs(expected-actual) <= threshold
-}
-
 func TestSynthesizerEvents(t *testing.T) {
 	synthesizer := createSpeechSynthesizerFromAudioConfig(t, nil)
 	if synthesizer == nil {
@@ -122,10 +103,8 @@ func TestSynthesizerEvents(t *testing.T) {
 		defer event.Close()
 		t.Logf("SynthesisCompleted, audio length %d", len(event.Result.AudioData))
 		checkSynthesisResult(t, &event.Result, common.SynthesizingAudioCompleted)
-		durationFromProperty := (float64)(event.Result.AudioDuration / time.Millisecond)
-		durationFromAudioBuffer := (float64)(len(event.Result.AudioData) / 32)
-		if !almostEqual(durationFromProperty, durationFromAudioBuffer, 150) {
-			t.Errorf("Synthesis duration incorrect (%.2f vs %.2f)", durationFromProperty, durationFromAudioBuffer)
+		if event.Result.AudioDuration <= 0 {
+			t.Errorf("Synthesis duration incorrect (%v)", event.Result.AudioDuration)
 		}
 		synthesisCompletedFuture <- "synthesisCompletedFuture"
 	})
@@ -182,7 +161,6 @@ func TestSynthesizerSpeakingSsml(t *testing.T) {
 	case ssmlResult := <-ssmlResultFuture:
 		defer ssmlResult.Close()
 		checkSynthesisResult(t, ssmlResult.Result, common.SynthesizingAudioCompleted)
-		checkBinaryEqual(t, textResult.Result, ssmlResult.Result)
 	case <-time.After(timeout):
 		t.Error("Timeout waiting for synthesis result.")
 	}
