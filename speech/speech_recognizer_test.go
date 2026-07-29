@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -445,7 +444,6 @@ func TestMultiChannelRecognition(t *testing.T) {
 	defer recognizer.Close()
 
 	const expectedChannels = 2
-	var mutex sync.Mutex
 	channelResultCounts := make(map[uint32]int)
 	sessionStoppedFuture := make(chan bool, 1)
 
@@ -458,9 +456,7 @@ func TestMultiChannelRecognition(t *testing.T) {
 		// The service may send an empty result for silence on a channel
 		// at the end, therefore count only non-empty transcriptions.
 		if event.Result.Text != "" && channel < expectedChannels {
-			mutex.Lock()
 			channelResultCounts[channel]++
-			mutex.Unlock()
 			t.Logf("Recognized (channel %d): %s", channel, event.Result.Text)
 		}
 	})
@@ -488,8 +484,9 @@ func TestMultiChannelRecognition(t *testing.T) {
 		t.Error("Got an error: ", err)
 	}
 
-	mutex.Lock()
-	defer mutex.Unlock()
+	// The recognizer events are raised in serial order and do not occur in parallel,
+	// and SessionStopped is raised after the recognition results. Thus a map with
+	// channel result counts can be read here without additional synchronization.
 	for channel := uint32(0); channel < expectedChannels; channel++ {
 		if channelResultCounts[channel] != 1 {
 			t.Errorf("Expected 1 result for channel %d, got %d", channel, channelResultCounts[channel])
