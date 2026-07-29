@@ -68,6 +68,10 @@ type SpeechRecognitionResult struct {
 	// Offset of the recognized speech in ticks.
 	Offset time.Duration
 
+	// Channel is the index of the input audio channel where the speech was recognized.
+	// Numbering starts at zero.
+	Channel uint32
+
 	// Collection of additional RecognitionResult properties.
 	Properties *common.PropertyCollection
 }
@@ -118,6 +122,13 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 		return nil, common.NewCarbonError(ret)
 	}
 	result.Offset = time.Nanosecond * time.Duration(100*cOffset)
+	/* Channel */
+	var cChannel C.uint32_t
+	ret = uintptr(C.result_get_channel(result.handle, &cChannel))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	result.Channel = uint32(cChannel)
 	/* Properties */
 	var propBagHandle C.SPXHANDLE
 	ret = uintptr(C.result_get_property_bag(uintptr2handle(handle), &propBagHandle))

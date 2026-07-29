@@ -358,6 +358,11 @@ const (
 	// - The Semantic strategy does not have any adjustable properties.
 	SegmentationStrategy PropertyID = 9004
 
+	// EnableMultiChannelProcessing specifies whether to process stereo input channels separately
+	// instead of downmixing them into a single channel.
+	// Allowed values are "true" and "false". The default is "false".
+	EnableMultiChannelProcessing PropertyID = 9020
+
 	// ConversationApplicationID is the identifier used to connect to the backend service.
 	ConversationApplicationID PropertyID = 10000
 

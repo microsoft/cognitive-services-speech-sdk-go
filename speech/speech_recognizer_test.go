@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -412,5 +413,86 @@ func TestRecognitionWithLanguageAutoDetection(t *testing.T) {
 		t.Log("Recognized: ", outcome.Result.Text)
 	case <-time.After(5 * time.Second):
 		t.Error("Timeout waiting for recognition result.")
+	}
+}
+
+func TestMultiChannelRecognition(t *testing.T) {
+	subscription := os.Getenv("SPEECH_SUBSCRIPTION_KEY")
+	region := os.Getenv("SPEECH_SUBSCRIPTION_REGION")
+	config, err := NewSpeechConfigFromSubscription(subscription, region)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	defer config.Close()
+	// Process the stereo input channels separately instead of downmixing them.
+	err = config.SetProperty(common.EnableMultiChannelProcessing, "true")
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	audioConfig, err := audio.NewAudioConfigFromWavFileInput("../test_files/whatstheweatherlike_8khz_2ch.wav")
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	defer audioConfig.Close()
+	recognizer, err := NewSpeechRecognizerFromConfig(config, audioConfig)
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	defer recognizer.Close()
+
+	const expectedChannels = 2
+	var mutex sync.Mutex
+	channelResultCounts := make(map[uint32]int)
+	sessionStoppedFuture := make(chan bool, 1)
+
+	recognizer.Recognized(func(event SpeechRecognitionEventArgs) {
+		defer event.Close()
+		if event.Result.Reason != common.RecognizedSpeech {
+			return
+		}
+		channel := event.Result.Channel
+		// The service may send an empty result for silence on a channel
+		// at the end, therefore count only non-empty transcriptions.
+		if event.Result.Text != "" && channel < expectedChannels {
+			mutex.Lock()
+			channelResultCounts[channel]++
+			mutex.Unlock()
+			t.Logf("Recognized (channel %d): %s", channel, event.Result.Text)
+		}
+	})
+	recognizer.SessionStopped(func(event SessionEventArgs) {
+		defer event.Close()
+		t.Log("SessionStopped")
+		select {
+		case sessionStoppedFuture <- true:
+		default:
+		}
+	})
+
+	err = <-recognizer.StartContinuousRecognitionAsync()
+	if err != nil {
+		t.Error("Got an error: ", err)
+		return
+	}
+	select {
+	case <-sessionStoppedFuture:
+	case <-time.After(15 * time.Second):
+		t.Error("Timeout waiting for SessionStopped event.")
+	}
+	err = <-recognizer.StopContinuousRecognitionAsync()
+	if err != nil {
+		t.Error("Got an error: ", err)
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+	for channel := uint32(0); channel < expectedChannels; channel++ {
+		if channelResultCounts[channel] != 1 {
+			t.Errorf("Expected 1 result for channel %d, got %d", channel, channelResultCounts[channel])
+		}
 	}
 }
