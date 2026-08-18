@@ -14,7 +14,7 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
       - name: Get Carbon
         run: |
           mkdir /tmp/carbon
@@ -25,7 +25,7 @@ jobs:
           ln -s SpeechSDK-Linux-$CARBON_VERSION current
           popd
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v5
+        uses: golangci/golangci-lint-action@38e1018663fa5173f3968ea0777460d3de38f256 # v5.3.0
         env:
           CGO_CFLAGS: "-I/tmp/carbon/current/include/c_api"
           CGO_LDFLAGS: "-L/tmp/carbon/current/lib/x64 -lMicrosoft.CognitiveServices.Speech.core"
