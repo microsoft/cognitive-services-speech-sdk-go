@@ -19,12 +19,12 @@ jobs:
         go: [1.13, 1.17, 1.18]
     steps:
     - name: Set up Go ${{ matrix.go }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@be3c94b385c4f180051c996d336f57a34c397495 # v3.6.1
       with:
         go-version: ${{ matrix.go }}
       id: go
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
 
     - name: Get dependencies
       run: |
@@ -74,7 +74,7 @@ jobs:
         export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/carbon/current/lib/x64"
         go test -v ./...
     - name: 'Upload Test Logs'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: always()
       with:
         name: Log-${{ matrix.os }}-${{ matrix.go }}
@@ -93,7 +93,7 @@ jobs:
         export HOMEBREW_NO_INSTALL_CLEANUP=1
         brew config && brew install bash
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
 
     - name: Get dependencies
       run: |
