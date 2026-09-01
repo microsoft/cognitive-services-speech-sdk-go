@@ -18,7 +18,11 @@ var sessionStartedCallbacks = make(map[C.SPXHANDLE]SessionEventHandler)
 func registerSessionStartedCallback(handler SessionEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	sessionStartedCallbacks[handle] = handler
+	if handler != nil {
+		sessionStartedCallbacks[handle] = handler
+	} else {
+		delete(sessionStartedCallbacks, handle)
+	}
 }
 
 func getSessionStartedCallback(handle C.SPXHANDLE) SessionEventHandler {
@@ -43,7 +47,11 @@ var sessionStoppedCallbacks = make(map[C.SPXHANDLE]SessionEventHandler)
 func registerSessionStoppedCallback(handler SessionEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	sessionStoppedCallbacks[handle] = handler
+	if handler != nil {
+		sessionStoppedCallbacks[handle] = handler
+	} else {
+		delete(sessionStoppedCallbacks, handle)
+	}
 }
 
 func getSessionStoppedCallback(handle C.SPXHANDLE) SessionEventHandler {
@@ -68,7 +76,11 @@ var speechStartDetectedCallbacks = make(map[C.SPXHANDLE]RecognitionEventHandler)
 func registerSpeechStartDetectedCallback(handler RecognitionEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	speechStartDetectedCallbacks[handle] = handler
+	if handler != nil {
+		speechStartDetectedCallbacks[handle] = handler
+	} else {
+		delete(speechStartDetectedCallbacks, handle)
+	}
 }
 
 func getSpeechStartDetectedCallback(handle C.SPXHANDLE) RecognitionEventHandler {
@@ -93,7 +105,11 @@ var speechEndDetectedCallbacks = make(map[C.SPXHANDLE]RecognitionEventHandler)
 func registerSpeechEndDetectedCallback(handler RecognitionEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	speechEndDetectedCallbacks[handle] = handler
+	if handler != nil {
+		speechEndDetectedCallbacks[handle] = handler
+	} else {
+		delete(speechEndDetectedCallbacks, handle)
+	}
 }
 
 func getSpeechEndDetectedCallback(handle C.SPXHANDLE) RecognitionEventHandler {
@@ -118,7 +134,11 @@ var recognizedCallbacks = make(map[C.SPXHANDLE]SpeechRecognitionEventHandler)
 func registerRecognizedCallback(handler SpeechRecognitionEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	recognizedCallbacks[handle] = handler
+	if handler != nil {
+		recognizedCallbacks[handle] = handler
+	} else {
+		delete(recognizedCallbacks, handle)
+	}
 }
 
 func getRecognizedCallback(handle C.SPXHANDLE) SpeechRecognitionEventHandler {
@@ -143,7 +163,11 @@ var recognizingCallbacks = make(map[C.SPXHANDLE]SpeechRecognitionEventHandler)
 func registerRecognizingCallback(handler SpeechRecognitionEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	recognizingCallbacks[handle] = handler
+	if handler != nil {
+		recognizingCallbacks[handle] = handler
+	} else {
+		delete(recognizingCallbacks, handle)
+	}
 }
 
 func getRecognizingCallback(handle C.SPXHANDLE) SpeechRecognitionEventHandler {
@@ -168,7 +192,11 @@ var canceledCallbacks = make(map[C.SPXHANDLE]SpeechRecognitionCanceledEventHandl
 func registerCanceledCallback(handler SpeechRecognitionCanceledEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	canceledCallbacks[handle] = handler
+	if handler != nil {
+		canceledCallbacks[handle] = handler
+	} else {
+		delete(canceledCallbacks, handle)
+	}
 }
 
 func getCanceledCallback(handle C.SPXHANDLE) SpeechRecognitionCanceledEventHandler {
@@ -193,7 +221,11 @@ var synthesisStartedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandler
 func registerSynthesisStartedCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	synthesisStartedCallbacks[handle] = handler
+	if handler != nil {
+		synthesisStartedCallbacks[handle] = handler
+	} else {
+		delete(synthesisStartedCallbacks, handle)
+	}
 }
 
 func getSynthesisStartedCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
@@ -218,7 +250,11 @@ var synthesizingCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandler)
 func registerSynthesizingCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	synthesizingCallbacks[handle] = handler
+	if handler != nil {
+		synthesizingCallbacks[handle] = handler
+	} else {
+		delete(synthesizingCallbacks, handle)
+	}
 }
 
 func getSynthesizingCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
@@ -243,7 +279,11 @@ var synthesisCompletedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandl
 func registerSynthesisCompletedCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	synthesisCompletedCallbacks[handle] = handler
+	if handler != nil {
+		synthesisCompletedCallbacks[handle] = handler
+	} else {
+		delete(synthesisCompletedCallbacks, handle)
+	}
 }
 
 func getSynthesisCompletedCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
@@ -268,7 +308,11 @@ var synthesisCanceledCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisEventHandle
 func registerSynthesisCanceledCallback(handler SpeechSynthesisEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	synthesisCanceledCallbacks[handle] = handler
+	if handler != nil {
+		synthesisCanceledCallbacks[handle] = handler
+	} else {
+		delete(synthesisCanceledCallbacks, handle)
+	}
 }
 
 func getSynthesisCanceledCallback(handle C.SPXHANDLE) SpeechSynthesisEventHandler {
@@ -293,7 +337,11 @@ var synthesisWordBoundaryCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisWordBou
 func registerSynthesisWordBoundaryCallback(handler SpeechSynthesisWordBoundaryEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	synthesisWordBoundaryCallbacks[handle] = handler
+	if handler != nil {
+		synthesisWordBoundaryCallbacks[handle] = handler
+	} else {
+		delete(synthesisWordBoundaryCallbacks, handle)
+	}
 }
 
 func getSynthesisWordBoundaryCallback(handle C.SPXHANDLE) SpeechSynthesisWordBoundaryEventHandler {
@@ -318,7 +366,11 @@ var synthesisVisemeReceivedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisVisem
 func registerSynthesisVisemeReceivedCallback(handler SpeechSynthesisVisemeEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	synthesisVisemeReceivedCallbacks[handle] = handler
+	if handler != nil {
+		synthesisVisemeReceivedCallbacks[handle] = handler
+	} else {
+		delete(synthesisVisemeReceivedCallbacks, handle)
+	}
 }
 
 func getSynthesisVisemeReceivedCallback(handle C.SPXHANDLE) SpeechSynthesisVisemeEventHandler {
@@ -343,7 +395,11 @@ var synthesisBookmarkReachedCallbacks = make(map[C.SPXHANDLE]SpeechSynthesisBook
 func registerSynthesisBookmarkReachedCallback(handler SpeechSynthesisBookmarkEventHandler, handle C.SPXHANDLE) {
 	mu.Lock()
 	defer mu.Unlock()
-	synthesisBookmarkReachedCallbacks[handle] = handler
+	if handler != nil {
+		synthesisBookmarkReachedCallbacks[handle] = handler
+	} else {
+		delete(synthesisBookmarkReachedCallbacks, handle)
+	}
 }
 
 func getSynthesisBookmarkReachedCallback(handle C.SPXHANDLE) SpeechSynthesisBookmarkEventHandler {
