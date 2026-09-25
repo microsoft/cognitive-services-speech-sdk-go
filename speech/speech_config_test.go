@@ -4,8 +4,9 @@
 package speech
 
 import (
-	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 	"testing"
+
+	"github.com/Microsoft/cognitive-services-speech-sdk-go/common"
 )
 
 func TestFromSubscription(t *testing.T) {
@@ -71,4 +72,58 @@ func TestPropertiesByString(t *testing.T) {
 		t.Error("Propery value not valid")
 	}
 
+}
+
+func TestModel(t *testing.T) {
+	config, err := NewSpeechConfigFromSubscription("test", "region")
+	if err != nil {
+		t.Fatalf("NewSpeechConfigFromSubscription returned an error: %v", err)
+	}
+	defer config.Close()
+
+	if model := config.Model(); model != "" {
+		t.Fatalf("Model() = %q, want empty string", model)
+	}
+
+	const model = "test-model"
+	if err := config.SetModel(model); err != nil {
+		t.Fatalf("SetModel(%q) returned an error: %v", model, err)
+	}
+	if got := config.Model(); got != model {
+		t.Fatalf("Model() = %q, want %q", got, model)
+	}
+
+	if err := config.SetModel(""); err != nil {
+		t.Fatalf("SetModel(\"\") returned an error: %v", err)
+	}
+	if model := config.Model(); model != "" {
+		t.Fatalf("Model() after clear = %q, want empty string", model)
+	}
+}
+
+func TestTranslationConfigModel(t *testing.T) {
+	config, err := NewSpeechTranslationConfigFromSubscription("test", "region")
+	if err != nil {
+		t.Fatalf("NewSpeechTranslationConfigFromSubscription returned an error: %v", err)
+	}
+	defer config.Close()
+
+	if model := config.Model(); model != "" {
+		t.Fatalf("Model() = %q, want empty string", model)
+	}
+
+	const model = "test-model"
+	if err := config.SetModel(model); err != nil {
+		t.Fatalf("SetModel(%q) returned an error: %v", model, err)
+	}
+	if got := config.Model(); got != model {
+		t.Fatalf("Model() = %q, want %q", got, model)
+	}
+
+	if err := config.SetModel(""); err != nil {
+		t.Fatalf("SetModel(\"\") returned an error: %v", err)
+	}
+	if model := config.Model(); model != "" {
+		t.Fatalf("Model() after clear = %q, want empty string", model)
+	}
 }
