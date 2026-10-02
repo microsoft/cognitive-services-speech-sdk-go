@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
