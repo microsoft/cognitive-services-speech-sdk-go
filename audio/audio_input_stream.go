@@ -82,6 +82,35 @@ func (stream PushAudioInputStream) Write(buffer []byte) error {
 	return nil
 }
 
+// Commit requests that the audio written so far be finalized as a completed
+// segment, on all channels, without ending the current recognition turn.
+// The call is non-blocking. On success it returns a commit token (>= 1) that
+// is echoed back in the CommitToken field of the recognition result that
+// closes the committed segment. A token of 0 means the request was rejected
+// (more than one commit per 100 ms on this stream, or an audio format that
+// does not support commit) and nothing is sent to the service.
+// A non-zero token does not guarantee an acknowledgment: the commit may be
+// dropped if the service does not support it, or if the session ends first.
+func (stream PushAudioInputStream) Commit() (uint32, error) {
+	var token C.uint32_t
+	ret := uintptr(C.push_audio_input_stream_commit(stream.handle, &token))
+	if ret != C.SPX_NOERROR {
+		return 0, common.NewCarbonError(ret)
+	}
+	return uint32(token), nil
+}
+
+// CommitChannel is like Commit, but scoped to a single (0-indexed) channel of
+// multichannel audio input.
+func (stream PushAudioInputStream) CommitChannel(channelID uint32) (uint32, error) {
+	var token C.uint32_t
+	ret := uintptr(C.push_audio_input_stream_commit_channel(stream.handle, (C.uint32_t)(channelID), &token))
+	if ret != C.SPX_NOERROR {
+		return 0, common.NewCarbonError(ret)
+	}
+	return uint32(token), nil
+}
+
 // SetProperty sets value of a property. The properties of the audio data should be set before writing the audio data.
 func (stream PushAudioInputStream) SetProperty(id common.PropertyID, value string) error {
 	v := C.CString(value)
