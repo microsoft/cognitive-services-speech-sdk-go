@@ -6,7 +6,7 @@ package speech
 import (
 	"bytes"
 	"encoding/binary"
-	"os"
+	"io/ioutil"
 	"testing"
 	"time"
 
@@ -31,7 +31,7 @@ func enableInlineCommit(t *testing.T, config *SpeechConfig) {
 
 // readWavData returns the format and audio samples (data chunk) of a WAV file.
 func readWavData(t *testing.T, filename string) (sampleRate uint32, bitsPerSample uint8, channels uint8, data []byte) {
-	content, err := os.ReadFile(filename)
+	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		t.Fatal("Error reading file: ", err)
 	}
