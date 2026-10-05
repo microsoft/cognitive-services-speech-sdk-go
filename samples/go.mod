@@ -1,6 +1,6 @@
 module github.com/Microsoft/cognitive-services-speech-sdk-go/samples
 
-require github.com/Microsoft/cognitive-services-speech-sdk-go v1.51.1
+require github.com/Microsoft/cognitive-services-speech-sdk-go v1.52.0
 
 replace github.com/Microsoft/cognitive-services-speech-sdk-go => ../
 
