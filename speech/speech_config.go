@@ -14,6 +14,8 @@ import (
 // #include <speechapi_c_speech_config.h>
 import "C"
 
+const speechModelNameProperty = "SPEECH-ModelName"
+
 // SpeechConfig is the class that defines configurations for speech recognition or speech synthesis.
 type SpeechConfig struct {
 	handle     C.SPXHANDLE
@@ -199,6 +201,18 @@ func (config *SpeechConfig) SpeechRecognitionLanguage() string {
 // SetSpeechRecognitionLanguage sets the input language to the speech recognizer.
 func (config *SpeechConfig) SetSpeechRecognitionLanguage(language string) error {
 	return config.SetProperty(common.SpeechServiceConnectionRecoLanguage, language)
+}
+
+// Model is the model configured for speech recognition.
+// An empty string means the service default is used.
+func (config *SpeechConfig) Model() string {
+	return config.GetPropertyByString(speechModelNameProperty)
+}
+
+// SetModel sets the model to use for speech recognition.
+// An empty string clears the configured model and uses the service default.
+func (config *SpeechConfig) SetModel(model string) error {
+	return config.SetPropertyByString(speechModelNameProperty, model)
 }
 
 // OutputFormat is result output format.

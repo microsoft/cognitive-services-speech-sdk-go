@@ -72,6 +72,10 @@ type SpeechRecognitionResult struct {
 	// Numbering starts at zero.
 	Channel uint32
 
+	// CommitToken is the token of the commit (see audio.PushAudioInputStream.Commit)
+	// that this result acknowledges, or 0 if the result is not a commit acknowledgment.
+	CommitToken uint32
+
 	// Collection of additional RecognitionResult properties.
 	Properties *common.PropertyCollection
 }
@@ -129,6 +133,13 @@ func NewSpeechRecognitionResultFromHandle(handle common.SPXHandle) (*SpeechRecog
 		return nil, common.NewCarbonError(ret)
 	}
 	result.Channel = uint32(cChannel)
+	/* CommitToken */
+	var cCommitToken C.uint32_t
+	ret = uintptr(C.result_get_commit_token(result.handle, &cCommitToken))
+	if ret != C.SPX_NOERROR {
+		return nil, common.NewCarbonError(ret)
+	}
+	result.CommitToken = uint32(cCommitToken)
 	/* Properties */
 	var propBagHandle C.SPXHANDLE
 	ret = uintptr(C.result_get_property_bag(uintptr2handle(handle), &propBagHandle))
