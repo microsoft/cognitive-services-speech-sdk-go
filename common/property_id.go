@@ -73,6 +73,14 @@ const (
 	// Hostnames are separated by commas and are matched in a case-insensitive manner. Wildcards are not supported.
 	SpeechServiceConnectionProxyHostBypass PropertyID = 1105
 
+	// SpeechServiceConnectionEnableIPv6 enables IPv6 for Speech service connections. Set it to "true" with
+	// SpeechConfig.SetProperty before creating a recognizer or synthesizer to allow IPv6 and IPv4.
+	// It defaults to "false"; on Windows and Linux, the SDK then resolves IPv4 addresses only.
+	// On macOS, iOS, and UWP, platform networking may use IPv6 regardless of this setting.
+	// Values "true" and "false" are case-insensitive; "1" and "0" are also accepted.
+	// Surrounding whitespace is ignored; unrecognized values are treated as "false".
+	SpeechServiceConnectionEnableIPv6 PropertyID = 1106
+
 	// SpeechServiceConnectionTranslationToLanguages is the list of comma separated languages used as target translation
 	// languages. Under normal circumstances, you shouldn't have to use this property directly.
 	// Instead use SpeechTranslationConfig.AddTargetLanguage and SpeechTranslationConfig.GetTargetLanguages.
