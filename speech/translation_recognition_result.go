@@ -185,11 +185,23 @@ func NewTranslationRecognitionCanceledEventArgsFromHandle(handle common.SPXHandl
 // TranslationSynthesisEventArgs represents the event arguments for a translation synthesis event.
 type TranslationSynthesisEventArgs struct {
 	SessionEventArgs
-	Result *TranslationSynthesisResult
+	Result       *TranslationSynthesisResult
+	resultHandle C.SPXRESULTHANDLE
+}
+
+// Close releases the underlying resources.
+func (event TranslationSynthesisEventArgs) Close() {
+	C.recognizer_result_handle_release(event.resultHandle)
+	event.SessionEventArgs.Close()
 }
 
 // NewTranslationSynthesisEventArgsFromHandle creates a TranslationSynthesisEventArgs from a handle.
 func NewTranslationSynthesisEventArgsFromHandle(handle common.SPXHandle) (*TranslationSynthesisEventArgs, error) {
+	base, err := NewSessionEventArgsFromHandle(handle)
+	if err != nil {
+		return nil, err
+	}
+
 	var resultHandle C.SPXRESULTHANDLE
 	ret := uintptr(C.recognizer_recognition_event_get_result(uintptr2handle(handle), &resultHandle))
 	if ret != C.SPX_NOERROR {
@@ -198,10 +210,15 @@ func NewTranslationSynthesisEventArgsFromHandle(handle common.SPXHandle) (*Trans
 
 	result, err := NewTranslationSynthesisResultFromHandle(handle2uintptr(resultHandle))
 	if err != nil {
+		C.recognizer_result_handle_release(resultHandle)
 		return nil, err
 	}
 
-	return &TranslationSynthesisEventArgs{Result: result}, nil
+	event := new(TranslationSynthesisEventArgs)
+	event.SessionEventArgs = *base
+	event.Result = result
+	event.resultHandle = resultHandle
+	return event, nil
 }
 
 // Event handler types
