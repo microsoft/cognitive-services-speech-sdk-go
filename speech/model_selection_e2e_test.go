@@ -24,15 +24,6 @@ func TestMAITranscribe2StreamingModelSelectionE2E(t *testing.T) {
 	if subscription == "" || region == "" {
 		t.Fatal("SPEECH_SUBSCRIPTION_KEY and SPEECH_SUBSCRIPTION_REGION are required")
 	}
-	supportedRegions := map[string]bool{
-		"centralus":     true,
-		"eastus2":       true,
-		"southeastasia": true,
-		"swedencentral": true,
-	}
-	if !supportedRegions[strings.ToLower(region)] {
-		t.Fatalf("MAI-Transcribe-2-Streaming is not available in region %q", region)
-	}
 
 	config, err := NewSpeechConfigFromSubscription(subscription, region)
 	if err != nil {
