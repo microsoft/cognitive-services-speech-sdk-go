@@ -212,7 +212,13 @@ func (config *SpeechConfig) Model() string {
 // SetModel sets the model to use for speech recognition.
 // An empty string clears the configured model and uses the service default.
 func (config *SpeechConfig) SetModel(model string) error {
-	return config.SetPropertyByString(speechModelNameProperty, model)
+	m := C.CString(model)
+	defer C.free(unsafe.Pointer(m))
+	ret := uintptr(C.speech_config_set_model(config.handle, m))
+	if ret != C.SPX_NOERROR {
+		return common.NewCarbonError(ret)
+	}
+	return nil
 }
 
 // OutputFormat is result output format.
