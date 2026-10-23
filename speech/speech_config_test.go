@@ -85,7 +85,7 @@ func TestModel(t *testing.T) {
 		t.Fatalf("Model() = %q, want empty string", model)
 	}
 
-	const model = "test-model"
+	const model = "mai-transcribe-2-streaming"
 	if err := config.SetModel(model); err != nil {
 		t.Fatalf("SetModel(%q) returned an error: %v", model, err)
 	}
@@ -112,7 +112,7 @@ func TestTranslationConfigModel(t *testing.T) {
 		t.Fatalf("Model() = %q, want empty string", model)
 	}
 
-	const model = "test-model"
+	const model = "mai-transcribe-2-streaming"
 	if err := config.SetModel(model); err != nil {
 		t.Fatalf("SetModel(%q) returned an error: %v", model, err)
 	}
